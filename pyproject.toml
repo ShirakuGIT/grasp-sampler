@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grasp-sampler"
+version = "0.1.0"
+description = "A simple, mesh-based parallel-jaw grasp sampler"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = [
+    "numpy>=1.21",
+    "trimesh>=3.20",
+    "scipy>=1.7",
+]
+
+[project.optional-dependencies]
+viz = ["pyglet<2"]                          # interactive trimesh viewer
+sim = ["pybullet>=3.2", "imageio>=2.9"]     # pybullet collision filter + viewer
+docs = ["sphinx>=7.0", "myst-parser>=2.0", "furo>=2024.1"]
+dev = ["pytest>=7.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

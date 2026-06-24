@@ -1,0 +1,4 @@
+# Core runtime dependencies. For the interactive viewer also: pip install "pyglet<2"
+numpy>=1.21
+trimesh>=3.20
+scipy>=1.7

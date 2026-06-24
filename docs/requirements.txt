@@ -1,0 +1,5 @@
+# Docs build (Read the Docs installs the package with its [docs] extra, but this
+# file lets you build locally: pip install -r docs/requirements.txt)
+sphinx>=7.0
+myst-parser>=2.0
+furo>=2024.1
