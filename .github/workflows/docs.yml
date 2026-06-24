@@ -3,9 +3,9 @@ name: docs
 # Build the Sphinx docs and publish them to GitHub Pages on every push to main.
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
   workflow_dispatch:
 
 permissions:
@@ -42,7 +42,7 @@ jobs:
 
   deploy:
     # Only deploy from main; PRs just build as a check.
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     needs: build
     runs-on: ubuntu-latest
     environment:
