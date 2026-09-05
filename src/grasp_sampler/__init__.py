@@ -15,6 +15,9 @@ from .primitives import side_grasps, top_grasps
 from .sampler import GraspSampler
 from .transforms import stack_poses, tcp_to_ee, to_world
 from .types import Grasp, GraspConfig, ObjMesh
+from .uncertainty import PoseUncertainty, GeometryUncertainty, ObjectHypothesis, sample_hypotheses
+from .robust import (RobustGraspEvaluator, RobustGraspResult, GeometricGraspBackend,
+                    FixedGraspResult, HypothesisGraspResult, RankedGrasp, rank_grasps)
 
 __version__ = "0.1.0"
 
@@ -31,4 +34,7 @@ __all__ = [
     "stack_poses",
     "to_world",
     "tcp_to_ee",
+    "PoseUncertainty", "GeometryUncertainty", "ObjectHypothesis", "sample_hypotheses",
+    "RobustGraspEvaluator", "RobustGraspResult", "GeometricGraspBackend",
+    "FixedGraspResult", "HypothesisGraspResult", "RankedGrasp", "rank_grasps",
 ]

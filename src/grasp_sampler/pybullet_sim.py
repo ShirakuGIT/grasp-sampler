@@ -138,6 +138,40 @@ def collision_filter(mesh_path: str, grasps: list[Grasp], *, clearance: float = 
         p.disconnect(cid)
 
 
+def fixed_pose_collision_check(mesh, poses, opening_width, config):
+    """Optional robust-backend callback: body clearance at object-local poses.
+
+    Uses the supplied hypothesis vertices exactly (no file loading, centering,
+    or convexification). This is the existing palm/stem proxy, NOT fingers,
+    robot links, continuous collision detection, or dynamic closure/lift.
+    Each client is isolated from other running PyBullet sessions.
+    """
+    import pybullet
+    from pybullet_utils.bullet_client import BulletClient
+
+    p = BulletClient(connection_mode=pybullet.DIRECT)
+    try:
+        shape = p.createCollisionShape(p.GEOM_MESH,
+            vertices=np.asarray(mesh.vertices).tolist(),
+            indices=np.asarray(mesh.faces).ravel().tolist(),
+            flags=p.GEOM_FORCE_CONCAVE_TRIMESH)
+        obj = p.createMultiBody(baseMass=0, baseCollisionShapeIndex=shape)
+        shapes, frames = _gripper_links(p, opening_width, config.finger_len, body_only=True)
+        # Place each proxy component at its actual TCP-local offset. The legacy
+        # compound helper's base reset loses its base-shape offset.
+        bodies = [p.createMultiBody(baseMass=0, baseCollisionShapeIndex=s) for s in shapes]
+        for pose in poses:
+            for body, offset in zip(bodies, frames):
+                pos = pose[:3, 3] + pose[:3, :3] @ offset
+                p.resetBasePositionAndOrientation(body, pos.tolist(), _quat_from_matrix(pose[:3, :3]))
+                pts = p.getClosestPoints(obj, body, distance=max(config.spine_clearance, 1e-4))
+                if any(c[8] < config.spine_clearance for c in pts):
+                    return False
+        return True
+    finally:
+        p.disconnect()
+
+
 def show_grasps(mesh_path: str, grasps: list[Grasp], *, max_grasps: int | None = None,
                 finger_len: float = 0.04, hold: bool = True) -> None:
     """Open a PyBullet GUI with the object and a gripper proxy at each grasp."""

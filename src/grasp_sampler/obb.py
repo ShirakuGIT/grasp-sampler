@@ -55,5 +55,5 @@ def _obb_frame(obj: ObjMesh):
     aabb_vol = float(np.prod(obj.extents))
     obb_vol = float(np.prod(obj.obb_extents))
     if not (0.85 * aabb_vol <= obb_vol <= 1.15 * aabb_vol):
-        return np.eye(3), obj.extents.copy(), np.zeros(3)
+        return np.eye(3), obj.extents.copy(), obj.mesh.bounding_box.centroid.copy()
     return obj.obb_transform[:3, :3], obj.obb_extents, obj.obb_transform[:3, 3]

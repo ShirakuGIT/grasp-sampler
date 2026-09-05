@@ -56,7 +56,9 @@ def antipodal_grasps(obj: ObjMesh, cfg: GraspConfig,
             pose[:3, :3] = np.column_stack([closing, y, z])
             pose[:3, 3] = center
             grasps.append(Grasp(pose, "antipodal", width,
-                                meta={"facet": int(facet_id)}))
+                                meta={"facet": int(facet_id),
+                                      "contact_geometry": "mesh" if proxy is mesh else "convex_hull",
+                                      "contact_geometry_policy": cfg.contact_geometry_policy}))
             if len(grasps) >= cfg.antipodal_max_grasps:
                 return grasps
     return grasps
@@ -78,7 +80,7 @@ def _opposing_contact(proxy, p1, n1, cone, cfg):
         n2 = proxy.face_normals[tri[j]]
         closing = (locs[j] - p1) / width          # unit closing line p1 -> p2
         # Force closure: closing line inside both friction cones.
-        if np.dot(-n1, closing) >= cone and np.dot(n2, closing) >= cone:
+        if friction_cones_valid(n1, n2, closing, cone):
             return locs[j], n2, width, closing
     return None
 
@@ -119,6 +121,12 @@ def _approach_dirs(closing, facets, cfg):
 
 def _ray_cast_proxy(mesh, cfg):
     """Return a solid, ray-castable proxy. Hollow scans fall back to the hull."""
+    if cfg.contact_geometry_policy == "mesh":
+        return mesh
+    if cfg.contact_geometry_policy == "convex_hull":
+        return mesh.convex_hull
+    if cfg.contact_geometry_policy != "existing_auto_policy":
+        raise ValueError("unknown contact_geometry_policy")
     try:
         hull = mesh.convex_hull
         if hull.volume > 0 and mesh.volume / hull.volume < cfg.hull_volume_ratio:
@@ -126,6 +134,11 @@ def _ray_cast_proxy(mesh, cfg):
     except Exception:
         pass
     return mesh
+
+
+def friction_cones_valid(n1, n2, closing, cone):
+    """Outward normals: -n1 and +n2 must align with p1 -> p2 (+TCP X)."""
+    return bool(np.dot(-np.asarray(n1), closing) >= cone and np.dot(n2, closing) >= cone)
 
 
 def _body_clears(mesh, pq, center, closing, approach, half, cfg) -> bool:

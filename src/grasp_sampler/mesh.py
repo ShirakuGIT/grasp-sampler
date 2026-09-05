@@ -14,8 +14,14 @@ _R_X90 = np.array([[1, 0, 0, 0],
                    [0, 0, 0, 1]], float)
 
 
-def load_mesh(path, *, upright_transform: np.ndarray | None = _R_X90) -> ObjMesh:
-    """Load a mesh file, stand it upright, and center it at its OBB centroid.
+def load_mesh(path, *, upright_transform: np.ndarray | None = _R_X90,
+              center: bool = True, process: bool = True) -> ObjMesh:
+    """Load geometry, optionally orient it and center its axis-aligned bounds.
+
+    Use ``center=False, upright_transform=None`` to preserve the file frame.
+    Scene node transforms are baked into scene coordinates. ``source_to_mesh``
+    maps those coordinates into the returned mesh frame; compose a perception
+    pose as ``T_W_mesh = T_W_source @ inv(obj.source_to_mesh)``.
 
     Parameters
     ----------
@@ -24,15 +30,30 @@ def load_mesh(path, *, upright_transform: np.ndarray | None = _R_X90) -> ObjMesh
     upright_transform : (4, 4) array or None
         Applied before centering. Defaults to a Y-up -> Z-up rotation. Pass
         ``None`` if the mesh is already oriented as you want it.
+    center : bool
+        Translate the axis-aligned bounds centroid to zero (default True).
+    process : bool
+        Retain trimesh's default vertex merging/cleanup. Set False to preserve
+        raw vertices/topology too; this is independent of frame preservation.
     """
-    raw = trimesh.load(str(path), force="scene")
-    mesh = (trimesh.util.concatenate(list(raw.geometry.values()))
-            if isinstance(raw, trimesh.Scene) else raw)
+    raw = trimesh.load(str(path), force="scene", process=process)
+    if isinstance(raw, trimesh.Scene):
+        mesh = (raw.to_geometry() if hasattr(raw, "to_geometry")
+                else raw.dump(concatenate=True))
+    else:
+        mesh = raw
     mesh = trimesh.Trimesh(vertices=np.asarray(mesh.vertices, float),
                            faces=np.asarray(mesh.faces), process=False)
+    source_to_mesh = np.eye(4)
     if upright_transform is not None:
         mesh.apply_transform(upright_transform)
-    mesh.apply_translation(-mesh.bounding_box.centroid)
+        source_to_mesh = np.asarray(upright_transform, float).copy()
+    if center:
+        shift = -mesh.bounding_box.centroid
+        mesh.apply_translation(shift)
+        translation = np.eye(4)
+        translation[:3, 3] = shift
+        source_to_mesh = translation @ source_to_mesh
 
     extents = np.asarray(mesh.bounding_box.extents, float)
     try:
@@ -42,7 +63,8 @@ def load_mesh(path, *, upright_transform: np.ndarray | None = _R_X90) -> ObjMesh
         obb_transform = np.eye(4)
         obb_extents = extents.copy()
 
-    return ObjMesh(mesh, extents, obb_transform, obb_extents, _classify(extents, mesh))
+    return ObjMesh(mesh, extents, obb_transform, obb_extents,
+                   _classify(extents, mesh), source_to_mesh)
 
 
 def _classify(extents: np.ndarray, mesh: trimesh.Trimesh) -> str:

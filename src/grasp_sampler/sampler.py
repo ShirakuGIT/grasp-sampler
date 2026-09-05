@@ -38,9 +38,11 @@ class GraspSampler:
             ex = obj.extents
             for pose, meta in top_grasps(ex, max_width=cfg.gripper_max_width,
                                          yaw_steps=cfg.primitive_yaw_steps):
+                pose[:3, 3] += obj.mesh.bounding_box.centroid
                 grasps.append(Grasp(pose, meta["type"], meta["span"], meta))
             for pose, meta in side_grasps(ex, max_width=cfg.gripper_max_width,
                                           roll_steps=cfg.primitive_roll_steps):
+                pose[:3, 3] += obj.mesh.bounding_box.centroid
                 grasps.append(Grasp(pose, meta["type"], meta["span"], meta))
         if "obb_face" in methods:
             grasps += obb_face_grasps(obj, cfg)

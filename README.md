@@ -57,7 +57,18 @@ Grasps use the standard tool-center-point (TCP) convention:
 `tcp_to_ee` converts to the Franka Panda flange frame (closing on +Y, flange
 `0.105 m` behind the TCP). Pass a different `remap` / `standoff` for other grippers.
 
-## Visualize
+## Robust evaluation under perceived object uncertainty
+
+See [the uncertainty guide](docs/uncertainty.md) and run:
+
+```bash
+python examples/robust_grasp_demo.py assets/meshes/pocky_box_metric_fp.glb
+```
+
+The robot command stays fixed; only hypothetical object geometry and pose vary.
+The existing generators and their default behavior remain available.
+
+## Visualize grasps
 
 ```bash
 python examples/visualize.py object.glb
