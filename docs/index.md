@@ -19,7 +19,7 @@ It combines three classic generators behind one API:
 | `obb_face`   | Grasps centered on the oriented bounding box faces    |
 | `antipodal`  | Dex-Net-style force-closure contacts via ray casting  |
 
-No simulator, no robot model, no GPU — just NumPy, trimesh, and SciPy. An
+No simulator, no robot model, no GPU — just NumPy, trimesh, SciPy, and Open3D. An
 optional PyBullet module adds collision checking and a 3-D viewer.
 
 ```{toctree}
@@ -28,6 +28,7 @@ optional PyBullet module adds collision checking and a 3-D viewer.
 
 installation
 usage
+uncertainty
 visualization
 configuration
 api

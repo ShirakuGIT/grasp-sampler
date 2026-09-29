@@ -11,7 +11,7 @@ It combines three classic generators:
 | `obb_face`   | Grasps centered on the oriented bounding box faces |
 | `antipodal`  | Dex-Net-style force-closure contacts found by ray casting |
 
-No simulator, no robot model, no GPU. Just NumPy, trimesh, and SciPy.
+No simulator, no robot model, no GPU. Just NumPy, trimesh, SciPy, and Open3D.
 
 ## Install
 
@@ -66,6 +66,13 @@ python examples/robust_grasp_demo.py assets/meshes/pocky_box_metric_fp.glb
 ```
 
 The robot command stays fixed; only hypothetical object geometry and pose vary.
+`generate_robust_grasp_set` returns grasps whose success rate over sampled
+perturbations meets a threshold, validated on an independent bank:
+
+```bash
+python examples/visualize_robust_set.py assets/meshes/ycb_cracker_box_metric_fp.glb
+```
+
 The existing generators and their default behavior remain available.
 
 ## Visualize grasps
@@ -135,9 +142,14 @@ src/grasp_sampler/
   transforms.py   object-local -> world -> flange poses
   sampler.py      GraspSampler facade
   viz.py          trimesh gripper-wireframe viewer
+  uncertainty.py  pose/geometry hypothesis sampling
+  robust.py       fixed-command evaluation + validity backends
+  robust_set.py   robust grasp-set generation
+  robust_viz.py   matplotlib uncertainty viewer
 examples/
   basic.py        generate + convert to robot poses
   visualize.py    generate + view
+  robust_grasp_demo.py, visualize_robust.py, visualize_robust_set.py
 ```
 
 ## License

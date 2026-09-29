@@ -14,8 +14,9 @@ from dataclasses import dataclass, field, replace
 from typing import Protocol
 import numpy as np
 import trimesh
+from scipy.spatial.transform import Rotation
 
-from .antipodal import _body_clears, _ray_cast_proxy, friction_cones_valid
+from .antipodal import _body_clears, _bodies_clear, _ray_cast_proxy, friction_cones_valid
 from .types import GraspConfig
 from .uncertainty import validate_pose
 
@@ -106,14 +107,102 @@ class GeometricGraspBackend:
         if self.check_body:
             pq = trimesh.proximity.ProximityQuery(mesh)
             # Check both fixed open width during approach and final contact width.
-            if (not all(_body_clears(mesh, pq, p[:3, 3], closing, approach, half, cfg) for p in poses)
-                    or not _body_clears(mesh, pq, center, closing, approach, width / 2, cfg)):
+            if not _bodies_clear(mesh, pq, [(p[:3, 3], half) for p in poses] + [(center, width / 2)],
+                                 closing, approach, cfg):
                 return result(False, "body_or_approach_collision", width, contacts)
         if self.collision_checker is not None:
             metadata["additional_collision_checker"] = True
             if not self.collision_checker(mesh, poses, opening_width, cfg):
                 return result(False, "backend_collision", width, contacts)
         return result(True, "valid", width, contacts)
+
+
+class SymmetricPointBackend(GeometricGraspBackend):
+    """Named baseline backend: the original symmetric point-contact model."""
+
+    def __init__(self, config=None, **kwargs):
+        kwargs.setdefault("contact_tolerance", 0.002)
+        super().__init__(config, **kwargs)
+
+
+class FinitePadFixedObjectBackend(GeometricGraspBackend):
+    """Finite contact-pad approximation with the object held fixed.
+
+    Rays still identify the first surface contacts, but a finite pad can absorb
+    a bounded left/right stopping mismatch. No object pose is changed.
+    """
+
+    def __init__(self, config=None, *, pad_radius=0.003, **kwargs):
+        if not np.isfinite(pad_radius) or pad_radius <= 0:
+            raise ValueError("pad_radius must be positive")
+        kwargs.setdefault("contact_tolerance", 2.0 * pad_radius)
+        super().__init__(config, **kwargs)
+        self.pad_radius = float(pad_radius)
+
+    def evaluate(self, mesh, **kwargs):
+        result = super().evaluate(mesh, **kwargs)
+        result.metadata["closure_backend"] = "finite_pad_fixed_object"
+        result.metadata["pad_radius"] = self.pad_radius
+        result.metadata["object_motion"] = False
+        return result
+
+
+class FinitePadQuasistaticBackend(FinitePadFixedObjectBackend):
+    """Finite pads plus bounded, explicitly modeled contact recentering.
+
+    This is not execution noise: the command remains fixed while the physical
+    object is allowed to translate/rotate toward the configured nominal pose
+    after contact. The correction is bounded and recorded in diagnostics.
+    """
+
+    def __init__(self, config=None, *, max_object_translation=0.004,
+                 max_object_rotation=np.deg2rad(5), **kwargs):
+        super().__init__(config, **kwargs)
+        if max_object_translation < 0 or max_object_rotation < 0:
+            raise ValueError("quasistatic bounds must be nonnegative")
+        self.max_object_translation = float(max_object_translation)
+        self.max_object_rotation = float(max_object_rotation)
+        self.nominal_object_pose = None
+
+    def set_nominal_pose(self, pose):
+        self.nominal_object_pose = validate_pose(pose)
+
+    def evaluate(self, mesh, *, object_world_pose, world_gripper_command, opening_width):
+        original_pose = validate_pose(object_world_pose)
+        first = super().evaluate(mesh, object_world_pose=original_pose,
+                                 world_gripper_command=world_gripper_command,
+                                 opening_width=opening_width)
+        first.metadata["closure_backend"] = "finite_pad_quasistatic"
+        first.metadata["max_object_translation"] = self.max_object_translation
+        first.metadata["max_object_rotation_rad"] = self.max_object_rotation
+        if first.valid or self.nominal_object_pose is None:
+            first.metadata["object_motion"] = False
+            return first
+        target = self.nominal_object_pose
+        delta = target[:3, 3] - original_pose[:3, 3]
+        norm = np.linalg.norm(delta)
+        if norm > self.max_object_translation > 0:
+            delta = delta * (self.max_object_translation / norm)
+        elif self.max_object_translation == 0:
+            delta = np.zeros(3)
+        corrected = original_pose.copy()
+        corrected[:3, 3] += delta
+        rotation_error = Rotation.from_matrix(target[:3, :3] @ original_pose[:3, :3].T)
+        rotvec = rotation_error.as_rotvec()
+        angle = np.linalg.norm(rotvec)
+        if angle > self.max_object_rotation > 0:
+            rotvec *= self.max_object_rotation / angle
+        elif self.max_object_rotation == 0:
+            rotvec[:] = 0
+        corrected[:3, :3] = Rotation.from_rotvec(rotvec).as_matrix() @ original_pose[:3, :3]
+        second = FinitePadFixedObjectBackend.evaluate(self, mesh,
+            object_world_pose=corrected, world_gripper_command=world_gripper_command,
+            opening_width=opening_width)
+        second.metadata.update({"closure_backend": "finite_pad_quasistatic",
+            "object_motion": True, "object_translation_correction": delta.tolist(),
+            "object_rotation_correction_rad": float(np.linalg.norm(rotvec)),
+            "uncorrected_reason": first.reason})
+        return second
 
 
 @dataclass
@@ -156,6 +245,8 @@ class RobustGraspEvaluator:
 
     def evaluate(self, grasp, *, nominal_object_pose, hypotheses):
         nominal_pose = validate_pose(nominal_object_pose)
+        if hasattr(self.backend, "set_nominal_pose"):
+            self.backend.set_nominal_pose(nominal_pose)
         command = nominal_pose @ validate_pose(grasp.pose)  # ONCE, outside loop
         hypotheses = list(hypotheses)
         weights = np.array([h.weight for h in hypotheses], float)

@@ -47,6 +47,20 @@ hypotheses = sample_hypotheses(obj.mesh, T_W_O_est, 100, seed=42,
 evaluator = RobustGraspEvaluator(obj.mesh)
 rows = rank_grasps(grasps, evaluator,
                   nominal_object_pose=T_W_O_est, hypotheses=hypotheses)
+
+# Nominal-first, failure-guided set generation. Validation is independent and
+# is the only bank used for the R >= threshold acceptance decision.
+from grasp_sampler import RobustSetConfig, generate_robust_grasp_set
+validation = sample_hypotheses(obj.mesh, T_W_O_est, 500, seed=43,
+    pose_uncertainty=PoseUncertainty(
+        translation_std_xyz=[.003, .003, .003],
+        rotation_std_rpy=np.deg2rad([3, 3, 3])),
+    geometry_uncertainty=GeometryUncertainty(scale_std_xyz=[.03, .03, .03]))
+result = generate_robust_grasp_set(obj.mesh, T_W_O_est, requested_count=20,
+    robustness_threshold=.95, search_hypotheses=hypotheses,
+    validation_hypotheses=validation,
+    config=RobustSetConfig(strategy="failure_guided", candidate_budget=200), seed=7)
+commands = result.world_commands  # immutable world-frame robot commands
 ```
 
 For every candidate, the evaluator computes `T_W_G_cmd = T_W_O_est @ grasp.pose`

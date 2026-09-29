@@ -43,6 +43,26 @@
 .. autofunction:: grasp_sampler.tcp_to_ee
 ```
 
+## Robust evaluation under object uncertainty
+
+See {doc}`uncertainty` for the workflow.
+
+```{eval-rst}
+.. autoclass:: grasp_sampler.PoseUncertainty
+.. autoclass:: grasp_sampler.GeometryUncertainty
+.. autoclass:: grasp_sampler.ObjectHypothesis
+.. autofunction:: grasp_sampler.sample_hypotheses
+.. autoclass:: grasp_sampler.RobustGraspEvaluator
+   :members:
+.. autofunction:: grasp_sampler.rank_grasps
+.. autoclass:: grasp_sampler.RobustSetConfig
+.. autofunction:: grasp_sampler.generate_robust_grasp_set
+.. autoclass:: grasp_sampler.RobustGraspSetResult
+```
+
+Validity backends: `GeometricGraspBackend`, `SymmetricPointBackend`,
+`FinitePadFixedObjectBackend`, `FinitePadQuasistaticBackend`.
+
 ## PyBullet integration
 
 ```{eval-rst}

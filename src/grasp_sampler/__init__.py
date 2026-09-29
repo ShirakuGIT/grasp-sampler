@@ -17,7 +17,11 @@ from .transforms import stack_poses, tcp_to_ee, to_world
 from .types import Grasp, GraspConfig, ObjMesh
 from .uncertainty import PoseUncertainty, GeometryUncertainty, ObjectHypothesis, sample_hypotheses
 from .robust import (RobustGraspEvaluator, RobustGraspResult, GeometricGraspBackend,
+                    SymmetricPointBackend, FinitePadFixedObjectBackend,
+                    FinitePadQuasistaticBackend,
                     FixedGraspResult, HypothesisGraspResult, RankedGrasp, rank_grasps)
+from .robust_set import (RobustSetConfig, RobustCandidate, RobustCandidateRecord,
+                         RobustGraspSetResult, generate_robust_grasp_set)
 
 __version__ = "0.1.0"
 
@@ -36,5 +40,8 @@ __all__ = [
     "tcp_to_ee",
     "PoseUncertainty", "GeometryUncertainty", "ObjectHypothesis", "sample_hypotheses",
     "RobustGraspEvaluator", "RobustGraspResult", "GeometricGraspBackend",
+    "SymmetricPointBackend", "FinitePadFixedObjectBackend", "FinitePadQuasistaticBackend",
     "FixedGraspResult", "HypothesisGraspResult", "RankedGrasp", "rank_grasps",
+    "RobustSetConfig", "RobustCandidate", "RobustCandidateRecord",
+    "RobustGraspSetResult", "generate_robust_grasp_set",
 ]

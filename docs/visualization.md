@@ -3,11 +3,10 @@
 ## Interactive uncertainty viewer
 
 ```bash
-PYTHONPATH=src conda run --no-capture-output -n mcr-robotics python examples/visualize_robust.py assets/meshes/pocky_box_metric_fp.glb
+python examples/visualize_robust.py assets/meshes/pocky_box_metric_fp.glb
 ```
 
-Uses Matplotlib (already available in `mcr-robotics`; elsewhere install
-`pip install -e '.[robust-viz]'`). The left 3D view shows sampled nominal grasp
+Requires `pip install -e '.[robust-viz]'`. The left 3D view shows sampled nominal grasp
 candidates. The right shows the selected **fixed world gripper command** in blue,
 the nominal object as a gray ghost, and the hypothetical object in green/red for
 geometric pass/fail. Orange markers show contact points when found. Both views
@@ -27,10 +26,20 @@ currently means anisotropic scaling about the mesh origin, not local deformation
 The viewer shows the generated grasp set, not internal sampler ray-search steps.
 Success means the geometric evaluator passes, not dynamic lift success.
 
+To view a generated robust set instead of raw candidates (each grasp passed the
+`R >= threshold` test on an independent validation bank):
+
+```bash
+python examples/visualize_robust_set.py assets/meshes/ycb_cracker_box_metric_fp.glb
+```
+
+Options include `--count`, `--threshold`, `--hypotheses`, `--budget`,
+`--backend point|pad|quasistatic` and the same uncertainty bounds as above.
+
 Headless snapshot (also useful over SSH):
 
 ```bash
-PYTHONPATH=src conda run -n mcr-robotics python examples/visualize_robust.py assets/meshes/pocky_box_metric_fp.glb --snapshot /tmp/robust-grasp.png --sample 1
+python examples/visualize_robust.py assets/meshes/pocky_box_metric_fp.glb --snapshot /tmp/robust-grasp.png --sample 1
 ```
 
 ## Trimesh viewer
