@@ -3,10 +3,22 @@ import pytest
 import trimesh
 from scipy.spatial.transform import Rotation
 
-from grasp_sampler import (Grasp, GraspConfig, GraspSampler, load_mesh,
-    PoseUncertainty, GeometryUncertainty, ObjectHypothesis, sample_hypotheses,
-    RobustGraspEvaluator, GeometricGraspBackend, rank_grasps, to_world, stack_poses)
-from grasp_sampler.antipodal import _ray_cast_proxy, friction_cones_valid
+from grasp_sampler import (
+    GeometricGraspBackend,
+    GeometryUncertainty,
+    Grasp,
+    GraspConfig,
+    GraspSampler,
+    ObjectHypothesis,
+    PoseUncertainty,
+    RobustGraspEvaluator,
+    load_mesh,
+    rank_grasps,
+    sample_hypotheses,
+    stack_poses,
+    to_world,
+)
+from grasp_sampler.collision import friction_cones_valid, ray_cast_proxy
 
 
 @pytest.fixture
@@ -134,9 +146,9 @@ def test_weights_and_ranking(box, grasp):
 
 
 def test_proxy_policies_and_friction(box, grasp):
-    assert _ray_cast_proxy(box, GraspConfig(contact_geometry_policy="mesh")) is box
-    assert _ray_cast_proxy(box, GraspConfig()) is box
-    assert _ray_cast_proxy(box, GraspConfig(contact_geometry_policy="convex_hull")) is not box
+    assert ray_cast_proxy(box, GraspConfig(contact_geometry_policy="mesh")) is box
+    assert ray_cast_proxy(box, GraspConfig()) is box
+    assert ray_cast_proxy(box, GraspConfig(contact_geometry_policy="convex_hull")) is not box
     assert friction_cones_valid([-1,0,0], [1,0,0], [1,0,0], 0.9)
     assert not friction_cones_valid([1,0,0], [-1,0,0], [1,0,0], 0.9)
     r = RobustGraspEvaluator(box, geometry_policy="convex_hull").evaluate(grasp,
@@ -167,7 +179,7 @@ def test_hull_can_invent_contacts(grasp):
     args = dict(nominal_object_pose=np.eye(4), hypotheses=[ObjectHypothesis(mesh,np.eye(4))])
     true_mesh = RobustGraspEvaluator(mesh).evaluate(grasp, **args)
     hull = RobustGraspEvaluator(mesh,geometry_policy="convex_hull").evaluate(grasp, **args)
-    auto = RobustGraspEvaluator(mesh,geometry_policy="existing_auto_policy").evaluate(grasp, **args)
+    auto = RobustGraspEvaluator(mesh,geometry_policy="auto").evaluate(grasp, **args)
     assert not true_mesh.nominal_valid
     assert hull.nominal_valid and auto.nominal_valid
     assert auto.nominal_result.metadata["contact_geometry"] == "convex_hull"
@@ -177,7 +189,8 @@ def test_rotated_world_command_and_backend(box, grasp):
     from grasp_sampler import FixedGraspResult
     seen = []
     class Recorder:
-        def evaluate(self, mesh, *, object_world_pose, world_gripper_command, opening_width):
+        def evaluate(self, mesh, *, object_world_pose, world_gripper_command, opening_width,
+                     nominal_object_pose=None):
             seen.append(world_gripper_command.copy())
             # Backend receives copies: accidental command edits must not leak.
             world_gripper_command[:] = 0

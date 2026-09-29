@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import trimesh
 
-from grasp_sampler import (Grasp, ObjectHypothesis, RobustGraspEvaluator)
+from grasp_sampler import Grasp, ObjectHypothesis, RobustGraspEvaluator
 from grasp_sampler.robust_viz import variation_sets
 
 
@@ -23,6 +23,7 @@ def test_viewer_controls_preserve_command(tmp_path):
     matplotlib = pytest.importorskip("matplotlib")
     matplotlib.use("Agg", force=True)
     import matplotlib.pyplot as plt
+
     from grasp_sampler.robust_viz import RobustGraspViewer
     mesh = trimesh.creation.box(extents=[0.04]*3)
     shifted = np.eye(4)

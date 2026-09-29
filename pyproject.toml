@@ -22,7 +22,22 @@ viz = ["pyglet<2"]                          # interactive trimesh viewer
 robust-viz = ["matplotlib>=3.5"]            # interactive uncertainty viewer
 sim = ["pybullet>=3.2", "imageio>=2.9"]     # pybullet collision filter + viewer
 docs = ["sphinx>=7.0", "myst-parser>=2.0", "furo>=2024.1"]
-dev = ["pytest>=7.0"]
+dev = ["pytest>=7.0", "ruff>=0.4"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "I", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# Terse one-line test setup and example CLI argument lists read better unwrapped.
+"tests/*" = ["E501", "E702"]
+"examples/*" = ["E501", "E702"]

@@ -26,4 +26,4 @@ environment without Open3D, fall back to trimesh automatically (much slower).
 | `robust-viz` | uncertainty viewer             | `matplotlib`          |
 | `sim`        | `grasp_sampler.pybullet_sim`   | `pybullet`, `imageio` |
 | `docs`       | building this documentation    | `sphinx`, `furo`, …   |
-| `dev`        | running the tests              | `pytest`              |
+| `dev`        | tests and linting              | `pytest`, `ruff`      |

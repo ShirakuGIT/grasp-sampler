@@ -5,11 +5,21 @@ perturbed object poses/sizes; the gripper command stays fixed while the object m
 """
 import argparse
 import time
+
 import numpy as np
 
-from grasp_sampler import (GraspConfig, GeometryUncertainty, PoseUncertainty,
-    FinitePadFixedObjectBackend, FinitePadQuasistaticBackend, RobustGraspEvaluator, RobustSetConfig, generate_robust_grasp_set, load_mesh,
-    sample_hypotheses)
+from grasp_sampler import (
+    FinitePadFixedObjectBackend,
+    FinitePadQuasistaticBackend,
+    GeometryUncertainty,
+    GraspConfig,
+    PoseUncertainty,
+    RobustGraspEvaluator,
+    RobustSetConfig,
+    generate_robust_grasp_set,
+    load_mesh,
+    sample_hypotheses,
+)
 
 
 def main():

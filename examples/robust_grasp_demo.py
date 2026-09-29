@@ -1,8 +1,17 @@
 """Fixed robot command, varying object: python examples/robust_grasp_demo.py mesh.glb."""
 import argparse
+
 import numpy as np
-from grasp_sampler import (GraspSampler, GraspConfig, PoseUncertainty,
-    GeometryUncertainty, sample_hypotheses, RobustGraspEvaluator, rank_grasps)
+
+from grasp_sampler import (
+    GeometryUncertainty,
+    GraspConfig,
+    GraspSampler,
+    PoseUncertainty,
+    RobustGraspEvaluator,
+    rank_grasps,
+    sample_hypotheses,
+)
 
 
 def main():

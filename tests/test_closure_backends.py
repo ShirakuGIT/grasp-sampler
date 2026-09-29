@@ -1,9 +1,12 @@
 import numpy as np
 import trimesh
 
-from grasp_sampler import (FinitePadFixedObjectBackend,
-    FinitePadQuasistaticBackend, FixedGraspResult, GraspConfig,
-    SymmetricPointBackend)
+from grasp_sampler import (
+    FinitePadFixedObjectBackend,
+    FinitePadQuasistaticBackend,
+    GraspConfig,
+    SymmetricPointBackend,
+)
 
 
 def test_backends_are_explicit_and_fixed_command_is_preserved():
@@ -15,10 +18,10 @@ def test_backends_are_explicit_and_fixed_command_is_preserved():
     point = SymmetricPointBackend(cfg, check_body=False)
     pad = FinitePadFixedObjectBackend(cfg, check_body=False)
     quasi = FinitePadQuasistaticBackend(cfg, check_body=False)
-    quasi.set_nominal_pose(pose)
     rp = point.evaluate(mesh, object_world_pose=shifted, world_gripper_command=command, opening_width=.08)
     rf = pad.evaluate(mesh, object_world_pose=shifted, world_gripper_command=command, opening_width=.08)
-    rq = quasi.evaluate(mesh, object_world_pose=shifted, world_gripper_command=command, opening_width=.08)
+    rq = quasi.evaluate(mesh, object_world_pose=shifted, world_gripper_command=command, opening_width=.08,
+                        nominal_object_pose=pose)
     assert not rp.valid
     assert rf.valid
     assert rq.valid
@@ -33,9 +36,9 @@ def test_quasistatic_motion_is_bounded_and_reported():
     true = nominal.copy(); true[0, 3] = .020
     backend = FinitePadQuasistaticBackend(GraspConfig(contact_geometry_policy="mesh"),
         check_body=False, max_object_translation=.004)
-    backend.set_nominal_pose(nominal)
     result = backend.evaluate(mesh, object_world_pose=true,
-        world_gripper_command=np.eye(4), opening_width=.08)
+        world_gripper_command=np.eye(4), opening_width=.08,
+        nominal_object_pose=nominal)
     assert result.metadata["object_motion"]
     assert np.linalg.norm(result.metadata["object_translation_correction"]) <= .004 + 1e-12
 

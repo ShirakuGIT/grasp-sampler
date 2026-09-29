@@ -1,10 +1,18 @@
 import numpy as np
 import trimesh
-from grasp_sampler import robust_set as robust_set_module
-from grasp_sampler import FixedGraspResult
 
-from grasp_sampler import (Grasp, GraspConfig, ObjectHypothesis, RobustSetConfig,
-    generate_robust_grasp_set, sample_hypotheses)
+from grasp_sampler import (
+    FixedGraspResult,
+    Grasp,
+    GraspConfig,
+    ObjectHypothesis,
+    RobustCandidate,
+    RobustCandidateRecord,
+    RobustSetConfig,
+    generate_robust_grasp_set,
+    sample_hypotheses,
+)
+from grasp_sampler import robust_set as robust_set_module
 
 
 def _run(seed=5, **kwargs):
@@ -67,7 +75,8 @@ def test_failure_guided_calls_failing_hypothesis_source(monkeypatch):
             Grasp(p, "test", .04), source.world_pose @ p, [source_id])]
     monkeypatch.setattr(robust_set_module, "_generate", fake_generate)
     class PoseGate:
-        def evaluate(self, mesh, *, object_world_pose, world_gripper_command, opening_width):
+        def evaluate(self, mesh, *, object_world_pose, world_gripper_command, opening_width,
+                     nominal_object_pose=None):
             ok = abs(object_world_pose[0, 3]) < .001
             return FixedGraspResult(ok, "valid" if ok else "pose_failure")
     result = robust_set_module.generate_robust_grasp_set(mesh, nominal,
@@ -79,3 +88,34 @@ def test_failure_guided_calls_failing_hypothesis_source(monkeypatch):
     assert calls[0] == "nominal"
     assert any(c.startswith("failure_hypothesis:") for c in calls[1:])
     assert result.diagnostics["failure_guided"]
+
+
+def _candidate(x, yaw=0., sources=("nominal",)):
+    from scipy.spatial.transform import Rotation
+    pose = np.eye(4)
+    pose[:3, :3] = Rotation.from_euler("z", yaw).as_matrix()
+    pose[:3, 3] = [x, 0, 0]
+    return RobustCandidate(Grasp(pose, "test", .04), pose, list(sources))
+
+
+def _record(candidate):
+    return RobustCandidateRecord(candidate, 1., 1., 1, 1, {}, {}, True, True)
+
+
+def test_dedup_merges_close_and_jaw_flipped_commands():
+    a, close, flipped, far = (_candidate(0, sources=["a"]), _candidate(.0005, sources=["b"]),
+                              _candidate(0, np.pi, ["c"]), _candidate(.05))
+    unique = robust_set_module._dedup([a, close, flipped, far], RobustSetConfig())
+    assert len(unique) == 2 and unique[0] is a and unique[1] is far
+    assert a.duplicate_count == 2 and a.sources == ["a", "b", "c"]
+
+
+def test_select_diverse_prefers_spread_then_pads_with_accepted():
+    cfg = RobustSetConfig()                               # 1 cm / 20 deg diversity
+    near_dup = _record(_candidate(.002))
+    accepted = [_record(_candidate(0)), near_dup, _record(_candidate(.05))]
+    def pick(n):
+        return robust_set_module._select_diverse(accepted, n, cfg)
+    assert pick(1) == accepted[:1]
+    assert pick(2) == [accepted[0], accepted[2]]          # skips the near-duplicate
+    assert pick(3) == [accepted[0], accepted[2], near_dup]  # padded when too few are diverse

@@ -119,7 +119,7 @@ normals can make ray hits/containment unreliable; watertightness is recorded and
 no automatic mesh repair is performed. Ray/proximity errors propagate rather
 than being mislabeled as ordinary grasp failures.
 
-Contact geometry policies are `mesh`, `convex_hull`, and `existing_auto_policy`.
+Contact geometry policies are `mesh`, `convex_hull`, and `auto`.
 The nominal sampler retains its automatic volume-ratio hull fallback by default.
 Robust evaluation defaults to `mesh` because hulls can invent contact surfaces.
 Both policy and actual selected geometry are recorded; collision geometry is

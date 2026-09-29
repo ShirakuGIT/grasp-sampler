@@ -6,6 +6,8 @@ runs can supply ObjectHypothesis directly, bypassing the independent sampler.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Literal
+
 import numpy as np
 import trimesh
 from scipy.spatial.transform import Rotation
@@ -58,7 +60,7 @@ class PoseUncertainty:
     rotation_std_rpy: object = None
     translation_bounds_xyz: object = None
     rotation_bounds_rpy: object = None
-    frame: str = "world"
+    frame: Literal["world", "object"] = "world"
 
     def sample(self, estimated_pose, rng):
         pose = validate_pose(estimated_pose)

@@ -12,16 +12,29 @@ from .antipodal import antipodal_grasps
 from .mesh import load_mesh
 from .obb import obb_face_grasps
 from .primitives import side_grasps, top_grasps
+from .robust import (
+                    FinitePadFixedObjectBackend,
+                    FinitePadQuasistaticBackend,
+                    FixedGraspResult,
+                    GeometricGraspBackend,
+                    HypothesisGraspResult,
+                    RankedGrasp,
+                    RobustGraspEvaluator,
+                    RobustGraspResult,
+                    SymmetricPointBackend,
+                    rank_grasps,
+)
+from .robust_set import (
+                    RobustCandidate,
+                    RobustCandidateRecord,
+                    RobustGraspSetResult,
+                    RobustSetConfig,
+                    generate_robust_grasp_set,
+)
 from .sampler import GraspSampler
 from .transforms import stack_poses, tcp_to_ee, to_world
 from .types import Grasp, GraspConfig, ObjMesh
-from .uncertainty import PoseUncertainty, GeometryUncertainty, ObjectHypothesis, sample_hypotheses
-from .robust import (RobustGraspEvaluator, RobustGraspResult, GeometricGraspBackend,
-                    SymmetricPointBackend, FinitePadFixedObjectBackend,
-                    FinitePadQuasistaticBackend,
-                    FixedGraspResult, HypothesisGraspResult, RankedGrasp, rank_grasps)
-from .robust_set import (RobustSetConfig, RobustCandidate, RobustCandidateRecord,
-                         RobustGraspSetResult, generate_robust_grasp_set)
+from .uncertainty import GeometryUncertainty, ObjectHypothesis, PoseUncertainty, sample_hypotheses
 
 __version__ = "0.1.0"
 

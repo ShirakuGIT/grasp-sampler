@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import numpy as np
 import trimesh
+from scipy.spatial import ConvexHull
 
-from .types import ObjMesh
+from .types import GeomClass, ObjMesh
 
 # Rotate 90 deg about X so a Y-up mesh stands upright (Y -> Z). Most GLB exports
 # are Y-up; adjust or pass an already-upright mesh if yours differs.
@@ -59,7 +60,7 @@ def load_mesh(path, *, upright_transform: np.ndarray | None = _R_X90,
     try:
         obb_transform = mesh.bounding_box_oriented.primitive.transform.copy()
         obb_extents = np.asarray(mesh.bounding_box_oriented.primitive.extents, float)
-    except Exception:
+    except (RuntimeError, ValueError, np.linalg.LinAlgError):   # degenerate OBB
         obb_transform = np.eye(4)
         obb_extents = extents.copy()
 
@@ -67,7 +68,7 @@ def load_mesh(path, *, upright_transform: np.ndarray | None = _R_X90,
                    _classify(extents, mesh), source_to_mesh)
 
 
-def _classify(extents: np.ndarray, mesh: trimesh.Trimesh) -> str:
+def _classify(extents: np.ndarray, mesh: trimesh.Trimesh) -> GeomClass:
     """Coarse shape class from sphericity, footprint aspect, and footprint fill.
 
     The XY footprint fill (hull area / bbox area) separates a square box (fill ~1)
@@ -82,10 +83,9 @@ def _classify(extents: np.ndarray, mesh: trimesh.Trimesh) -> str:
     fx, fy = extents[0], extents[1]
     foot_ratio = min(fx, fy) / max(fx, fy)
     try:
-        from scipy.spatial import ConvexHull
         pts, _ = trimesh.sample.sample_surface(mesh, 2500)
         fill = float(ConvexHull(pts[:, :2]).volume) / (fx * fy)   # 2D hull -> area
-    except Exception:
+    except (RuntimeError, ValueError):   # degenerate footprint hull (QhullError)
         fill = 1.0
 
     if fill >= 0.90:

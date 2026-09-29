@@ -139,6 +139,7 @@ src/grasp_sampler/
   primitives.py   bounding-box top/side grasps      (ss-pybullet, MIT)
   obb.py          oriented-bounding-box face grasps
   antipodal.py    force-closure antipodal sampler    (Dex-Net, BSD-2)
+  collision.py    shared contact + gripper-body clearance checks (Open3D, trimesh fallback)
   transforms.py   object-local -> world -> flange poses
   sampler.py      GraspSampler facade
   viz.py          trimesh gripper-wireframe viewer

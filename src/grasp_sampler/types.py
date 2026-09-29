@@ -2,8 +2,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Literal
 
 import numpy as np
+import trimesh
+
+GraspKind = Literal["top", "side", "obb_face", "antipodal"]
+GeomClass = Literal["box", "cylinder", "sphere", "irregular"]
+# Solid used for contact ray casts: the mesh itself, its convex hull, or "auto"
+# (the hull for hollow scans, the mesh otherwise).
+ContactGeometryPolicy = Literal["mesh", "convex_hull", "auto"]
 
 
 @dataclass
@@ -20,7 +28,7 @@ class Grasp:
     """
 
     pose: np.ndarray              # (4, 4) TCP pose in the object's local frame
-    kind: str                     # "top" | "side" | "obb_face" | "antipodal"
+    kind: GraspKind
     width: float                  # finger opening required (m)
     meta: dict = field(default_factory=dict)
 
@@ -29,11 +37,11 @@ class Grasp:
 class ObjMesh:
     """Loaded geometry and the transform from file/scene frame to mesh frame."""
 
-    mesh: object                  # trimesh.Trimesh in returned local frame
+    mesh: trimesh.Trimesh         # in the returned local frame
     extents: np.ndarray           # (3,) axis-aligned full extents (m)
     obb_transform: np.ndarray     # (4, 4) oriented-bounding-box -> local frame
     obb_extents: np.ndarray       # (3,) oriented-bounding-box full extents (m)
-    geom_class: str               # "box" | "cylinder" | "sphere" | "irregular"
+    geom_class: GeomClass
     source_to_mesh: np.ndarray = field(default_factory=lambda: np.eye(4))
 
 
@@ -75,7 +83,7 @@ class GraspConfig:
     approach_facets: tuple = _DEFAULT_FACETS
     cone_deg: float = 50.0               # half-angle of the per-facet approach cone
     directed_spread: int = 3             # approaches sampled within each cone
-    contact_geometry_policy: str = "existing_auto_policy"
+    contact_geometry_policy: ContactGeometryPolicy = "auto"
 
     def approach_facet_array(self) -> np.ndarray:
         """Unit approach facets as an (N, 3) array; degenerate facets dropped."""

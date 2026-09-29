@@ -39,7 +39,7 @@ class RobustGraspViewer:
     """
     def __init__(self, mesh, grasps, nominal_pose, hypotheses, evaluator):
         import matplotlib.pyplot as plt
-        from matplotlib.widgets import Slider, RadioButtons, Button
+        from matplotlib.widgets import Button, RadioButtons, Slider
 
         if not grasps or not hypotheses:
             raise ValueError("viewer needs at least one grasp and one hypothesis")
@@ -58,7 +58,8 @@ class RobustGraspViewer:
         self.fig.text(0.03, 0.02,
             "Drag to orbit · scroll to zoom | Blue: fixed open gripper | Gray: nominal mesh | "
             "Green/red: geometric pass/fail | Orange: contacts\n"
-            "Playback steps through sampled hypotheses. No robot execution noise; no dynamic lift validation.", fontsize=10)
+            "Playback steps through sampled hypotheses. No robot execution noise; "
+            "no dynamic lift validation.", fontsize=10)
         self.candidate_slider = Slider(self.fig.add_axes([0.16, 0.29, 0.76, 0.025]),
             "Candidate", 0, max(1, len(grasps)-1), valinit=0, valstep=1)
         if len(grasps) == 1:
@@ -107,7 +108,9 @@ class RobustGraspViewer:
         for i, setter in enumerate((ax.set_xlim, ax.set_ylim, ax.set_zlim)):
             setter(self.center[i]-self.radius, self.center[i]+self.radius)
         ax.set_box_aspect((1, 1, 1))
-        ax.set_xlabel("World X (m)"); ax.set_ylabel("World Y (m)"); ax.set_zlabel("World Z (m)")
+        ax.set_xlabel("World X (m)")
+        ax.set_ylabel("World Y (m)")
+        ax.set_zlabel("World Z (m)")
         ax.tick_params(labelsize=8)
 
     @staticmethod
@@ -134,7 +137,8 @@ class RobustGraspViewer:
                     result.per_hypothesis_results[self.sample_index-1].validity)
         command = self.commands[self.grasp_index]  # NEVER derived from h.world_pose
         color = "#269b56" if validity.valid else "#d84b46"
-        self._axes(self.left, f"Nominal sampled candidates ({len(self.grasps)}) · selected {self.grasp_index}")
+        self._axes(self.left,
+                   f"Nominal sampled candidates ({len(self.grasps)}) · selected {self.grasp_index}")
         self._mesh(self.left, self.mesh, self.nominal_pose, "#aab4c1", 0.5)
         for i, pose in enumerate(self.commands):
             if i != self.grasp_index:
@@ -152,7 +156,8 @@ class RobustGraspViewer:
         self.right.plot(*np.array([start, command[:3, 3]]).T, "--", color="#176cd3")
         self.right.scatter(*h.world_pose[:3, 3], color="black", marker="+", s=40)
         dt = (h.world_pose[:3, 3] - self.nominal_pose[:3, 3]) * 1000
-        rpy = Rotation.from_matrix(h.world_pose[:3, :3] @ self.nominal_pose[:3, :3].T).as_euler("xyz", degrees=True)
+        rotation_delta = h.world_pose[:3, :3] @ self.nominal_pose[:3, :3].T
+        rpy = Rotation.from_matrix(rotation_delta).as_euler("xyz", degrees=True)
         scale = h.metadata.get("scale_xyz", [1, 1, 1])
         width = "N/A" if validity.contact_width is None else f"{validity.contact_width*1000:.2f} mm"
         self.info.set_text(

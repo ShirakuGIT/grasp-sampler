@@ -1,9 +1,16 @@
 """Inspect fixed grasp commands against object perturbations in interactive 3D."""
 import argparse
+
 import numpy as np
 
-from grasp_sampler import (GraspSampler, GraspConfig, PoseUncertainty,
-    GeometryUncertainty, sample_hypotheses, RobustGraspEvaluator)
+from grasp_sampler import (
+    GeometryUncertainty,
+    GraspConfig,
+    GraspSampler,
+    PoseUncertainty,
+    RobustGraspEvaluator,
+    sample_hypotheses,
+)
 
 
 def main():

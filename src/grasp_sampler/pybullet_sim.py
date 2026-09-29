@@ -12,6 +12,7 @@ the object frame: +X closing, +Z approach, origin between the fingertips.
 from __future__ import annotations
 
 import numpy as np
+from scipy.spatial.transform import Rotation
 
 from .types import Grasp
 
@@ -21,22 +22,7 @@ _BAR = 0.012
 
 def _quat_from_matrix(R: np.ndarray):
     """Rotation matrix -> xyzw quaternion (PyBullet order)."""
-    t = np.trace(R)
-    if t > 0:
-        s = 0.5 / np.sqrt(t + 1.0)
-        w, x, y, z = 0.25 / s, (R[2, 1] - R[1, 2]) * s, (R[0, 2] - R[2, 0]) * s, (R[1, 0] - R[0, 1]) * s
-    else:
-        i = int(np.argmax(np.diag(R)))
-        if i == 0:
-            s = 2.0 * np.sqrt(1.0 + R[0, 0] - R[1, 1] - R[2, 2])
-            w, x, y, z = (R[2, 1] - R[1, 2]) / s, 0.25 * s, (R[0, 1] + R[1, 0]) / s, (R[0, 2] + R[2, 0]) / s
-        elif i == 1:
-            s = 2.0 * np.sqrt(1.0 + R[1, 1] - R[0, 0] - R[2, 2])
-            w, x, y, z = (R[0, 2] - R[2, 0]) / s, (R[0, 1] + R[1, 0]) / s, 0.25 * s, (R[1, 2] + R[2, 1]) / s
-        else:
-            s = 2.0 * np.sqrt(1.0 + R[2, 2] - R[0, 0] - R[1, 1])
-            w, x, y, z = (R[1, 0] - R[0, 1]) / s, (R[0, 2] + R[2, 0]) / s, (R[1, 2] + R[2, 1]) / s, 0.25 * s
-    return [float(x), float(y), float(z), float(w)]
+    return Rotation.from_matrix(R).as_quat().tolist()
 
 
 def _as_obj(mesh_path: str) -> str:
@@ -46,6 +32,7 @@ def _as_obj(mesh_path: str) -> str:
     if path.lower().endswith((".obj", ".stl")):
         return path
     import tempfile
+
     from .mesh import load_mesh
     obj = load_mesh(path)                       # upright + centered, like sampling
     tmp = tempfile.NamedTemporaryFile(suffix=".obj", delete=False)
