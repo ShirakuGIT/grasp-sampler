@@ -57,6 +57,43 @@ Grasps use the standard tool-center-point (TCP) convention:
 `tcp_to_ee` converts to the Franka Panda flange frame (closing on +Y, flange
 `0.105 m` behind the TCP). Pass a different `remap` / `standoff` for other grippers.
 
+## Robot planners and simulators
+
+Use `PlanningGrasps` for calibrated tool-link targets with aligned pregrasp,
+grasp, lift, jaw widths, candidate IDs, and optional robustness scores:
+
+```python
+from grasp_sampler import PlanningGrasps
+from grasp_sampler.integrations.pybullet import to_pybullet
+
+# object_pose must describe the processed mesh frame in world coordinates.
+# tcp_to_tool is the planner tool link expressed in our grasp TCP frame.
+targets = PlanningGrasps.from_grasps(
+    grasps, object_pose, frame_id="world", tool_link="my_tcp",
+    approach_distance=0.12, lift_offset=(0, 0, 0.15),
+)
+position, quaternion_xyzw = to_pybullet(targets, stage="pregrasp")[0]
+```
+
+Adapters support **cuRobo** (current `GoalToolPose` and legacy 0.7 `Pose`),
+**MoveIt 2**, **PyBullet / pybullet-planning**, **MuJoCo**, and **MPlib / SAPIEN**.
+Planner packages are imported only when their adapters are called. See the
+[planning guide](docs/planning.md) for frame/tool calibration, batch shapes,
+robust-command preservation, and runnable exports/examples.
+
+Run the Panda through a complete multi-object pick-and-place using sampled
+antipodal grasps and physical finger contact:
+
+```bash
+pip install -e ".[sim]"
+python examples/pick_place_pybullet.py --gui --hold
+# Or verify without a display:
+python examples/pick_place_pybullet.py --headless --report /tmp/pick-place.json
+```
+
+The tabletop demo uses Cartesian waypoints and IK. For cluttered robot scenes,
+connect the same targets to a collision-aware motion planner.
+
 ## Robust evaluation under perceived object uncertainty
 
 See [the uncertainty guide](docs/uncertainty.md) and run:

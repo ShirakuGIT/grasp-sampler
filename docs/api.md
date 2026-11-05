@@ -43,6 +43,26 @@
 .. autofunction:: grasp_sampler.tcp_to_ee
 ```
 
+## Planning targets and optional adapters
+
+See {doc}`planning` for frame conventions and usage.
+
+```{eval-rst}
+.. autoclass:: grasp_sampler.PlanningGrasps
+   :members:
+
+.. autofunction:: grasp_sampler.mesh_world_pose
+.. autofunction:: grasp_sampler.pose_components
+.. autofunction:: grasp_sampler.integrations.curobo.goal_arrays
+.. autofunction:: grasp_sampler.integrations.curobo.to_curobo
+.. autofunction:: grasp_sampler.integrations.moveit.to_pose_stamped
+.. autofunction:: grasp_sampler.integrations.pybullet.to_pybullet
+.. autofunction:: grasp_sampler.integrations.mujoco.to_mujoco
+.. autofunction:: grasp_sampler.integrations.mujoco.set_mocap_target
+.. autofunction:: grasp_sampler.integrations.mujoco.site_world_pose
+.. autofunction:: grasp_sampler.integrations.mplib.to_mplib
+```
+
 ## Robust evaluation under object uncertainty
 
 See {doc}`uncertainty` for the workflow.

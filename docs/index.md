@@ -28,6 +28,7 @@ optional PyBullet module adds collision checking and a 3-D viewer.
 
 installation
 usage
+planning
 uncertainty
 visualization
 configuration

@@ -28,3 +28,25 @@ jobs:
 
       - name: Test
         run: pytest
+
+  integrations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install simulator integrations and CPU tensors
+        run: |
+          pip install -e ".[dev,sim,mujoco]"
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - name: Test planner contracts and simulator frames
+        run: pytest tests/test_planning.py -q
+      - name: Physical multi-object pick and place
+        run: python examples/pick_place_pybullet.py --headless --objects 5 --report pick-place-report.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pick-place-report
+          path: pick-place-report.json

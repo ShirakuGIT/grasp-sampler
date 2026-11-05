@@ -55,6 +55,10 @@ or `standoff` for another gripper.
 
 ## Collision checking with PyBullet
 
+For complete robot pick-and-place and cuRobo, MoveIt 2, MuJoCo, or MPlib targets,
+see {doc}`planning`. That workflow adds tool calibration, pregrasp/lift targets,
+and candidate tracking to the transform helpers above.
+
 ```python
 from grasp_sampler.pybullet_sim import collision_filter
 

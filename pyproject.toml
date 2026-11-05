@@ -21,6 +21,8 @@ dependencies = [
 viz = ["pyglet<2"]                          # interactive trimesh viewer
 robust-viz = ["matplotlib>=3.5"]            # interactive uncertainty viewer
 sim = ["pybullet>=3.2", "imageio>=2.9"]     # pybullet collision filter + viewer
+mujoco = ["mujoco>=3.1"]                   # official MuJoCo mocap/site integration
+mplib = ["mplib>=0.2"]                     # MPlib / SAPIEN pose targets
 docs = ["sphinx>=7.0", "myst-parser>=2.0", "furo>=2024.1"]
 dev = ["pytest>=7.0", "ruff>=0.4"]
 
