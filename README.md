@@ -97,6 +97,8 @@ report; the viewer keeps the scene free of text panels and charts.
 
 ![MuJoCo FR3v2 with original household scan textures](docs/results/mujoco-expanded.png)
 
+[Watch the recorded demonstration on YouTube](https://youtu.be/lQIbH18UIP4).
+
 ```bash
 pip install -e ".[mujoco,fr3]"
 python tools/prepare_fr3_mujoco.py          # pinned models and source materials

@@ -13,6 +13,10 @@ grasp generation, rejection, selection, physical closure, and extraction visible
 This is an illustrative scene inspired by the references below, not a
 reproduction of their benchmarks or a claim of comparable performance.
 
+```{raw} html
+:file: _includes/demo-video.html
+```
+
 | Reference | Published setup | Design consequence here |
 | --- | --- | --- |
 | [MotionBenchMaker (RA-L 2022)](https://arxiv.org/html/2112.06402v1) | Shelf picking, including a UR5/cylinder example with varied shelf/object poses; box picking with Panda | Use a compact shelf and object-relative grasps, with explicit clearance checks |
