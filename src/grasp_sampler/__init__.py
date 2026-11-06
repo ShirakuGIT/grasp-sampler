@@ -11,6 +11,7 @@ Quick start
 from .antipodal import antipodal_grasps
 from .mesh import load_mesh
 from .obb import obb_face_grasps
+from .planning import PlanningGrasps, mesh_world_pose, pose_components
 from .primitives import side_grasps, top_grasps
 from .robust import (
                     FinitePadFixedObjectBackend,
@@ -51,6 +52,7 @@ __all__ = [
     "stack_poses",
     "to_world",
     "tcp_to_ee",
+    "PlanningGrasps", "mesh_world_pose", "pose_components",
     "PoseUncertainty", "GeometryUncertainty", "ObjectHypothesis", "sample_hypotheses",
     "RobustGraspEvaluator", "RobustGraspResult", "GeometricGraspBackend",
     "SymmetricPointBackend", "FinitePadFixedObjectBackend", "FinitePadQuasistaticBackend",

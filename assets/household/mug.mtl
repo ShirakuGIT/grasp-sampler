@@ -1,0 +1,3 @@
+newmtl mug
+Kd 1 1 1
+map_Kd mug.png

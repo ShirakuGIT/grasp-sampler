@@ -1,0 +1,3 @@
+newmtl ycb_banana_metric_fp
+Kd 1 1 1
+map_Kd ycb_banana_metric_fp.png

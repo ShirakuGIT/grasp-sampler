@@ -1,0 +1,3 @@
+newmtl axe_body_spray_metric_fp
+Kd 1 1 1
+map_Kd axe_body_spray_metric_fp.png

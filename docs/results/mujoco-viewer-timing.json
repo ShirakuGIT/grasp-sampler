@@ -1,0 +1,16 @@
+{
+  "measurement": "scene-state synchronization, not physical display presentation",
+  "hardware": "Apple M4, 8-core GPU, Retina framebuffer 2940 x 1782",
+  "simulator": "MuJoCo 3.17.0",
+  "scenario": "expanded, six physical objects, stationary home pose",
+  "duration_sim_s": 10,
+  "duration_wall_s": 5.001995665952563,
+  "baseline_scene_update_hz": 27.05904503235379,
+  "after": {
+    "scene_update_hz": 60.002169639187436,
+    "scene_frame_interval_ms_p95": 16.939887206535786,
+    "sync_ms_p95": 0.16777494456619022,
+    "fps_target": 60,
+    "playback_rate": 2.0
+  }
+}

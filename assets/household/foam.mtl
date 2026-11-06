@@ -1,0 +1,3 @@
+newmtl foam
+Kd 1 1 1
+map_Kd foam.png
