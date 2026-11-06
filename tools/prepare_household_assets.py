@@ -71,6 +71,7 @@ def prepare(sources, names):
     output = ROOT / "assets/household"
     output.mkdir(parents=True, exist_ok=True)
     paths = {
+        "bowl": sources / "bowl/meshes/bowl_textured.obj",
         "mug": sources / "025_mug/meshes/025_mug_textured.obj",
         "cup": sources / "065-f_cups/meshes/065-f_cups_textured.obj",
         "plate": sources / "029_plate/meshes/029_plate_textured.obj",
@@ -91,6 +92,10 @@ def prepare(sources, names):
             mesh.apply_transform(trimesh.transformations.rotation_matrix(np.pi/2, [1, 0, 0]))
         else:
             mesh = trimesh.load(paths[name], force="mesh", process=False)
+        if name == "bowl":
+            # Local bowl reconstruction is Y-up with unit diameter.
+            mesh.apply_scale(.16 / max(mesh.extents))
+            mesh.apply_transform(trimesh.transformations.rotation_matrix(np.pi/2, [1, 0, 0]))
         mesh.apply_translation(-mesh.bounds.mean(axis=0))
         # Native OBJ retains per-corner UV coordinates. Explicit MuJoCo
         # materials point at the image; MuJoCo does not import OBJ MTLs.
@@ -105,7 +110,7 @@ def prepare(sources, names):
         y_up = mesh.copy()
         y_up.apply_transform(trimesh.transformations.rotation_matrix(-np.pi/2, [1, 0, 0]))
         y_up.export(output / f"{name}.glb")
-        if name in ("mug", "cup", "plate"):
+        if name in ("mug", "cup", "plate", "bowl"):
             print(f"  decomposing {name} for cavity/handle contacts", flush=True)
             geometry = trimesh.Trimesh(vertices=mesh.vertices, faces=mesh.faces, process=True)
             coacd.set_log_level("warn")
@@ -130,7 +135,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sources", type=Path, default=Path.home()/"Documents/Coding")
     parser.add_argument("--objects", nargs="+",
-                        default=["ritz", "mug", "cup", "plate", "mustard", "can", "foam"])
+                        default=["ritz", "mug", "cup", "plate", "mustard", "can", "foam", "bowl"])
     args = parser.parse_args()
     prepare(args.sources, args.objects)
     if all((ROOT/f"assets/household/{name}.obj").exists() for name in ("mustard", "can", "foam")):

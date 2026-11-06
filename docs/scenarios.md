@@ -1,11 +1,14 @@
 # Constrained shelf retrieval and transfer
 
 The default MuJoCo demonstration uses a **single FR3v2 and a two-tier cabinet**.
-The default `--suite household` samples lateral and oblique grasps on a Ritz box,
-mug, cup and plate. The box moves to the upper tier, and the remaining objects
-move from their shelf tiers to the tabletop. `--suite classic` selects the
+The default `--suite expanded` includes a Ritz box, mug, cup, plate, bowl and
+curved mustard bottle, preserving original mesh colors. The box and cup move
+from the lower tier to separate upper-tier slots. Mug, plate and bottle move
+to the tabletop, while the bowl uses an oblique rim grasp to move across the
+table. `--suite household` retains the earlier four-object demonstration. `--suite classic` selects the
 earlier mustard-bottle, can and foam-brick sequence.
-The 28 cm tier spacing makes approach clearance matter. Its purpose is to make
+The lower bay retains 28 cm tier spacing; the expanded scene has a taller
+40 cm upper bay for the bottle. Approach clearance still matters. Its purpose is to make
 grasp generation, rejection, selection, physical closure, and extraction visible.
 This is an illustrative scene inspired by the references below, not a
 reproduction of their benchmarks or a claim of comparable performance.
@@ -102,3 +105,21 @@ settled on its side can pass, while the same bottle on the wrong tier cannot.
 Candidate IDs, rejection reasons, approach obliquity, selection costs and support
 forces are recorded. This is a single seeded demonstration, not a multi-seed
 benchmark success-rate estimate.
+
+## Playback performance
+
+The native viewer defaults to `--speed 2 --fps 60`. Playback pacing and redraws
+are independent, and rendering is limited by wall time rather than every fixed
+number of physics steps. Sleep is batched to reduce tiny scheduler wakeups.
+Physics remains MuJoCo's compiled CPU solver at a 2 ms timestep; faster playback
+does not skip contact integration or speed up motor commands in simulation time.
+The requested frame rate is a target, not a hardware-independent guarantee.
+JAX/MJX is useful for batched simulation workloads; this single native viewer
+uses the existing CPU solver and does not introduce a JAX dependency.
+
+The [expanded six-object physical run](results/mujoco-expanded-pick-place.json)
+completed all six transfers, including two lower-to-upper shelf placements.
+Maximum XY placement error was 3.41 cm against the unchanged 4 cm tolerance.
+The run requires bilateral finger forces, an 8 cm lift, released and settled
+load-bearing contact on the requested support, and the correct object-bottom
+height. [Expanded scene snapshot](results/mujoco-expanded.png).

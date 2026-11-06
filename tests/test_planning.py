@@ -287,7 +287,8 @@ def test_mujoco_site_ik_preserves_live_state_and_reports_unreachable_goals():
         solve_site_ik(model, data, "missing", goal, ["shoulder"])
 
 
-def test_mujoco_placement_requires_the_correct_support_and_allows_settled_rotation(monkeypatch):
+@pytest.mark.parametrize("floor,surface", [(1.12, "upper_tier"), (.84, "shelf_floor")])
+def test_mujoco_placement_requires_the_correct_support_and_allows_settled_rotation(monkeypatch, floor, surface):
     mj = pytest.importorskip("mujoco")
     monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1] / "examples"))
     monkeypatch.setenv("GRASP_SAMPLER_DISABLE_OPEN3D", "1")
@@ -295,6 +296,8 @@ def test_mujoco_placement_requires_the_correct_support_and_allows_settled_rotati
 
     model = mj.MjModel.from_xml_string('''<mujoco><option timestep=".002"/><worldbody>
       <geom name="table" type="box" pos="0 0 .71" size="1 1 .01"/>
+      <geom name="shelf_floor" type="box" pos="0 0 .83" size="1 1 .01"/>
+      <geom name="shelf_floor_edge" type="box" pos="1 0 .82" size=".01 1 .01"/>
       <geom name="upper_tier" type="box" pos="0 0 1.11" size="1 1 .01"/>
       <geom name="upper_tier_edge" type="box" pos="1 0 1.10" size=".01 1 .01"/>
       <body name="gripper_hand" pos="5 0 0"><geom size=".01" contype="0" conaffinity="0"/></body>
@@ -302,19 +305,22 @@ def test_mujoco_placement_requires_the_correct_support_and_allows_settled_rotati
         <freejoint/><geom type="box" size=".02 .03 .07" mass=".06"/>
       </body></worldbody></mujoco>''')
     data = mj.MjData(model)
+    data.qpos[2] = floor+.02
     demo = object.__new__(Workstation)
     demo.model, demo.data = model, data
     demo.body_ids, demo.finger_ids = [model.body("item").id], set()
-    demo.objects = [(trimesh.creation.box(extents=[.04, .06, .14]), "box", np.zeros(3))]
+    demo.objects = [(trimesh.creation.box(extents=[.04, .06, .14]), "box",
+                     np.array([0., 0., floor+.07]))]
     mj.mj_step(model, data, nstep=400)
-    passed, metrics = demo.placement_status(0, np.array([0., 0., 1.19]))
+    passed, metrics = demo.placement_status(0, np.array([0., 0., floor+.07]))
     assert passed and metrics["supported"] and metrics["released"]
+    assert metrics["support_surface"] == surface
     assert metrics["support_normal_force"] > .1
     # Resting on the tabletop at the same XY is not an upper-tier success.
     data.qpos[2] = .74
     data.qvel[:] = 0
     mj.mj_step(model, data, nstep=400)
-    passed, metrics = demo.placement_status(0, np.array([0., 0., 1.19]))
+    passed, metrics = demo.placement_status(0, np.array([0., 0., floor+.07]))
     assert not passed
     assert not metrics["supported"]
 

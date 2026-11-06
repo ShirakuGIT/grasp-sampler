@@ -41,3 +41,11 @@ Rebuild from the original workspace with `tools/prepare_household_assets.py`;
 the preparation tool requires `coacd==1.0.14`. The checked-in assets need no
 CoACD dependency at runtime. MuJoCo materials explicitly reference the PNGs;
 MuJoCo does not import the OBJ material library.
+
+The expanded scene also uses the existing textured workspace bowl reconstruction
+from `Documents/Coding/bowl/meshes/bowl_textured.obj`. Its source UVs and PNG
+pixels are preserved. The source has unit diameter and Y-up coordinates; the
+preparation tool explicitly scales it to a 16 cm diameter and rotates to Z-up.
+This bowl is a separate workspace reconstruction, not an attributed YCB scan.
+It has 40 approximate convex contact pieces and an illustrative 60 g mass;
+its inertia uses convex-piece volume weights rather than equal piece masses.
