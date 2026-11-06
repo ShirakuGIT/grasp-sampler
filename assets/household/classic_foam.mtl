@@ -1,0 +1,3 @@
+newmtl classic_foam
+Kd 1 1 1
+map_Kd classic_foam.png

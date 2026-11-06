@@ -201,7 +201,5 @@
   "attachment_constraints": false,
   "rrt_connect_queries": 3,
   "joint_collision_resolution_rad": 0.04,
-  "placement_orientation": "free",
-  "command": "PYTHONPATH=src python examples/pick_place_mujoco.py --headless --objects 3 --report /tmp/shelf-picks.json",
-  "scope": "Single seeded lateral/oblique retrieval run with native MuJoCo physics, existing asset meshes, scratch-state RRT-Connect and orientation-free released placement on the requested support. Not a benchmark success-rate estimate."
+  "placement_orientation": "free"
 }

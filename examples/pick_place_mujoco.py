@@ -6,8 +6,8 @@ python examples/pick_place_mujoco.py --headless --report /tmp/mujoco-picks.json
 
 Uses lateral/oblique antipodal grasps, named-site Jacobian IK, RRT-Connect,
 native joint actuators, and frictional finger contact. No object attachment or
-teleportation. The bottle goes from the lower bay to the upper tier; the other
-existing mesh assets are extracted and reoriented for tabletop placement.
+teleportation. A textured Ritz box moves between tiers; a mug, cup and plate
+move to the tabletop. Use --suite classic for the earlier bottle/can/foam scene.
 """
 from __future__ import annotations
 
@@ -29,15 +29,17 @@ from scipy.spatial.transform import Rotation, Slerp
 if sys.platform == "darwin":
     os.environ.setdefault("GRASP_SAMPLER_DISABLE_OPEN3D", "1")
 
-from mujoco_workstation_scene import BASE_Z, SHELF_Z, TABLE_Z, UPPER_Z, build_scene  # noqa: E402
+from mujoco_workstation_scene import BASE_Z, SHELF_Z, SUITES, TABLE_Z, UPPER_Z, build_scene  # noqa: E402
 
 from grasp_sampler import GraspConfig, GraspSampler, ObjMesh, PlanningGrasps, tcp_to_ee  # noqa: E402
 from grasp_sampler.integrations.mujoco import solve_site_ik  # noqa: E402
 
 
 class Workstation:
-    def __init__(self, count=3, gui=False):
-        xml, self.objects, fixtures = build_scene(count)
+    def __init__(self, count=3, gui=False, suite="classic"):
+        self.suite = suite
+        self.shapes = SUITES[suite][:count]
+        xml, self.objects, fixtures = build_scene(count, suite)
         self.model = mj.MjModel.from_xml_string(xml)
         self.data = mj.MjData(self.model)
         self.scratch = mj.MjData(self.model)
@@ -137,10 +139,14 @@ class Workstation:
             self.step(seconds / count)
         self.step(.25)
 
-    def move_joint(self, target, seconds=1.2):
+    def move_joint(self, target, seconds=1.2, seed=None):
         """Collision-checked joint transit, with the held mesh in the query."""
         result = solve_site_ik(self.model, self.data, "hand_tcp", target, self.joint_names,
-                               max_iterations=200, damping=.02)
+                               seed=seed, max_iterations=200, damping=.02)
+        if not result.success and result.position_error > .004:
+            result = solve_site_ik(self.model, self.data, "hand_tcp", target, self.joint_names,
+                seed=self.home, max_iterations=400, damping=.01,
+                position_tolerance=.002, orientation_tolerance=.03)
         if not result.success and result.position_error > .004:
             raise RuntimeError(f"Transit IK failed during {self.phase}: {result.position_error:.4f}m")
         start = self.data.qpos[self.q_indices].copy()
@@ -255,11 +261,17 @@ class Workstation:
         raise RuntimeError(f"No collision-free transit found during {self.phase}")
 
     def grip(self, opening, settle=.65):
-        self.data.ctrl[self.gripper] = float(np.clip(opening / .08, 0, 1) * 255)
+        fraction = float(np.clip(opening / .08, 0, 1))
+        # Invert the preloaded tendon actuator's equilibrium for partial
+        # openings. Zero remains a force-closing command.
+        if self.suite == "household" and opening > 0:
+            fraction = (16+500*(fraction*.04))/36
+        self.data.ctrl[self.gripper] = fraction*255
         self.step(settle)
 
     def make_targets(self, index):
         mesh, _, _ = self.objects[index]
+        shape = self.shapes[index]
         world = np.eye(4)
         world[:3, 3] = self.data.xpos[self.body_ids[index]]
         world[:3, :3] = self.data.xmat[self.body_ids[index]].reshape(3, 3)
@@ -267,38 +279,69 @@ class Workstation:
         # frontal and oblique world directions after physical settling.
         world_facets = np.array([[1., 0., 0.], [.94, .25, .2], [.94, -.25, -.2]])
         local_facets = world_facets @ world[:3, :3]
-        sampler = GraspSampler(replace(self.sampler.config, approach_facets=tuple(map(tuple, local_facets))))
+        concave = shape in ("mug", "cup", "plate")
+        sampler = GraspSampler(replace(self.sampler.config, approach_facets=tuple(map(tuple, local_facets)),
+            contact_geometry_policy="mesh" if concave else "auto",
+            antipodal_samples=1800 if concave else 600,
+            antipodal_max_grasps=900 if concave else 600,
+            antipodal_min_width=.004 if concave else .01))
         # MuJoCo uses the dynamic mesh's convex hull for contact. Match that
         # geometry for these decimated, occasionally open scan meshes.
-        contact_mesh = mesh.convex_hull
+        contact_mesh = mesh.copy() if concave else mesh.convex_hull
+        if concave:
+            contact_mesh.merge_vertices(merge_tex=True, merge_norm=True)
+            contact_mesh.update_faces(contact_mesh.nondegenerate_faces())
+            contact_mesh.remove_unreferenced_vertices()
+        if shape == "mug":
+            # Sample the actual handle region densely. Full-scene MuJoCo
+            # screening still checks the complete vessel and every fixture.
+            contact_mesh = contact_mesh.submesh([contact_mesh.triangles_center[:, 0] > .031], append=True)
         grasps = sampler.generate(ObjMesh(contact_mesh, mesh.extents, np.eye(4), mesh.extents, "irregular"),
                                   methods=("antipodal",), seed=index)
-        grasps = [g for g in grasps if abs(g.pose[2, 3]) < mesh.extents[2] * .40
+        grasps = [g for g in grasps if (shape == "plate" or abs(g.pose[2, 3]) < mesh.extents[2] * .40)
                   and (world[:3, :3] @ g.pose[:3, 2])[0] > .75
-                  and abs((world[:3, :3] @ g.pose[:3, 0])[2]) < .35]
+                  and (shape == "plate" or abs((world[:3, :3] @ g.pose[:3, 0])[2]) < .35)
+                  and (shape != "plate" or g.pose[0, 3] < -.09)
+                  and (shape != "mug" or g.pose[0, 3] > .047)]
         grasps.sort(key=lambda g: float(np.linalg.norm(g.pose[:3, 3])))
         calibration = tcp_to_ee(np.eye(4)[None], standoff=0)[0]
         targets = PlanningGrasps.from_grasps(grasps, world, frame_id="world", tool_link="hand_tcp",
-                                             tcp_to_tool=calibration, approach_distance=.15,
+                                             tcp_to_tool=calibration,
+                                             approach_distance=.23 if shape == "ritz" else .15,
                                              lift_offset=(-.20, 0, .15))
         return targets, grasps, world
 
     def screen(self, targets):
         rejected, costs = {}, {}
+        self.pregrasp_seeds = {}
+        self.place_rotations = {}
         self.scratch.qpos[:] = self.data.qpos
         for name in ("gripper_finger_joint1", "gripper_finger_joint2"):
             self.scratch.qpos[self.model.joint(name).qposadr[0]] = .04
         start = self.data.qpos[self.q_indices].copy()
         for i in np.linspace(0, len(targets)-1, min(len(targets), 32), dtype=int):
             i = int(i)
-            seed, reason = start.copy(), None
+            self.scratch.qpos[:] = self.data.qpos
+            for name in ("gripper_finger_joint1", "gripper_finger_joint2"):
+                self.scratch.qpos[self.model.joint(name).qposadr[0]] = .04
+            seed, reason = (self.home if self.suite == "household" else start).copy(), None
             for t in np.linspace(0, 1, 5):
                 pose = targets.grasp[i].copy()
                 pose[:3, 3] = (1 - t) * targets.pregrasp[i, :3, 3] + t * targets.grasp[i, :3, 3]
-                result = solve_site_ik(self.model, self.scratch, "hand_tcp", pose, self.joint_names, seed=seed)
+                options = (dict(max_iterations=250, damping=.01,
+                                position_tolerance=.002, orientation_tolerance=.03)
+                           if self.suite == "household" else {})
+                result = solve_site_ik(self.model, self.scratch, "hand_tcp", pose,
+                                       self.joint_names, seed=seed, **options)
+                if not result.success and t == 0 and self.suite == "household":
+                    result = solve_site_ik(self.model, self.scratch, "hand_tcp", pose, self.joint_names,
+                        seed=self.home, max_iterations=400, damping=.01,
+                        position_tolerance=.002, orientation_tolerance=.03)
                 if not result.success:
                     reason = "IK / joint limits"; break
                 seed = result.positions
+                if t == 0:
+                    self.pregrasp_seeds[i] = seed.copy()
                 self.scratch.qpos[self.q_indices] = seed
                 mj.mj_forward(self.model, self.scratch)
                 for contact in self.scratch.contact[:self.scratch.ncon]:
@@ -324,10 +367,82 @@ class Workstation:
                         a, b = self.model.geom_bodyid[[contact.geom1, contact.geom2]]
                         if contact.dist < -.0005 and (a in self.robot_bodies or b in self.robot_bodies):
                             reason = "upper-tier collision"; break
+            if reason is None and self.suite == "household":
+                # Check the post-contact Cartesian extraction and lift too.
+                # A reachable grasp alone is insufficient near a joint limit.
+                unseat = targets.grasp[i].copy(); unseat[2, 3] += .015
+                retreat = targets.pregrasp[i].copy(); retreat[2, 3] = unseat[2, 3]
+                lift = retreat.copy()
+                lift[2, 3] += .14 if self.active == 0 else .16 if self.shapes[self.active] == "plate" else .10
+                previous = targets.grasp[i]
+                for endpoint in (unseat, retreat, lift):
+                    for fraction in np.linspace(0, 1, 4)[1:]:
+                        pose = endpoint.copy()
+                        pose[:3, 3] = (1-fraction)*previous[:3, 3]+fraction*endpoint[:3, 3]
+                        result = solve_site_ik(self.model, self.scratch, "hand_tcp", pose, self.joint_names,
+                            seed=seed, max_iterations=200, damping=.02,
+                            position_tolerance=.001, orientation_tolerance=.02)
+                        if not result.success:
+                            reason = "extraction / lift IK"; break
+                        seed = result.positions
+                    if reason:
+                        break
+                    previous = endpoint
+                if reason is None:
+                    held = self.body_ids[self.active]
+                    obj = lift @ np.linalg.inv(targets.grasp[i]) @ self.world
+                    address = self.model.joint(f"item_{self.active}_free").qposadr[0]
+                    self.scratch.qpos[address:address+3] = obj[:3, 3]
+                    quat = Rotation.from_matrix(obj[:3, :3]).as_quat()
+                    self.scratch.qpos[address+3:address+7] = quat[[3, 0, 1, 2]]
+                    self.scratch.qpos[self.q_indices] = seed
+                    for name in ("gripper_finger_joint1", "gripper_finger_joint2"):
+                        self.scratch.qpos[self.model.joint(name).qposadr[0]] = targets.widths[i]/2
+                    mj.mj_forward(self.model, self.scratch)
+                    gripper = self.finger_ids | {self.model.body("gripper_hand").id}
+                    for contact in self.scratch.contact[:self.scratch.ncon]:
+                        a, b = map(int, self.model.geom_bodyid[[contact.geom1, contact.geom2]])
+                        if (a == held and b in gripper) or (b == held and a in gripper):
+                            continue
+                        if contact.dist < -.001 and (a in self.robot_bodies or b in self.robot_bodies
+                                                     or a == held or b == held):
+                            reason = "lift / held-object collision"; break
+                if reason is None and self.active > 0:
+                    mesh, _, goal = self.objects[self.active]
+                    relative = np.linalg.inv(targets.grasp[i]) @ self.world
+                    sign = 1 if goal[1] < 0 else -1
+                    for angle in (90, 65, 115):
+                        destination = np.eye(4)
+                        destination[:3, :3] = (Rotation.from_euler("z", sign*angle, degrees=True).as_matrix()
+                                                @ targets.grasp[i, :3, :3])
+                        rotation = destination[:3, :3] @ relative[:3, :3]
+                        center = goal.copy()
+                        center[2] = TABLE_Z-float((mesh.vertices @ rotation.T)[:, 2].min())
+                        destination[:3, 3] = center+[0, 0, .012]-destination[:3, :3] @ relative[:3, 3]
+                        overhead = destination.copy()
+                        overhead[2, 3] = max(TABLE_Z+.30, destination[2, 3]+.12)
+                        high = solve_site_ik(self.model, self.scratch, "hand_tcp", overhead, self.joint_names,
+                            seed=self.home, max_iterations=300, damping=.01,
+                            position_tolerance=.002, orientation_tolerance=.03)
+                        if not high.success:
+                            continue
+                        low = solve_site_ik(self.model, self.scratch, "hand_tcp", destination, self.joint_names,
+                            seed=high.positions, max_iterations=250, damping=.01,
+                            position_tolerance=.002, orientation_tolerance=.03)
+                        if low.success:
+                            self.place_rotations[i] = destination[:3, :3].copy()
+                            break
+                    else:
+                        reason = "placement IK"
             if reason:
                 rejected[i] = reason
             else:
                 costs[i] = float(np.linalg.norm(seed - start) + 20 * np.linalg.norm(self.grasps[i].pose[:3, 3]))
+                if self.shapes[self.active] == "plate":
+                    # Prefer a horizontal rim insertion over a shorter joint
+                    # move that leaves a steep, easily slipping thin contact.
+                    approach = self.world[:3, :3] @ self.grasps[i].pose[:3, 2]
+                    costs[i] += 5*float(np.arccos(np.clip(approach[0], -1, 1)))
         if not costs:
             raise RuntimeError(f"No feasible sampled grasp: {rejected}")
         return min(costs, key=costs.get), rejected, costs
@@ -341,8 +456,12 @@ class Workstation:
     def contacts(self, index):
         touched = set()
         body = self.body_ids[index]
-        for contact in self.data.contact[:self.data.ncon]:
+        force = np.zeros(6)
+        for number, contact in enumerate(self.data.contact[:self.data.ncon]):
             a, b = self.model.geom_bodyid[[contact.geom1, contact.geom2]]
+            mj.mj_contactForce(self.model, self.data, number, force)
+            if force[0] <= .01:
+                continue
             if a == body and b in self.finger_ids:
                 touched.add(int(b))
             elif b == body and a in self.finger_ids:
@@ -380,16 +499,21 @@ class Workstation:
         floor = UPPER_Z if index == 0 else TABLE_Z
         bottom = float((mesh.vertices @ rotation.T + position)[:, 2].min())
         error = float(np.linalg.norm(position[:2]-goal[:2]))
+        in_region = error < .04
         settled = (np.linalg.norm(self.data.cvel[body, 3:]) < .08
                    and np.linalg.norm(self.data.cvel[body, :3]) < .5)
-        passed = bool(supported and released and settled and abs(bottom-floor) < .015 and error < .04)
+        passed = bool(supported and released and settled and abs(bottom-floor) < .015 and in_region)
         return passed, {"support_surface": names[0], "supported": bool(supported),
                         "released": released, "settled": bool(settled), "support_normal_force": normal_force,
-                        "object_bottom_height": bottom, "placement_error_xy": error}
+                        "object_bottom_height": bottom, "placement_error_xy": error,
+                        "within_placement_region": in_region,
+                        "placement_radial_tolerance": .04}
 
-    def run(self):
-        records = []
-        for i, (_, label, goal) in enumerate(self.objects):
+    def run(self, object_indices=None):
+        records = self.records = []
+        indices = list(range(self.count)) if object_indices is None else list(object_indices)
+        for i in indices:
+            _, label, goal = self.objects[i]
             initial_height = float(self.data.xpos[self.body_ids[i], 2])
             self.active, self.selected, self.rejected, self.costs = i, None, {}, {}
             self.active_target = None
@@ -407,7 +531,9 @@ class Workstation:
             unseat = chosen.grasp[0].copy(); unseat[2, 3] += .015
             retreat = chosen.pregrasp[0].copy(); retreat[2, 3] = unseat[2, 3]
             lift = retreat.copy(); lift[2, 3] += .14 if i == 0 else .20
-            if i > 0:
+            if self.suite == "household" and i > 0:
+                lift[2, 3] = retreat[2, 3]+(.16 if self.shapes[i] == "plate" else .10)
+            if i > 0 and self.suite == "classic":
                 down_tcp = np.diag([1., -1., -1., 1.])
                 lift[:3, :3] = tcp_to_ee(down_tcp[None], standoff=0)[0, :3, :3]
             self.pick_path = [chosen.pregrasp[0], chosen.grasp[0], unseat, retreat, lift]
@@ -416,7 +542,8 @@ class Workstation:
                 self.step(1.5)
             self.grip(.08, .15)
             self.stage("APPROACH")
-            self.move_joint(chosen.pregrasp[0], 1.5)
+            self.move_joint(chosen.pregrasp[0], 1.5,
+                            seed=self.pregrasp_seeds[self.selected] if self.suite == "household" else None)
             self.move(chosen.grasp[0], .9)
             self.stage("CLOSE / BILATERAL CONTACT")
             self.grip(0.)
@@ -432,6 +559,8 @@ class Workstation:
             self.move_joint(lift, 1.1)
             lifted = float(self.data.xpos[self.body_ids[i], 2])
             grasped = contact and lifted > initial_height + .08
+            if not grasped or not self.contacts(i):
+                raise RuntimeError(f"Lost the {label} during extraction/lift")
             self.stage("TRANSFER TO UPPER TIER" if i == 0 else "TRANSFER TO TABLETOP")
             # Place the current physical orientation on the table. This also
             # handles naturally settled, horizontal scan assets such as markers.
@@ -443,6 +572,10 @@ class Workstation:
             destination = self.pose()
             if i == 0:
                 destination[:3, :3] = chosen.grasp[0, :3, :3]
+            elif self.suite == "household":
+                # Turn around world Z to approach a table edge while keeping
+                # the mug/cup/plate upright, rather than tipping vessels over.
+                destination[:3, :3] = self.place_rotations[self.selected]
             object_rotation = destination[:3, :3] @ relative[:3, :3]
             goal = goal.copy()
             floor = UPPER_Z if i == 0 else TABLE_Z
@@ -453,16 +586,68 @@ class Workstation:
             if i == 0:
                 overhead[0, 3] -= .15
             else:
-                overhead[2, 3] = max(TABLE_Z+.36, destination[2, 3]+.12)
+                overhead[2, 3] = max(TABLE_Z+(.30 if self.suite == "household" else .36), destination[2, 3]+.12)
             self.move_joint(overhead, 1.5)
+            if self.suite == "household":
+                # Re-measure after transit: thin rim/handle contacts can settle
+                # within the pads, so the earlier relative pose is stale.
+                rotation = self.data.xmat[self.body_ids[i]].reshape(3, 3)
+                goal[2] = floor-float((mesh.vertices @ rotation.T)[:, 2].min())
+                destination = self.pose()
+                destination[:3, 3] += goal+[0, 0, clearance]-self.data.xpos[self.body_ids[i]]
             self.stage("PLACE / RELEASE")
-            self.move(destination, 1.)
-            correction = goal + [0, 0, clearance] - self.data.xpos[self.body_ids[i]]
-            if grasped and np.linalg.norm(correction) > .003:
-                corrected = self.pose(); corrected[:3, 3] += correction
-                self.move(corrected, .6)
-            self.grip(.08, .6)
+            if self.suite == "household" and i > 0:
+                if self.shapes[i] == "plate":
+                    # A settled rim contact can move the plate center by a
+                    # substantial fraction of its radius during transit. Align
+                    # above the lower shelf lip before starting the descent.
+                    for _ in range(24):
+                        rotation = self.data.xmat[self.body_ids[i]].reshape(3, 3)
+                        offset = float((mesh.vertices @ rotation.T)[:, 2].min())
+                        center = self.data.xpos[self.body_ids[i]]
+                        delta = np.array([goal[0]-center[0], goal[1]-center[1],
+                                          max(0., SHELF_Z+.02-(center[2]+offset))])
+                        distance = np.linalg.norm(delta)
+                        if distance < .003:
+                            break
+                        corrected = self.pose()
+                        corrected[:3, 3] += delta*min(1., .015/distance)
+                        self.move(corrected, .12)
+                # Pose feedback during lowering handles settling/sliding in
+                # the pads. Recompute the actual support height every step.
+                clearance = .002 if self.shapes[i] == "plate" else .004
+                for _ in range(40):
+                    rotation = self.data.xmat[self.body_ids[i]].reshape(3, 3)
+                    goal[2] = floor-float((mesh.vertices @ rotation.T)[:, 2].min())
+                    delta = goal+[0, 0, clearance]-self.data.xpos[self.body_ids[i]]
+                    distance = np.linalg.norm(delta)
+                    if distance < .002:
+                        break
+                    corrected = self.pose()
+                    corrected[:3, 3] += delta*min(1., .015/distance)
+                    self.move(corrected, .12)
+            else:
+                self.move(destination, 1.)
+                correction = goal + [0, 0, clearance] - self.data.xpos[self.body_ids[i]]
+                if grasped and np.linalg.norm(correction) > .003:
+                    corrected = self.pose(); corrected[:3, 3] += correction
+                    self.move(corrected, .6)
+            # A rim grasp closes vertically: opening 80 mm at table height
+            # would drive the lower finger through the table. Release just
+            # beyond the measured rim width, retract, then open fully.
+            rim = self.shapes[i] == "plate"
+            self.grip(min(.08, chosen.widths[0]+.015) if rim else .08, .6)
             self.held_index = None
+            if rim:
+                # Slide out along the insertion direction before rising; an
+                # immediate vertical retract would hook the rim from below.
+                withdraw = self.pose()
+                direction = -withdraw[:3, 2].copy()
+                direction[2] = max(0., direction[2])
+                withdraw[:3, 3] += direction/np.linalg.norm(direction)*.10
+                self.move(withdraw, .8)
+            if rim:
+                self.grip(.08, .2)
             self.move(overhead, .8)
             self.step(.8)
             placed, support = self.placement_status(i, goal)
@@ -476,15 +661,16 @@ class Workstation:
             angle = float(np.degrees(np.arccos(np.clip(
                 self.world[:3, :3] @ self.grasps[self.selected].pose[:3, 2] @ np.array([1., 0., 0.]), -1, 1))))
             records.append({"object": i, "shape": label, "sampled_candidates": len(targets),
+                "demo_mass_kg": float(self.model.body_mass[self.body_ids[i]]),
                 "destination": "upper tier" if i == 0 else "tabletop", "approach_obliquity_deg": angle,
                 "selected_candidate": self.selected, "rejected": self.rejected, "costs": self.costs,
                 "bilateral_contact": contact, "lifted_height": lifted, "goal": goal.tolist(),
                 "final_position": final.tolist(), **support, "success": success})
             print(f"  contact={contact}, lift={lifted-BASE_Z:.3f}m above base, "
                   f"placement_error={error:.4f}m, success={success}", flush=True)
-        self.stage(f"COMPLETE / {self.completed} OF {self.count} RETRIEVED")
-        return {"simulator": "MuJoCo", "version": mj.__version__, "robot": "FR3v2",
-                "objects": records, "successes": self.completed, "total": self.count,
+        self.stage(f"COMPLETE / {self.completed} OF {len(indices)} RETRIEVED")
+        return {"simulator": "MuJoCo", "version": mj.__version__, "robot": "FR3v2", "suite": self.suite,
+                "objects": records, "successes": self.completed, "total": len(indices),
                 "attachment_constraints": False, "rrt_connect_queries": self.planning_calls,
                 "joint_collision_resolution_rad": .04, "placement_orientation": "free"}
 
@@ -567,14 +753,27 @@ def main():
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--gui", action="store_true")
     mode.add_argument("--headless", action="store_true")
-    parser.add_argument("--objects", type=int, choices=range(1, 4), default=3)
+    parser.add_argument("--suite", choices=SUITES, default="household")
+    parser.add_argument("--objects", type=int, choices=range(1, 5))
     parser.add_argument("--hold", action="store_true")
     parser.add_argument("--report", type=Path)
     parser.add_argument("--snapshot", type=Path)
     args = parser.parse_args()
-    demo = Workstation(args.objects, gui=args.gui)
+    count = args.objects or len(SUITES[args.suite])
+    if count > len(SUITES[args.suite]):
+        parser.error("--objects exceeds the number of objects in the chosen suite")
+    demo = Workstation(count, gui=args.gui, suite=args.suite)
     try:
-        report = demo.run()
+        try:
+            report = demo.run()
+        except RuntimeError as error:
+            failed_stage = demo.phase
+            demo.stage(f"FAILED / {error}")
+            report = {"simulator": "MuJoCo", "robot": "FR3v2", "suite": args.suite,
+                      "objects": getattr(demo, "records", []), "successes": demo.completed,
+                      "total": count, "failed_object": demo.active, "failed_stage": failed_stage,
+                      "error": str(error), "attachment_constraints": False}
+            print(str(error), file=sys.stderr, flush=True)
         if args.report:
             args.report.parent.mkdir(parents=True, exist_ok=True)
             args.report.write_text(json.dumps(report, indent=2) + "\n")

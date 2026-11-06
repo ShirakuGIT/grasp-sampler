@@ -82,13 +82,14 @@ Planner packages are imported only when their adapters are called. See the
 robust-command preservation, and runnable exports/examples.
 
 The default demo uses **MuJoCo and a Franka FR3v2** for constrained lateral and
-oblique grasps inside a two-tier cabinet. The mustard bottle moves from the lower
-bay to the upper tier; the can and foam brick are extracted and reoriented for
-tabletop placement. All three objects come from `assets/meshes`. Cyan glyphs show
+oblique grasps inside a two-tier cabinet. The household scene includes a **Ritz
+box, mug, cup and plate**, using original scanned textures and packaging colors.
+The mug handle, cup cavity and plate rim have separate convex contact pieces.
+`--suite classic` retains the mustard/can/foam sequence. Cyan glyphs show
 candidates, coral marks rejections, and gold highlights the selection and staged
 extraction path. A native HUD and cost plot explain the decisions.
 
-![MuJoCo FR3v2 with a two-tier cabinet and lateral grasp candidates](docs/results/mujoco-shelf.png)
+![MuJoCo FR3v2 with original household scan textures](docs/results/mujoco-household.png)
 
 ```bash
 pip install -e ".[mujoco,fr3]"
@@ -98,6 +99,8 @@ mjpython examples/pick_place_mujoco.py --gui --hold
 # Linux: python examples/pick_place_mujoco.py --gui --hold
 # Headless physical check:
 python examples/pick_place_mujoco.py --headless --report /tmp/shelf-picks.json
+# Original three-object scene:
+python examples/pick_place_mujoco.py --suite classic --headless
 ```
 
 The scene follows shelf-picking / open-cabinet retrieval setups from
@@ -107,6 +110,8 @@ insertion and extraction use Cartesian stages. Execution uses native actuators
 and finger contact, with no object attachments or teleportation. Source material
 regions preserve the FR3v2's dark accents and
 markings. The separate PyBullet demo remains in `examples/pick_place_pybullet.py`.
+Household asset provenance and preparation are documented in
+[assets/household/README.md](assets/household/README.md).
 
 ## Robust evaluation under perceived object uncertainty
 

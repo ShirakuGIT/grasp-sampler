@@ -15,17 +15,27 @@ COLORS = [[.94, .25, .16, 1], [.12, .48, .94, 1], [.98, .65, .12, 1],
           [.56, .28, .86, 1], [.08, .72, .49, 1], [.95, .28, .56, 1]]
 
 
-def object_mesh(i):
-    name = ("ycb_mustard_bottle", "ycb_potted_meat_can", "ycb_foam_brick")[i]
-    obj = load_mesh(ROOT / "assets/meshes" / f"{name}_metric_fp.glb")
-    return obj.mesh, name.removeprefix("ycb_").replace("_", " ")
+SUITES = {"classic": ("mustard", "can", "foam"), "household": ("ritz", "mug", "cup", "plate")}
+LABELS = {"ritz": "Ritz cracker box", "mug": "mug", "cup": "cup", "plate": "plate",
+          "mustard": "mustard bottle", "can": "potted meat can", "foam": "foam brick"}
+
+
+def object_mesh(i, suite="classic"):
+    name = SUITES[suite][i]
+    if suite == "classic":
+        old_name = ("mustard_bottle", "potted_meat_can", "foam_brick")[i]
+        return load_mesh(ROOT/f"assets/meshes/ycb_{old_name}_metric_fp.glb").mesh, LABELS[name]
+    path = ROOT / "assets/household" / f"{name}.glb"
+    if not path.exists():
+        raise FileNotFoundError(f"Missing original household asset: {path}")
+    return load_mesh(path, process=False).mesh, LABELS[name]
 
 
 def numbers(values):
     return " ".join(f"{v:.8g}" for v in values)
 
 
-def build_scene(count):
+def build_scene(count, suite="classic"):
     path = ROOT / "assets/robots/fr3v2_mujoco/fr3v2_with_hand.xml"
     if not path.exists():
         raise FileNotFoundError("Run python tools/prepare_fr3_mujoco.py before launching the workstation")
@@ -60,7 +70,7 @@ def build_scene(count):
             fixtures.append(name)
         return ET.SubElement(world, "geom", **attrs)
 
-    box("table", [1.28, 1.06, .045], [.44, 0, TABLE_Z - .0225], material="table_material")
+    box("table", [1.28, 1.20 if suite == "household" else 1.06, .045], [.44, 0, TABLE_Z - .0225], material="table_material")
     for x in [-.13, 1.01]:
         for y in [-.45, .45]:
             box(f"leg_{x}_{y}", [.055, .055, .67], [x, y, .36], material="steel_material")
@@ -76,32 +86,65 @@ def build_scene(count):
     box("pick_mat", [.36, .29, .002], [.45, -.18, TABLE_Z + .001], collision=False)
     # Two constrained cabinet bays. The 28 cm tier spacing rules out a full
     # top-down pregrasp for the tall object; the arm approaches through -X.
+    shelf_width = .88 if suite == "household" else .64
     for name, z in (("shelf_floor", SHELF_Z), ("upper_tier", UPPER_Z), ("shelf_roof", 1.40)):
-        box(name, [.35, .64, .018], [.60, -.04, z-.009], color=".70 .74 .76 1")
-        box(name+"_edge", [.012, .64, .025], [.425, -.04, z-.014], color=".28 .34 .39 1")
-    box("shelf_back", [.016, .64, .68], [.785, -.04, 1.06], color=".20 .25 .30 1")
-    for y in [-.37, .29]:
+        box(name, [.35, shelf_width, .018], [.60, -.04, z-.009], color=".70 .74 .76 1")
+        box(name+"_edge", [.012, shelf_width, .025], [.425, -.04, z-.014], color=".28 .34 .39 1")
+    box("shelf_back", [.016, shelf_width, .68], [.785, -.04, 1.06], color=".20 .25 .30 1")
+    for y in [-.04-shelf_width/2-.01, -.04+shelf_width/2+.01]:
         box(f"shelf_side_{y}", [.36, .016, .68], [.60, y, 1.06], color=".55 .61 .65 1")
     for x in [.45, .75]:
         for y in [-.33, .25]:
             box(f"shelf_foot_{x}_{y}", [.025, .025, .11], [x, y, .775], material="steel_material")
     objects = []
     for i in range(count):
-        mesh, label = object_mesh(i)
+        mesh, label = object_mesh(i, suite)
+        name = SUITES[suite][i]
         size = mesh.extents
         position = [.50 if i == 0 else .44, -.16 + .16 * i, SHELF_Z + size[2] / 2 + .001]
         goal = (np.array([.50, -.16, UPPER_Z + size[2] / 2]) if i == 0 else
                 np.array([.30, -.28 if i == 1 else .35, TABLE_Z + size[2] / 2]))
         yaw = .08 * (i - 1)
+        if suite == "household":
+            position = ([.50, -.23, SHELF_Z+size[2]/2+.001],
+                        [.54, -.06, UPPER_Z+size[2]/2+.001],
+                        [.49, .17, SHELF_Z+size[2]/2+.001],
+                        [.54, .20, UPPER_Z+size[2]/2+.001])[i]
+            goal = np.array(([.50, -.23, UPPER_Z+size[2]/2],
+                             [.24, -.50, TABLE_Z+size[2]/2],
+                             [.27, .43, TABLE_Z+size[2]/2],
+                             [.26, .10, TABLE_Z+size[2]/2])[i])
+            yaw = np.pi if name == "mug" else 0.
         body = ET.SubElement(world, "body", name=f"item_{i}", pos=numbers(position),
                              quat=numbers([np.cos(yaw / 2), 0, 0, np.sin(yaw / 2)]))
         ET.SubElement(body, "freejoint", name=f"item_{i}_free")
-        kwargs = dict(name=f"item_{i}_geom", mass=".06", rgba=numbers(COLORS[i]),
+        kwargs = dict(
                       friction="1.6 .015 .002", condim="4", solref=".004 1", solimp=".95 .99 .001")
-        ET.SubElement(asset, "mesh", name=f"item_{i}_mesh", vertex=numbers(mesh.vertices.reshape(-1)),
-                      face=" ".join(map(str, mesh.faces.reshape(-1))))
-        kwargs.update(type="mesh", mesh=f"item_{i}_mesh")
-        ET.SubElement(body, "geom", **kwargs)
+        directory = ROOT / "assets/household"
+        visual_name = f"classic_{name}" if suite == "classic" else name
+        ET.SubElement(asset, "texture", name=f"item_{i}_texture", type="2d", file=str(directory/f"{visual_name}.png"))
+        ET.SubElement(asset, "material", name=f"item_{i}_material", texture=f"item_{i}_texture",
+                      rgba="1 1 1 1", specular=".15", shininess=".15")
+        ET.SubElement(asset, "mesh", name=f"item_{i}_visual", file=str(directory/f"{visual_name}.obj"))
+        ET.SubElement(body, "geom", name=f"item_{i}_visual_geom", type="mesh", mesh=f"item_{i}_visual",
+                      material=f"item_{i}_material", contype="0", conaffinity="0", group="1", mass="0")
+        if suite == "classic":
+            ET.SubElement(asset, "mesh", name=f"item_{i}_mesh", vertex=numbers(mesh.vertices.reshape(-1)),
+                          face=" ".join(map(str, mesh.faces.reshape(-1))))
+            ET.SubElement(body, "geom", name=f"item_{i}_geom", mass=".06", group="3",
+                          type="mesh", mesh=f"item_{i}_mesh", **kwargs)
+        else:
+            parts = np.load(directory/f"{name}_collision.npz", allow_pickle=False)
+            part_count = len(parts.files)//2
+            mass = .03 if name == "plate" else .06
+            for part in range(part_count):
+                mesh_name = f"item_{i}_part_{part}"
+                ET.SubElement(asset, "mesh", name=mesh_name,
+                              vertex=numbers(parts[f"vertices_{part}"].reshape(-1)),
+                              face=" ".join(map(str, parts[f"faces_{part}"].reshape(-1))))
+                ET.SubElement(body, "geom", name=f"item_{i}_geom" if part == 0 else mesh_name,
+                              type="mesh", mesh=mesh_name, group="3", mass=str(mass/part_count), **kwargs)
+            parts.close()
         floor_z = UPPER_Z if i == 0 else TABLE_Z
         box(f"slot_{i}", [.10, .12, .0005], [goal[0], goal[1], floor_z + .0005],
             color=numbers([*COLORS[i][:3], .45]), collision=False)
@@ -112,4 +155,17 @@ def build_scene(count):
         if "fingertip_pad_collision" in node.attrib.get("class", ""):
             geom = node.find("geom")
             geom.attrib.update(friction="2 .02 .002", condim="4", solref=".004 1")
+            if suite == "household":
+                # Rolling resistance represents the finite 17 mm rubber pad,
+                # rather than a torque-free point contact on a thin rim.
+                geom.attrib.update(condim="6", friction="2 .02 .008")
+                if node.attrib["class"].endswith("_1"):
+                    # The stock central proxy leaves a 3 mm dead gap even at
+                    # zero opening. Let the rubber pads meet for thin rims.
+                    geom.attrib["size"] = ".0085 .0055 .0085"
+    if suite == "household":
+        # Preload lets the native force-limited fingers hold thin handles/rims.
+        # The same 80 mm opening and +/-40 N actuator limits are retained.
+        actuator = root.find("actuator/general[@name='gripper_actuator8']")
+        actuator.attrib.update(gainprm=f"{36/255} 0 0", biasprm="-16 -500 -20")
     return ET.tostring(root, encoding="unicode"), objects, fixtures
