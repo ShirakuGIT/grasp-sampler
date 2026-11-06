@@ -47,12 +47,12 @@ def build_scene(count, suite="classic"):
     ET.SubElement(root, "size", njmax="4000", nconmax="2000")
     visual = ET.SubElement(root, "visual")
     ET.SubElement(visual, "global", offwidth="1600", offheight="1000", azimuth="135", elevation="-28")
-    ET.SubElement(visual, "quality", shadowsize="4096", offsamples="4")
+    ET.SubElement(visual, "quality", shadowsize="2048", offsamples="2")
     ET.SubElement(visual, "headlight", ambient=".25 .25 .25", diffuse=".6 .6 .6", specular=".3 .3 .3")
     ET.SubElement(asset, "texture", name="studio_sky", type="skybox", builtin="gradient",
                   rgb1=".14 .18 .23", rgb2=".025 .04 .065", width="512", height="3072")
     ET.SubElement(asset, "material", name="table_material", rgba=".42 .51 .56 1",
-                  specular=".35", shininess=".25", reflectance=".025")
+                  specular=".35", shininess=".25", reflectance="0")
     ET.SubElement(asset, "material", name="steel_material", rgba=".22 .29 .35 1", specular=".65", shininess=".5")
     ET.SubElement(world, "light", pos="0 -1 3", dir=".1 .3 -1", diffuse=".8 .85 .9", castshadow="true")
     ET.SubElement(world, "light", pos="1 1 2.5", dir="-.4 -.2 -1", diffuse=".5 .6 .7", castshadow="false")

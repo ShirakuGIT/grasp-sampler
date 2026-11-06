@@ -245,7 +245,7 @@ Reference: [pybullet-planning tool-pose IK](https://pybullet-planning.readthedoc
 
 For the default **FR3v2 lateral tier-to-tier and tabletop demonstration**, use the existing mesh
 assets and setup in {doc}`scenarios`. It includes native physics, a live grasp
-selection HUD/cost plot, source material colors, and recorded physical outcomes.
+selection glyphs, source material colors, and recorded physical outcomes.
 Prepare it with `python tools/prepare_fr3_mujoco.py` after installing the `mujoco`
 and `fr3` extras. On macOS run its viewer with `mjpython`.
 

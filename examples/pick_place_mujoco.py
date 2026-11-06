@@ -18,7 +18,7 @@ import json
 import os
 import sys
 import time
-from collections import Counter
+from collections import deque
 from dataclasses import replace
 from pathlib import Path
 
@@ -81,13 +81,9 @@ class Workstation:
         self.grasps, self.world, self.selected = [], np.eye(4), None
         self.pick_path = []
         self.rejected, self.costs, self.active_target = {}, {}, None
-        self.figure = mj.MjvFigure()
-        mj.mjv_defaultFigure(self.figure)
-        self.figure.title = "GRASP SELECTION / travel + centering cost"
-        self.figure.xlabel = "Candidate ID (lower cost is better)"
-        self.figure.flg_extend = 0
-        self.figure.figurergba[:] = [.035, .055, .085, .94]
-        self.figure.panergba[:] = [.04, .065, .095, 1]
+        self.overlay_key = None
+        self.frame_times = deque(maxlen=180)
+        self.sync_times = deque(maxlen=180)
         if gui:
             import mujoco.viewer
             self.viewer = mujoco.viewer.launch_passive(self.model, self.data,
@@ -111,10 +107,13 @@ class Workstation:
             if self.viewer and time.monotonic() >= self.next_frame:
                 if not self.viewer.is_running():
                     raise KeyboardInterrupt
+                period = 1/self.fps
+                now = time.monotonic()
+                self.next_frame += (int((now-self.next_frame)/period)+1)*period
                 self.update_viewer()
-                self.next_frame = time.monotonic() + 1/self.fps
-            if self.viewer and (k % 8 == 7 or k == count-1):
-                delay = start + (k + 1) * self.model.opt.timestep/self.speed - time.monotonic()
+            wall_target = start + (k+1)*self.model.opt.timestep/self.speed
+            if self.viewer and (k % 8 == 7 or k == count-1 or wall_target >= self.next_frame):
+                delay = min(wall_target, self.next_frame)-time.monotonic()
                 if delay > 0:
                     time.sleep(delay)
 
@@ -130,8 +129,9 @@ class Workstation:
         while time.monotonic() < deadline:
             if not self.viewer.is_running():
                 raise KeyboardInterrupt
+            tick = time.monotonic()
             self.update_viewer()
-            time.sleep(1/self.fps)
+            time.sleep(max(0., 1/self.fps-(time.monotonic()-tick)))
 
     def pose(self):
         out = np.eye(4)
@@ -745,32 +745,31 @@ class Workstation:
     def update_viewer(self):
         if not self.viewer:
             return
-        with self.viewer.lock():
-            self.viewer.user_scn.ngeom = 0
-            self.decorate(self.viewer.user_scn)
-        if hasattr(self.viewer, "set_texts"):
-            reasons = ", ".join(f"{n} {reason}" for reason, n in Counter(self.rejected.values()).items())
-            self.viewer.set_texts([
-                (mj.mjtFontScale.mjFONTSCALE_150, mj.mjtGridPos.mjGRID_TOPLEFT,
-                 "FRANKA FR3v2  /  GRASP LAB\n\nObject\nPhase\nCandidates\nRejected\nSelected\nPlaced",
-                 f"MuJoCo native / {self.speed:g}x / {self.fps} FPS target\n\n{self.active+1:02d} / {self.count:02d}\n{self.phase}\n"
-                 f"{len(self.grasps)}\n{len(self.rejected)}\n{self.selected if self.selected is not None else '-'}\n"
-                 f"{self.completed} / {self.count}"),
-                (mj.mjtFontScale.mjFONTSCALE_100, mj.mjtGridPos.mjGRID_BOTTOMLEFT,
-                 "CYAN  sampled candidates\nCORAL  rejected by IK / collision\nGOLD  selected grasp + approach\n\n"
-                 "Physical fingers / no object attachments", reasons),
-            ])
-        if self.costs and hasattr(self.viewer, "set_figures"):
-            self.figure.linepnt[:] = 0
-            for line, (i, cost) in enumerate(self.costs.items()):
-                self.figure.linepnt[line] = 2
-                self.figure.linedata[line, :4] = [i, 0, i, cost]
-                self.figure.linergb[line] = [1, .72, .12] if i == self.selected else [.1, .8, .95]
-            self.figure.range[0] = [-1, max(self.costs)+1]
-            self.figure.range[1] = [0, max(self.costs.values()) * 1.15]
-            width = max(self.viewer.viewport.width, 1280)
-            self.viewer.set_figures((mj.MjrRect(width-390, 20, 370, 190), self.figure))
-        self.viewer.sync()
+        # Glyphs change only with the candidate set, selection or stage. Keep
+        # static geometry out of the per-frame path. No text/figure HUD: bitmap
+        # font rendering is particularly expensive on macOS OpenGL drivers.
+        key = (id(self.grasps), self.selected, id(self.rejected), id(self.pick_path), self.phase)
+        if key != self.overlay_key:
+            with self.viewer.lock():
+                self.viewer.user_scn.ngeom = 0
+                self.decorate(self.viewer.user_scn)
+            self.overlay_key = key
+        start = time.monotonic()
+        self.frame_times.append(start)
+        # The model's visual assets are static after launch. Send integration
+        # state rather than copying the full mesh/texture model every frame.
+        self.viewer.sync(state_only=True)
+        self.sync_times.append(time.monotonic()-start)
+
+    def viewer_performance(self):
+        frames = np.array(self.frame_times)
+        intervals = np.diff(frames)
+        return {
+            "scene_update_hz": float(1/intervals.mean()) if len(intervals) else 0.,
+            "scene_frame_interval_ms_p95": float(np.percentile(intervals, 95)*1000) if len(intervals) else 0.,
+            "sync_ms_p95": float(np.percentile(self.sync_times, 95)*1000) if self.sync_times else 0.,
+            "fps_target": self.fps, "playback_rate": self.speed,
+        }
 
     def snapshot(self, path):
         from PIL import Image
@@ -815,6 +814,9 @@ def main():
                       "total": count, "failed_object": demo.active, "failed_stage": failed_stage,
                       "error": str(error), "attachment_constraints": False}
             print(str(error), file=sys.stderr, flush=True)
+        if args.gui:
+            report["viewer_performance"] = demo.viewer_performance()
+            print("Viewer timing:", json.dumps(report["viewer_performance"]), flush=True)
         if args.report:
             args.report.parent.mkdir(parents=True, exist_ok=True)
             args.report.write_text(json.dumps(report, indent=2) + "\n")

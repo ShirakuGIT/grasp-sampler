@@ -69,11 +69,11 @@ are checked at a maximum 0.04-radian spacing; this is discrete collision checkin
 not a continuous swept-volume guarantee. The planner adapters can replace this
 demonstration controller with an application's production motion planner.
 
-The HUD shows phase, candidate/rejection counts, selected ID, and placed-object
-count. Cyan TCP glyphs are sampled candidates, coral glyphs are rejected, and
-gold highlights the selected command and staging targets. A small native figure
-shows feasible candidates' selection costs. Those costs are not robustness
-probabilities. The robot's full source visual material regions preserve the
+Cyan TCP glyphs are sampled candidates, coral glyphs are rejected, and gold
+highlights the selected command and staging targets. The viewer has no text HUD
+or cost chart. Phase updates appear in the terminal, and feasible selection
+costs and rejection reasons are saved in the JSON report. Those costs are not
+robustness probabilities. The robot's full source visual material regions preserve the
 white shell, dark accents and markings; native Menagerie dynamics are retained.
 
 ```bash
@@ -110,7 +110,10 @@ benchmark success-rate estimate.
 
 The native viewer defaults to `--speed 2 --fps 60`. Playback pacing and redraws
 are independent, and rendering is limited by wall time rather than every fixed
-number of physics steps. Sleep is batched to reduce tiny scheduler wakeups.
+number of physics steps. Sleep is batched while honoring the next frame deadline. Frame deadlines
+include synchronization work rather than adding a full interval afterward.
+Static glyphs are cached, and viewer synchronization sends integration state
+instead of repeatedly copying the complete visual model.
 Physics remains MuJoCo's compiled CPU solver at a 2 ms timestep; faster playback
 does not skip contact integration or speed up motor commands in simulation time.
 Candidate-display pauses refresh only the viewer; they do not advance physics.
@@ -125,3 +128,9 @@ Maximum XY placement error was 3.41 cm against the unchanged 4 cm tolerance.
 The run requires bilateral finger forces, an 8 cm lift, released and settled
 load-bearing contact on the requested support, and the correct object-bottom
 height. [Expanded scene snapshot](results/mujoco-expanded.png).
+
+A local M4 / Retina timing check measured 60.0 scene updates per second, with
+a 95th-percentile update interval of 16.94 ms, after removing bitmap-text HUDs,
+disabling the table mirror pass, and using 2048-pixel shadows. The earlier loop
+measured 27.1 updates/s. The [timing record](results/mujoco-viewer-timing.json) measures scene-state
+synchronization, not physical display presentation; performance depends on the machine and workload.

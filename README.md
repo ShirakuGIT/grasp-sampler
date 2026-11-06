@@ -91,7 +91,8 @@ The mug handle, cup cavity and plate rim have separate convex contact pieces.
 `--suite household` retains the previous four-object scene.
 `--suite classic` retains the mustard/can/foam sequence. Cyan glyphs show
 candidates, coral marks rejections, and gold highlights the selection and staged
-extraction path. A native HUD and cost plot explain the decisions.
+extraction path. Selection costs and rejection reasons are saved in the JSON
+report; the viewer keeps the scene free of text panels and charts.
 
 ![MuJoCo FR3v2 with original household scan textures](docs/results/mujoco-expanded.png)
 
