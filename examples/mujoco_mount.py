@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
 import numpy as np
-from scipy.spatial import Delaunay
+from scipy.spatial import ConvexHull, Delaunay
 
 
 def plate_mesh(half=.12, height=.012, chamfer=.014, hole_radius=.011, through_radius=.0045):
@@ -57,6 +58,33 @@ def plate_mesh(half=.12, height=.012, chamfer=.014, hole_radius=.011, through_ra
     return vertices, np.asarray(faces), centers
 
 
+def pedestal_mesh(asset, height, offset):
+    """Follow the actual mounting-foot outline, with a 2 mm support margin."""
+    vertices = []
+    for mesh in asset.findall("mesh"):
+        if mesh.get("name", "").startswith("full_fr3v2_link0_"):
+            for line in Path(mesh.attrib["file"]).read_text().splitlines():
+                if line.startswith("v "):
+                    vertices.append([float(value) for value in line.split()[1:4]])
+    vertices = np.asarray(vertices)
+    foot = vertices[vertices[:, 2] < vertices[:, 2].min()+.001, :2]-offset[:2]
+    outline = foot[ConvexHull(foot).vertices]
+    angles = np.arange(32)*2*np.pi/32
+    margin = .002*np.column_stack([np.cos(angles), np.sin(angles)])
+    expanded = (outline[:, None, :]+margin[None, :, :]).reshape(-1, 2)
+    outline = expanded[ConvexHull(expanded).vertices]
+    count = len(outline)
+    vertices = np.vstack([np.column_stack([outline, np.zeros(count)]),
+                          np.column_stack([outline, np.full(count, height)])])
+    faces = []
+    for i in range(1, count-1):
+        faces.extend([[0, i+1, i], [count, count+i, count+i+1]])
+    for i in range(count):
+        j = (i+1) % count
+        faces.extend([[i, j, j+count], [i, j+count, i+count]])
+    return vertices, np.asarray(faces)
+
+
 def add_mount(world, asset, table_z, base_z):
     # The FR3v2 mounting-foot bounds are centered behind its joint-frame origin.
     # Align the complete mounting assembly with the foot, not the arm axis.
@@ -80,8 +108,12 @@ def add_mount(world, asset, table_z, base_z):
     ET.SubElement(world, "geom", name="mount_plate", type="mesh", mesh="mount_plate_mesh",
                   pos=numbers(np.array([0, 0, table_z])+offset), material="mount_aluminum", contype="0", conaffinity="0")
     pedestal_height = base_z-table_z-.012
-    geom("mount_pedestal", "box", [.088, .088, pedestal_height/2],
-         [0, 0, table_z+.012+pedestal_height/2], "mount_dark")
+    vertices, faces = pedestal_mesh(asset, pedestal_height, offset)
+    ET.SubElement(asset, "mesh", name="mount_pedestal_mesh", vertex=numbers(vertices),
+                  face=" ".join(map(str, faces.reshape(-1))))
+    ET.SubElement(world, "geom", name="mount_pedestal", type="mesh", mesh="mount_pedestal_mesh",
+                  pos=numbers(np.array([0, 0, table_z+.012])+offset), material="mount_dark",
+                  contype="0", conaffinity="0")
     geom("mount_registration_ring", "cylinder", [.079, .001], [0, 0, base_z-.001], "mount_aluminum")
     for i, (x, y) in enumerate(centers):
         geom(f"mount_bolt_{i}_shaft", "cylinder", [.004, .012], [x, y, table_z], "mount_dark")
