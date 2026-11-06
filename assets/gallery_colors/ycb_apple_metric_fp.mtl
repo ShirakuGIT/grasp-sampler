@@ -1,0 +1,3 @@
+newmtl ycb_apple_metric_fp
+Kd 1 1 1
+map_Kd ycb_apple_metric_fp.png

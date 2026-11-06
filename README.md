@@ -99,6 +99,16 @@ report; the viewer keeps the scene free of text panels and charts.
 
 [Watch the recorded demonstration on YouTube](https://youtu.be/lQIbH18UIP4).
 
+For a separate **8 × 5 live gallery of all 40 object variants**, with original
+source colors, slow synchronized rotation and streaming grasp candidates:
+
+```bash
+PYTHONPATH=src mjpython examples/grasp_gallery.py  # macOS; use python on Linux
+```
+
+Bright contact points and approach arrows show the candidates. Use `+` / `−`
+to adjust density and `Space` to pause. See the [gallery guide](docs/visualization.md).
+
 ```bash
 pip install -e ".[mujoco,fr3]"
 python tools/prepare_fr3_mujoco.py          # pinned models and source materials

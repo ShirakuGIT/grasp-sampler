@@ -1,0 +1,560 @@
+[
+  {
+    "asset": "assets/meshes/axe_body_spray_metric_fp.glb",
+    "source_object": "axe_body_spray",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/meshes/axe_body_spray/axe_body_spray.mesh.metric-fp.glb",
+    "source_sha256": "c466efaa8258de359cc395afcfa4bda616a09035b249be0a184d7b0c944634c7",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.057586729526519775,
+      0.05754758603870869,
+      0.13362201303243637
+    ],
+    "target_extents_m": [
+      0.057789746671915054,
+      0.05779876932501793,
+      0.1345718875527382
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/baking_soda_box_metric_fp.glb",
+    "source_object": "baking_soda_box",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/meshes/baking_soda_box/baking_soda_box.mesh.metric-fp.glb",
+    "source_sha256": "8f35c18c429ba2348b207f9abac9e15ee3f81dfdf9d569a1caf761c0d6be251a",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.08577311038970947,
+      0.0586411040276289,
+      0.10809560865163803
+    ],
+    "target_extents_m": [
+      0.08698480576276779,
+      0.05847544968128205,
+      0.10916950926184654
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/bandage_box_metric_fp.glb",
+    "source_object": "hansaplast_bandaid",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/meshes/hansaplast_bandaid/hansaplast_bandaid.mesh.metric-fp.glb",
+    "source_sha256": "d66149ac92b246055f170dad110c84d94c5b1ba0bc02511361febf57c41a7048",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.09547307342290878,
+      0.03082074318081141,
+      0.10428201779723167
+    ],
+    "target_extents_m": [
+      0.09366481751203537,
+      0.030701682902872562,
+      0.10480174422264099
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/black_filter_box_metric_fp.glb",
+    "source_object": "toothpaste_box",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/meshes/toothpaste_box/toothpaste_box.mesh.metric-fp.glb",
+    "source_sha256": "5bd08607a49f704f732377b3dbe64319b4657d6efb0d6fa99144659a1c5563a3",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.057209599763154984,
+      0.057193150743842125,
+      0.17298859357833862
+    ],
+    "target_extents_m": [
+      0.056581830605864525,
+      0.05670451000332832,
+      0.17095983773469925
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/blue_cleaner_box_metric_fp.glb",
+    "source_object": "dishwasher_cleaner_box",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/meshes/dishwasher_cleaner_box/dishwasher_cleaner_box.mesh.metric-fp.glb",
+    "source_sha256": "cf69c0375b2acf7eada27b44499e8adff0c28c75b4c20f8e68cb3a94c4a52271",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.08877062425017357,
+      0.04347728192806244,
+      0.12448453158140182
+    ],
+    "target_extents_m": [
+      0.10750362649559975,
+      0.048786355182528496,
+      0.1386430785059929
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/cleaner_canister_metric_fp.glb",
+    "source_object": "potato_chips_can",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/meshes/potato_chips_can/potato_chips_can.mesh.metric-fp.glb",
+    "source_sha256": "f745b5eb5099b69ed6e451a82b2c682513d7c64a5bf9fc829c688cf486061c55",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.08583047986030579,
+      0.08336609974503517,
+      0.19187313318252563
+    ],
+    "target_extents_m": [
+      0.08341250196099281,
+      0.08301516249775887,
+      0.19054540991783142
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/palmolive_shampoo_metric_fp.glb",
+    "source_object": "palmolive_shampoo",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/meshes/palmolive_shampoo/palmolive_shampoo.mesh.metric-fp.glb",
+    "source_sha256": "6cf908e83e908894642b7513375ac073dbb52b250a3f911e693bb0d847e71e57",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.08345159888267517,
+      0.047561269253492355,
+      0.20589935779571533
+    ],
+    "target_extents_m": [
+      0.0833657830953598,
+      0.04766453430056572,
+      0.20514791458845139
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/pocky_box_metric_fp.glb",
+    "source_object": "pocky_box",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/meshes/pocky_box/pocky_box.mesh.metric-fp.glb",
+    "source_sha256": "a77783a4ba203eb305c408a22991791302327597d3da2087e524ca7d8ec7d74e",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.09121585264801979,
+      0.032281944528222084,
+      0.14392241835594177
+    ],
+    "target_extents_m": [
+      0.09098725020885468,
+      0.03254188038408756,
+      0.14418087899684906
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ritz_crackers_metric_fp.glb",
+    "source_object": "ritz_cracker_box",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/meshes/ritz_cracker_box/ritz_cracker_box.mesh.metric-fp.glb",
+    "source_sha256": "c4f4fee3ef26c3008dafe94af4c3b5652236093f9f5cb01a86aae32791c8360e",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.14931561797857285,
+      0.06437426432967186,
+      0.179562509059906
+    ],
+    "target_extents_m": [
+      0.15039286762475967,
+      0.06476737186312675,
+      0.18069428950548172
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_apple_metric_fp.glb",
+    "source_object": "013_apple",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/013_apple/013_apple/google_16k/textured.obj",
+    "source_sha256": "f32e694c0473b6858fcfb6f5b53a742e9cdedce2fb488bd5a5666d37354f87df",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.075448,
+      0.074871,
+      0.07188900000000001
+    ],
+    "target_extents_m": [
+      0.07552649825811386,
+      0.07477901503443718,
+      0.0720687098801136
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_banana_metric_fp.glb",
+    "source_object": "011_banana",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/011_banana/011_banana/google_16k/textured.obj",
+    "source_sha256": "6f9bc2218bf6ff483e8397c664ddb6c25603a37d9ffb7f4127ea66ee99e61619",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.10894200000000001,
+      0.178447,
+      0.036739999999999995
+    ],
+    "target_extents_m": [
+      0.19593346118927002,
+      0.07920335233211517,
+      0.03780675423331559
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_baseball_metric_fp.glb",
+    "source_object": "055_baseball",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/055_baseball/055_baseball/google_16k/textured.obj",
+    "source_sha256": "f9b719a13329aafdd5cd9e42717a9420af0b8e0d609670e0132529d4210c8696",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.073078,
+      0.073712,
+      0.072563
+    ],
+    "target_extents_m": [
+      0.07320183888077736,
+      0.07350929453969002,
+      0.07256374508142471
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_chips_can_metric_fp.glb",
+    "source_object": "001_chips_can",
+    "source_file": "YCB dataset/001_chips_can/poisson/textured.obj",
+    "source_sha256": "080827c1358d748d7f77ab99afc7129f09db40e80753ff8720387da7ef143aeb",
+    "source_texture_sha256": "d8ab5b7c950e4886fd67e51dfb5a2712bcb57f1d67866264d976bc051d2677c6",
+    "source_extents_m": [
+      0.0794773,
+      0.0776305,
+      0.245528156
+    ],
+    "target_extents_m": [
+      0.08372172713279724,
+      0.08610500209033489,
+      0.2406523060053587
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_cracker_box_metric_fp.glb",
+    "source_object": "003_cracker_box",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/003_cracker_box/003_cracker_box/google_16k/textured.obj",
+    "source_sha256": "387d3c0e36330051e7e24a5c2859bd5651a739b1b1bad1f536d56227ed2d002a",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.0718,
+      0.16403600000000002,
+      0.213437
+    ],
+    "target_extents_m": [
+      0.07166859088465571,
+      0.16384751349687576,
+      0.213412806391716
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_foam_brick_metric_fp.glb",
+    "source_object": "061_foam_brick",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/061_foam_brick/061_foam_brick/google_16k/textured.obj",
+    "source_sha256": "04a5b79997a874638c3ad71044b1ed50fae16148f9bd29629fe37caab3a71d86",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.052559999999999996,
+      0.077874,
+      0.051193
+    ],
+    "target_extents_m": [
+      0.07412349618971348,
+      0.09032821655273438,
+      0.0540547389537096
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_gelatin_box_metric_fp.glb",
+    "source_object": "009_gelatin_box",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/009_gelatin_box/009_gelatin_box/google_16k/textured.obj",
+    "source_sha256": "85ed671e61720e722b3e283afb5843666b76c89c7788d32ab8fc1baad718dc51",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.08940399999999998,
+      0.101108,
+      0.030074
+    ],
+    "target_extents_m": [
+      0.07163244113326073,
+      0.06786869466304779,
+      0.088520304299891
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_large_marker_metric_fp.glb",
+    "source_object": "040_large_marker",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/040_large_marker/040_large_marker/google_16k/textured.obj",
+    "source_sha256": "7297294d2f21a60bf358024fab89eddcfc489301a363490b11b92563b7eaf037",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.021022,
+      0.120969,
+      0.018895000000000002
+    ],
+    "target_extents_m": [
+      0.021032104268670082,
+      0.12108231708407402,
+      0.018984095193445676
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_lemon_metric_fp.glb",
+    "source_object": "014_lemon",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/014_lemon/014_lemon/google_16k/textured.obj",
+    "source_sha256": "3c70b40ef12a5fad1da5701b8c49df3ffbf964b5a2f23ae4bd8008dcc3b6a1b1",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.060588,
+      0.059299000000000004,
+      0.053017
+    ],
+    "target_extents_m": [
+      0.06075393781065941,
+      0.05934367701411247,
+      0.05307712033390999
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_master_chef_can_metric_fp.glb",
+    "source_object": "002_master_chef_can",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/002_master_chef_can/002_master_chef_can/google_16k/textured.obj",
+    "source_sha256": "2d179b0ae197312e8868a8eb08de11231b79c9aaa0e289799b6b56b2cf4ecd56",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.10252900000000001,
+      0.102377,
+      0.140177
+    ],
+    "target_extents_m": [
+      0.10199781507253647,
+      0.1024831123650074,
+      0.140028215944767
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_mustard_bottle_metric_fp.glb",
+    "source_object": "006_mustard_bottle",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/006_mustard_bottle/006_mustard_bottle/google_16k/textured.obj",
+    "source_sha256": "aa81d47a5c37431c7c0b602e78982091af97219bff03ad5a63dc0f7e94153b19",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.09719799999999999,
+      0.066621,
+      0.191301
+    ],
+    "target_extents_m": [
+      0.09643526747822762,
+      0.058080380782484994,
+      0.19171497225761414
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_orange_metric_fp.glb",
+    "source_object": "017_orange",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/017_orange/017_orange/google_16k/textured.obj",
+    "source_sha256": "631c3e94d662d75ff9ae40ed309e4ea8b1ccdb055a3d74ad86849ab22ffc505f",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.072158,
+      0.073986,
+      0.071352
+    ],
+    "target_extents_m": [
+      0.07227862998843193,
+      0.07402250543236732,
+      0.07159283757209778
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_peach_metric_fp.glb",
+    "source_object": "015_peach",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/015_peach/015_peach/google_16k/textured.obj",
+    "source_sha256": "03d80a048febe93fa6b749ccb2e2ed71d2f2a553e5b815a2e49681b4c0217ece",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.062123,
+      0.06263200000000001,
+      0.058645
+    ],
+    "target_extents_m": [
+      0.06214847415685654,
+      0.0626751109957695,
+      0.05872461572289467
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_pear_metric_fp.glb",
+    "source_object": "016_pear",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/016_pear/016_pear/google_16k/textured.obj",
+    "source_sha256": "7ccc3ca825c0c23b5911237c2180619ecdc807824da2d8bc16d771dd30ee8871",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.066546,
+      0.100455,
+      0.065663
+    ],
+    "target_extents_m": [
+      0.06650681421160698,
+      0.10423528403043747,
+      0.06648656819015741
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_potted_meat_can_metric_fp.glb",
+    "source_object": "010_potted_meat_can",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/010_potted_meat_can/010_potted_meat_can/google_16k/textured.obj",
+    "source_sha256": "07c0d2c0dcc12c5e0e7ce7284c438c8077651aeec8ba1938f676aadfddc4f5ff",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.10208500000000001,
+      0.060103000000000004,
+      0.083543
+    ],
+    "target_extents_m": [
+      0.1008945070207119,
+      0.09024068340659142,
+      0.08433043584227562
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_pudding_box_metric_fp.glb",
+    "source_object": "008_pudding_box",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/008_pudding_box/008_pudding_box/google_16k/textured.obj",
+    "source_sha256": "8e72a0e501429e17d2b80f902a8ae59803051dcf37475633825169657c3bce40",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.137938,
+      0.128756,
+      0.03888900000000001
+    ],
+    "target_extents_m": [
+      0.12875758856534958,
+      0.03874191828072071,
+      0.13803723454475403
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_rubiks_cube_metric_fp.glb",
+    "source_object": "077_rubiks_cube",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/077_rubiks_cube/077_rubiks_cube/google_16k/textured.obj",
+    "source_sha256": "5693a6ce2ac3b6374d12ee709e575a638b26ba40355ac22a18a51d2e7aa4bf84",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.075745,
+      0.07611699999999999,
+      0.057939000000000004
+    ],
+    "target_extents_m": [
+      0.0763782374560833,
+      0.05788985267281532,
+      0.07584090530872345
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_strawberry_metric_fp.glb",
+    "source_object": "012_strawberry",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/012_strawberry/012_strawberry/google_16k/textured.obj",
+    "source_sha256": "41e1dc4d6d8b5608f3da0b3828c7d1ecee4a18f3a99f01e2ba577791ba63121a",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.045224,
+      0.04528600000000001,
+      0.04567499999999999
+    ],
+    "target_extents_m": [
+      0.04194103926420212,
+      0.05381496250629425,
+      0.04574463423341513
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_sugar_box_metric_fp.glb",
+    "source_object": "004_sugar_box",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/004_sugar_box/004_sugar_box/google_16k/textured.obj",
+    "source_sha256": "b7333f94bf81703ea5d58b1403544cf5565a8e301f4c52791454c1391bab0be9",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.049496,
+      0.094162,
+      0.176015
+    ],
+    "target_extents_m": [
+      0.04935956932604313,
+      0.09380999952554704,
+      0.1759638711810112
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_tennis_ball_metric_fp.glb",
+    "source_object": "056_tennis_ball",
+    "source_file": "YCB dataset/056_tennis_ball/google_16k/textured.obj",
+    "source_sha256": "30a79e3d5ed50a682285f1b386213cea018786af7bf533ff4d0d02f9114dd030",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.066975,
+      0.06703,
+      0.066457
+    ],
+    "target_extents_m": [
+      0.06703047081828117,
+      0.0670417882502079,
+      0.06668339320458472
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_tomato_soup_can_metric_fp.glb",
+    "source_object": "005_tomato_soup_can",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/005_tomato_soup_can/005_tomato_soup_can/google_16k/textured.obj",
+    "source_sha256": "0da7d8ca01caefa1e85d1aad5eb198aa2298eca5c2a903dfb4c9d2fb0814c39d",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.067911,
+      0.067743,
+      0.101855
+    ],
+    "target_extents_m": [
+      0.06706065684556961,
+      0.06752818822860718,
+      0.1021665669977665
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  },
+  {
+    "asset": "assets/meshes/ycb_tuna_fish_can_metric_fp.glb",
+    "source_object": "007_tuna_fish_can",
+    "source_file": "research/ntu/research_workspace/proposal/imagination/ycb_assets/007_tuna_fish_can/007_tuna_fish_can/google_16k/textured.obj",
+    "source_sha256": "b1c1e69b902d29b7b5a9c056fdd7f6daee6e1b9a116bcadbdb98c92999571076",
+    "source_texture_sha256": null,
+    "source_extents_m": [
+      0.085559,
+      0.08554,
+      0.033538
+    ],
+    "target_extents_m": [
+      0.08532330766320229,
+      0.03413358889520168,
+      0.08521969243884087
+    ],
+    "method": "bounds alignment; nearest original vertex color sampled into triangle UV atlas"
+  }
+]

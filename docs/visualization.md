@@ -1,5 +1,66 @@
 # Visualization
 
+## Live 8 × 5 object gallery
+
+The native MuJoCo gallery shows **all 40 object variants simultaneously**, with
+one slow 360° revolution per minute. Genuine grasp batches are generated in two
+sampling processes while the viewer keeps rotating. No prerecorded candidate
+animation is used.
+
+![Original-color object library with live grasp candidates](results/grasp-gallery-grid.png)
+
+```bash
+pip install -e ".[mujoco]"
+# macOS
+PYTHONPATH=src mjpython examples/grasp_gallery.py
+# Linux
+PYTHONPATH=src python examples/grasp_gallery.py
+```
+
+Bright contact beads, gripper outlines and approach arrows make candidates
+visible against the original object colors. **Cyan** denotes antipodal
+candidates, **violet** primitive/OBB proposals, and **gold** recent arrivals.
+The view has a plain background with no HUD, text, stands or dials. The drawing
+shows a spatially thinned subset (four per object initially) to keep the grid
+readable; the full candidate counts are written to the console and JSON report.
+
+| Control | Action |
+| --- | --- |
+| `Space` | Pause/resume rotation and new sampling submissions |
+| `+` / `−` | Increase/decrease visible candidates per object |
+| `G` | Show/hide grasp glyphs |
+| `R` | Resample the complete grid |
+| Mouse drag / wheel | Orbit / zoom |
+| `Q` / `Esc` | Close |
+
+```bash
+# Slower rotation, or more visible candidates:
+PYTHONPATH=src mjpython examples/grasp_gallery.py --seconds 90 --visible-grasps 8
+# Single-object turntable, with N/P or arrow-key navigation:
+PYTHONPATH=src mjpython examples/grasp_gallery.py --layout turntable --seconds 12
+# Audit every asset and save an image without opening a window:
+PYTHONPATH=src python examples/grasp_gallery.py --headless --batches 2 \
+  --report /tmp/gallery.json --snapshot /tmp/gallery.png
+```
+
+The inventory includes 31 compact meshes plus nine scanned/reconstructed
+household variants. OBJ/PNG sidecars and robot link meshes are not extra objects.
+The compact GLBs were originally geometry-only; appearance-only sidecars restore
+colors from their named original workspace reconstructions and YCB scans. This
+transfer is approximate, using bounds alignment and a triangle UV atlas; it does
+not preserve the dense scans' original UV fidelity. Existing household texture
+appearances are retained. See the
+[appearance provenance](https://github.com/ShirakuGIT/grasp-sampler/blob/feat/planner-integrations/assets/gallery_colors/README.md).
+Lighting is neutral, and objects receive no palette tint.
+
+Object display sizes are normalized for the grid. Sampling still uses original
+metric geometry and an **80 mm jaw limit**, configurable with `--jaw-width`.
+The larger master-chef can has no feasible candidates at that width in the saved
+[40-asset audit](results/grasp-gallery-audit.json); that cell has no grasp glyphs.
+These are geometric grasp proposals, not robot IK, collision-screened motion
+plans or verified physical picks. Glyph finger/stem lengths are schematic;
+TCP positions, orientation and jaw opening follow the actual sampler outputs.
+
 ## Interactive uncertainty viewer
 
 ```bash

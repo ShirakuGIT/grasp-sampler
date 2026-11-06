@@ -1,0 +1,3 @@
+newmtl pocky_box_metric_fp
+Kd 1 1 1
+map_Kd pocky_box_metric_fp.png
