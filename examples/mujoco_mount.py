@@ -58,12 +58,16 @@ def plate_mesh(half=.12, height=.012, chamfer=.014, hole_radius=.011, through_ra
 
 
 def add_mount(world, asset, table_z, base_z):
+    # The FR3v2 mounting-foot bounds are centered behind its joint-frame origin.
+    # Align the complete mounting assembly with the foot, not the arm axis.
+    offset = np.array([-.04103731, 0., 0.])
+
     def numbers(values):
         return " ".join(f"{v:.8g}" for v in np.asarray(values).reshape(-1))
 
     def geom(name, kind, size, pos, material, **extra):
         return ET.SubElement(world, "geom", name=name, type=kind, size=numbers(size),
-                             pos=numbers(pos), material=material, contype="0", conaffinity="0", **extra)
+                             pos=numbers(np.asarray(pos)+offset), material=material, contype="0", conaffinity="0", **extra)
 
     ET.SubElement(asset, "material", name="mount_aluminum", rgba=".56 .61 .65 1",
                   specular=".75", shininess=".6")
@@ -74,7 +78,7 @@ def add_mount(world, asset, table_z, base_z):
     ET.SubElement(asset, "mesh", name="mount_plate_mesh", vertex=numbers(vertices),
                   face=" ".join(map(str, faces.reshape(-1))))
     ET.SubElement(world, "geom", name="mount_plate", type="mesh", mesh="mount_plate_mesh",
-                  pos=numbers([0, 0, table_z]), material="mount_aluminum", contype="0", conaffinity="0")
+                  pos=numbers(np.array([0, 0, table_z])+offset), material="mount_aluminum", contype="0", conaffinity="0")
     pedestal_height = base_z-table_z-.012
     geom("mount_pedestal", "box", [.088, .088, pedestal_height/2],
          [0, 0, table_z+.012+pedestal_height/2], "mount_dark")
