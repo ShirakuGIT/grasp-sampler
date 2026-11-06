@@ -49,3 +49,11 @@ preparation tool explicitly scales it to a 16 cm diameter and rotates to Z-up.
 This bowl is a separate workspace reconstruction, not an attributed YCB scan.
 It has 40 approximate convex contact pieces and an illustrative 60 g mass;
 its inertia uses convex-piece volume weights rather than equal piece masses.
+
+The blue vase uses the existing textured workspace mesh from
+`Documents/Coding/vase/meshes/vase_textured.obj`. Original UVs and image pixels
+are preserved. Its Y-up source is explicitly scaled to an illustrative 18 cm
+height and rotated to Z-up. This is a separate workspace reconstruction, not
+a YCB scan. The bulbous body and narrow neck use 29 approximate convex contact
+pieces, with an illustrative 60 g mass and volume-weighted piece inertia.
+The sampler searches the actual neck surface rather than its filled convex hull.

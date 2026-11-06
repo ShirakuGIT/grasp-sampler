@@ -1,8 +1,8 @@
 # Constrained shelf retrieval and transfer
 
 The default MuJoCo demonstration uses a **single FR3v2 and a two-tier cabinet**.
-The default `--suite expanded` includes a Ritz box, mug, cup, plate, bowl and
-curved mustard bottle, preserving original mesh colors. The box and cup move
+The default `--suite expanded` includes a Ritz box, mug, cup, plate, bowl,
+curved mustard bottle and blue vase, preserving original mesh colors. The box, cup and vase move
 from the lower tier to separate upper-tier slots. Mug, plate and bottle move
 to the tabletop, while the bowl uses an oblique rim grasp to move across the
 table. `--suite household` retains the earlier four-object demonstration. `--suite classic` selects the
@@ -122,9 +122,9 @@ The requested frame rate is a target, not a hardware-independent guarantee.
 JAX/MJX is useful for batched simulation workloads; this single native viewer
 uses the existing CPU solver and does not introduce a JAX dependency.
 
-The [expanded six-object physical run](results/mujoco-expanded-pick-place.json)
-completed all six transfers, including two lower-to-upper shelf placements.
-Maximum XY placement error was 3.41 cm against the unchanged 4 cm tolerance.
+The [expanded seven-object physical run](results/mujoco-expanded-pick-place.json)
+completed all seven transfers, including three lower-to-upper shelf placements.
+Maximum XY placement error was 3.82 cm against the unchanged 4 cm tolerance.
 The run requires bilateral finger forces, an 8 cm lift, released and settled
 load-bearing contact on the requested support, and the correct object-bottom
 height. [Expanded scene snapshot](results/mujoco-expanded.png).
@@ -134,3 +134,19 @@ a 95th-percentile update interval of 16.94 ms, after removing bitmap-text HUDs,
 disabling the table mirror pass, and using 2048-pixel shadows. The earlier loop
 measured 27.1 updates/s. The [timing record](results/mujoco-viewer-timing.json) measures scene-state
 synchronization, not physical display presentation; performance depends on the machine and workload.
+
+## Arm mounting and curved vase
+
+The arm sits on a 240 × 240 × 12 mm aluminum plate with chamfered corners,
+beveled edges, four 22 mm counterbores and 9 mm through holes. The counterbore
+shoulders support the washers and recessed cap screws. A 23 mm pedestal and
+registration ring keep the original robot base height. This is illustrative
+mounting hardware, rather than a manufacturer-certified plate design. It is
+fixed visual geometry, as was the previous mount; robot dynamics are unchanged.
+
+The blue vase has a bulbous body and narrow neck. Its original image and UVs
+are retained, with 29 convex contact pieces. Sampling uses the neck's actual
+surface, and a longer extraction clears the wide body before lifting. Its
+lower-to-upper transfer passed with a 6 mm XY placement error in the complete
+seven-object physical run. Like the other example objects, its mass and inertia
+are illustrative rather than measured hardware parameters.

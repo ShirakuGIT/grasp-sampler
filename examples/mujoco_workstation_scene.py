@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import numpy as np
+from mujoco_mount import add_mount
 
 from grasp_sampler import load_mesh
 
@@ -16,9 +17,9 @@ COLORS = [[.94, .25, .16, 1], [.12, .48, .94, 1], [.98, .65, .12, 1],
 
 
 SUITES = {"classic": ("mustard", "can", "foam"), "household": ("ritz", "mug", "cup", "plate"),
-          "expanded": ("ritz", "mug", "cup", "plate", "bowl", "mustard")}
+          "expanded": ("ritz", "mug", "cup", "plate", "bowl", "mustard", "vase")}
 LABELS = {"ritz": "Ritz cracker box", "mug": "mug", "cup": "cup", "plate": "plate",
-          "bowl": "bowl", "mustard": "mustard bottle", "can": "potted meat can", "foam": "foam brick"}
+          "bowl": "bowl", "vase": "curved vase", "mustard": "mustard bottle", "can": "potted meat can", "foam": "foam brick"}
 
 
 def object_mesh(i, suite="classic"):
@@ -78,12 +79,7 @@ def build_scene(count, suite="classic"):
             box(f"foot_{x}_{y}", [.09, .09, .03], [x, y, .015])
     for y in [-.45, .45]:
         box(f"rail_{y}", [1.18, .04, .065], [.44, y, .6], material="steel_material")
-    box("mount", [.19, .19, BASE_Z - TABLE_Z], [0, 0, (BASE_Z + TABLE_Z) / 2],
-        material="steel_material", collision=False)
-    for x in [-.075, .075]:
-        for y in [-.075, .075]:
-            ET.SubElement(world, "geom", type="cylinder", size=".009 .002", pos=f"{x} {y} {BASE_Z+.002}",
-                          rgba=".06 .08 .1 1", contype="0", conaffinity="0")
+    add_mount(world, asset, TABLE_Z, BASE_Z)
     box("pick_mat", [.36, .29, .002], [.45, -.18, TABLE_Z + .001], collision=False)
     # Two constrained cabinet bays. The 28 cm tier spacing rules out a full
     # top-down pregrasp for the tall object; the arm approaches through -X.
@@ -112,13 +108,15 @@ def build_scene(count, suite="classic"):
                         [.49, .17, SHELF_Z+size[2]/2+.001],
                         [.54, .20, UPPER_Z+size[2]/2+.001],
                         [.27, .46, TABLE_Z+size[2]/2+.001],
-                        [.55, -.40, UPPER_Z+size[2]/2+.001])[i]
+                        [.55, -.40, UPPER_Z+size[2]/2+.001],
+                        [.54, .33, SHELF_Z+size[2]/2+.001])[i]
             goal = np.array(([.50, -.23, UPPER_Z+size[2]/2],
                              [.24, -.50, TABLE_Z+size[2]/2],
                              [.27, .43, TABLE_Z+size[2]/2],
                              [.26, .10, TABLE_Z+size[2]/2],
                              [.30, -.25, TABLE_Z+size[2]/2],
-                             [.27, .43, TABLE_Z+size[2]/2])[i])
+                             [.27, .43, TABLE_Z+size[2]/2],
+                             [.57, .35, UPPER_Z+size[2]/2])[i])
             yaw = np.pi if name == "mug" else 0.
         if suite == "expanded":
             if i == 2:
@@ -146,7 +144,7 @@ def build_scene(count, suite="classic"):
             part_count = len(parts.files)//2
             mass = .03 if name == "plate" else .06
             weights = np.ones(part_count)
-            if name == "bowl":
+            if name in ("bowl", "vase"):
                 for part in range(part_count):
                     triangles = parts[f"vertices_{part}"][parts[f"faces_{part}"]]
                     weights[part] = abs(np.einsum("ij,ij->", triangles[:, 0],
@@ -164,7 +162,7 @@ def build_scene(count, suite="classic"):
             parts.close()
         floor_z = float(goal[2]-size[2]/2)
         box(f"slot_{i}", [.10, .12, .0005], [goal[0], goal[1], floor_z + .0005],
-            color=numbers([*COLORS[i][:3], .45]), collision=False)
+            color=numbers([*COLORS[i % len(COLORS)][:3], .45]), collision=False)
         objects.append((mesh, label, goal))
     # Grip pads retain the native hand's contact geometry, with high-friction
     # rubber contact coefficients appropriate for this light-object example.

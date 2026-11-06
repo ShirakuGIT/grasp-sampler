@@ -83,10 +83,11 @@ robust-command preservation, and runnable exports/examples.
 
 The default demo uses **MuJoCo and a Franka FR3v2** for constrained lateral and
 oblique grasps inside a two-tier cabinet. The default expanded scene includes a
-**Ritz box, mug, cup, plate, bowl and curved mustard bottle**, using original
-scanned textures and packaging colors. Ritz and cup transfer from the lower
-tier to the upper tier; the mug, plate and mustard bottle move to the table,
-and the bowl uses an oblique rim grasp for a tabletop transfer.
+**Ritz box, mug, cup, plate, bowl, curved mustard bottle and blue vase**, using original
+scanned textures and packaging colors. Ritz, cup and vase transfer from the
+lower tier to the upper tier; the mug, plate and mustard bottle move to the table,
+and the bowl uses an oblique rim grasp for a tabletop transfer. A chamfered
+aluminum plate, counterbored bolt holes and recessed fasteners mount the arm.
 The mug handle, cup cavity and plate rim have separate convex contact pieces.
 `--suite household` retains the previous four-object scene.
 `--suite classic` retains the mustard/can/foam sequence. Cyan glyphs show

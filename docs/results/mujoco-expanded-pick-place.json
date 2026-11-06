@@ -49,24 +49,24 @@
         "296": 3.7310843403539984
       },
       "bilateral_contact": true,
-      "lifted_height": 1.0820764429299787,
+      "lifted_height": 1.0820764429298517,
       "goal": [
         0.5,
         -0.23,
-        1.2190408260938597
+        1.219040826093973
       ],
       "final_position": [
-        0.5174259037337675,
-        -0.2273968441352851,
-        1.1922956455017177
+        0.5174259037337805,
+        -0.22739684413466532,
+        1.192295645501719
       ],
       "support_surface": "upper_tier",
       "supported": true,
       "released": true,
       "settled": true,
-      "support_normal_force": 0.5885996529583016,
-      "object_bottom_height": 1.1199415330023952,
-      "placement_error_xy": 0.017619266199093882,
+      "support_normal_force": 0.5885996529534985,
+      "object_bottom_height": 1.1199415330024036,
+      "placement_error_xy": 0.017619266199198298,
       "within_placement_region": true,
       "placement_radial_tolerance": 0.04,
       "success": true
@@ -77,7 +77,7 @@
       "sampled_candidates": 238,
       "demo_mass_kg": 0.06000000000000003,
       "destination": "tabletop",
-      "approach_obliquity_deg": 14.900625544278563,
+      "approach_obliquity_deg": 14.900625544246605,
       "selected_candidate": 99,
       "rejected": {
         "0": "IK / joint limits",
@@ -112,28 +112,28 @@
         "237": "IK / joint limits"
       },
       "costs": {
-        "99": 5.423984774376769,
-        "129": 5.596486988364756
+        "99": 5.42398477438216,
+        "129": 5.596486988366912
       },
       "bilateral_contact": true,
-      "lifted_height": 1.2663445291046256,
+      "lifted_height": 1.266344529104463,
       "goal": [
         0.24,
         -0.5,
-        0.7785659504088293
+        0.7785659504092282
       ],
       "final_position": [
-        0.21777672520262586,
-        -0.5163205879787501,
-        0.760931871004745
+        0.21777672520928193,
+        -0.5163205876727921,
+        0.7609318710047456
       ],
       "support_surface": "table",
       "supported": true,
       "released": true,
       "settled": true,
-      "support_normal_force": 0.5885972603246438,
-      "object_bottom_height": 0.7202559237087987,
-      "placement_error_xy": 0.027572369043876648,
+      "support_normal_force": 0.588597260324589,
+      "object_bottom_height": 0.7202559237087997,
+      "placement_error_xy": 0.027572368857409737,
       "within_placement_region": true,
       "placement_radial_tolerance": 0.04,
       "success": true
@@ -144,7 +144,7 @@
       "sampled_candidates": 557,
       "demo_mass_kg": 0.06000000000000003,
       "destination": "upper tier",
-      "approach_obliquity_deg": 25.975005225858432,
+      "approach_obliquity_deg": 25.975005225875204,
       "selected_candidate": 35,
       "rejected": {
         "0": "upper-tier collision",
@@ -180,27 +180,27 @@
         "556": "IK / joint limits"
       },
       "costs": {
-        "35": 4.844930856590337
+        "35": 4.8449308565912705
       },
       "bilateral_contact": true,
-      "lifted_height": 0.9907959072981265,
+      "lifted_height": 0.9907959072984492,
       "goal": [
         0.6,
         -0.04,
-        1.1605687373521705
+        1.1605687354210361
       ],
       "final_position": [
-        0.5807150400759559,
-        -0.06808753125246958,
-        1.1560233857806297
+        0.5807340668632178,
+        -0.06805806351361339,
+        1.156023385780643
       ],
       "support_surface": "upper_tier",
       "supported": true,
       "released": true,
       "settled": true,
-      "support_normal_force": 0.5888925526858161,
-      "object_bottom_height": 1.119956269381627,
-      "placement_error_xy": 0.034070795281743026,
+      "support_normal_force": 0.5888925524741685,
+      "object_bottom_height": 1.1199562693816159,
+      "placement_error_xy": 0.03403573280781425,
       "within_placement_region": true,
       "placement_radial_tolerance": 0.04,
       "success": true
@@ -211,7 +211,7 @@
       "sampled_candidates": 38,
       "demo_mass_kg": 0.02999999999999992,
       "destination": "tabletop",
-      "approach_obliquity_deg": 22.44838014081782,
+      "approach_obliquity_deg": 22.641287597528592,
       "selected_candidate": 1,
       "rejected": {
         "2": "IK / joint limits",
@@ -219,6 +219,7 @@
         "4": "IK / joint limits",
         "5": "IK / joint limits",
         "11": "extraction / lift IK",
+        "16": "extraction / lift IK",
         "17": "extraction / lift IK",
         "20": "extraction / lift IK",
         "25": "IK / joint limits",
@@ -234,40 +235,39 @@
         "37": "IK / joint limits"
       },
       "costs": {
-        "0": 6.9329003974702506,
-        "1": 6.879574782231147,
-        "7": 7.532147293582059,
-        "8": 7.000522092387483,
-        "9": 7.468223929761532,
-        "10": 7.473232022366659,
-        "13": 7.846484464634296,
-        "14": 7.470949783185734,
-        "15": 7.25596099034372,
-        "16": 7.237419378949327,
-        "19": 7.615436923499889,
-        "21": 9.096994999118962,
-        "22": 8.835573121857532,
-        "23": 8.82143114432471
+        "0": 6.955244351691623,
+        "1": 6.907643233553574,
+        "7": 7.552173101213357,
+        "8": 7.029847797617046,
+        "9": 7.479618162138241,
+        "10": 7.485057020306735,
+        "13": 7.8541102240462575,
+        "14": 7.482286191621153,
+        "15": 7.264788056135258,
+        "19": 7.621420084764469,
+        "21": 9.087620538703188,
+        "22": 8.819580116910906,
+        "23": 8.81069092287277
       },
       "bilateral_contact": true,
-      "lifted_height": 1.2497038374522658,
+      "lifted_height": 1.2498622898242275,
       "goal": [
         0.26,
         0.1,
-        0.7809321295583929
+        0.7809904394589408
       ],
       "final_position": [
-        0.2630600234185892,
-        0.13060053311683953,
-        0.7336754094900098
+        0.26317508459695077,
+        0.13810312150156837,
+        0.7336755863312646
       ],
       "support_surface": "table",
       "supported": true,
       "released": true,
       "settled": true,
-      "support_normal_force": 0.29442368743421843,
-      "object_bottom_height": 0.7203229087521802,
-      "placement_error_xy": 0.03075315220196308,
+      "support_normal_force": 0.2943037219268222,
+      "object_bottom_height": 0.7203228268338459,
+      "placement_error_xy": 0.038235180532607334,
       "within_placement_region": true,
       "placement_radial_tolerance": 0.04,
       "success": true
@@ -278,7 +278,7 @@
       "sampled_candidates": 663,
       "demo_mass_kg": 0.05999999999999999,
       "destination": "tabletop",
-      "approach_obliquity_deg": 66.30335792667722,
+      "approach_obliquity_deg": 66.30337160644685,
       "selected_candidate": 298,
       "rejected": {
         "0": "scene / self collision",
@@ -301,40 +301,40 @@
         "662": "scene / self collision"
       },
       "costs": {
-        "21": 12.543714244975604,
-        "42": 9.203087145806771,
-        "64": 10.633340305939551,
-        "85": 11.419903185096876,
-        "128": 15.48356151664602,
-        "170": 11.066307504095441,
-        "192": 9.413287636733543,
-        "277": 10.939741487128266,
-        "298": 8.795614923859976,
-        "320": 9.099407310601979,
-        "384": 10.331368999239103,
-        "427": 12.352174627440409,
-        "512": 10.64067783712792,
-        "533": 11.616968977360976
+        "21": 12.536802053538032,
+        "42": 9.194558753276947,
+        "64": 10.624804242798543,
+        "85": 11.407724901235516,
+        "128": 15.48646152382675,
+        "170": 11.059592050394368,
+        "192": 9.404456899343426,
+        "277": 10.923183390161363,
+        "298": 8.782540809458988,
+        "320": 9.088887204399876,
+        "384": 10.313510456557253,
+        "427": 12.33161186442944,
+        "512": 10.633179139272244,
+        "533": 11.610531033409654
       },
       "bilateral_contact": true,
-      "lifted_height": 0.9106357347555156,
+      "lifted_height": 0.9106347780537172,
       "goal": [
         0.3,
         -0.25,
-        0.7506615992277809
+        0.7506620458335733
       ],
       "final_position": [
-        0.29485522507842726,
-        -0.2460695115904062,
-        0.7396800158463208
+        0.2948550777227307,
+        -0.24606925105640098,
+        0.7396800158463263
       ],
       "support_surface": "table",
       "supported": true,
       "released": true,
       "settled": true,
-      "support_normal_force": 0.5887932790985265,
-      "object_bottom_height": 0.7206066660842552,
-      "placement_error_xy": 0.00647436855080053,
+      "support_normal_force": 0.5887932791273175,
+      "object_bottom_height": 0.7206066660842678,
+      "placement_error_xy": 0.00647464381234573,
       "within_placement_region": true,
       "placement_radial_tolerance": 0.04,
       "success": true
@@ -345,7 +345,7 @@
       "sampled_candidates": 99,
       "demo_mass_kg": 0.06,
       "destination": "tabletop",
-      "approach_obliquity_deg": 38.15888551132757,
+      "approach_obliquity_deg": 38.158651887961014,
       "selected_candidate": 66,
       "rejected": {
         "15": "scene / self collision",
@@ -364,53 +364,120 @@
         "98": "scene / self collision"
       },
       "costs": {
-        "0": 2.686146476720066,
-        "3": 2.6443098166685752,
-        "6": 2.738802426444876,
-        "9": 2.700017027287067,
-        "12": 2.8460419405612174,
-        "18": 2.85525019787905,
-        "25": 3.171156796191915,
-        "28": 3.1306554139990777,
-        "31": 3.2656921362029707,
-        "34": 3.299964016862342,
-        "47": 3.2024750148857493,
-        "50": 3.3231088323216293,
-        "66": 2.347803526533228,
-        "72": 3.662776756720917,
-        "75": 3.6956576111373556,
-        "79": 3.6416771417744647,
-        "82": 3.756838693301022,
-        "88": 3.750974109489351
+        "0": 2.6861519407970267,
+        "3": 2.644312719156947,
+        "6": 2.738806239237718,
+        "9": 2.700020105615646,
+        "12": 2.846045236590626,
+        "18": 2.8552533170109657,
+        "25": 3.171165588457819,
+        "28": 3.130660846532105,
+        "31": 3.265684137600799,
+        "34": 3.2999624351965617,
+        "47": 3.202483862117181,
+        "50": 3.3231182136307647,
+        "66": 2.347748933565203,
+        "72": 3.6627508097238906,
+        "75": 3.695642529561277,
+        "79": 3.64162856021123,
+        "82": 3.7568061522371146,
+        "88": 3.750943574442661
       },
       "bilateral_contact": true,
-      "lifted_height": 1.329823536641225,
+      "lifted_height": 1.3298232800510703,
       "goal": [
         0.27,
         0.43,
-        0.8188552205005224
+        0.8188611202161589
       ],
       "final_position": [
-        0.2640607238627225,
-        0.41924024928824927,
-        0.8155887585766012
+        0.26406087189897826,
+        0.4192142796307917,
+        0.8155887586417377
       ],
       "support_surface": "table",
       "supported": true,
       "released": true,
       "settled": true,
-      "support_normal_force": 0.588511696735852,
-      "object_bottom_height": 0.7199520269689466,
-      "placement_error_xy": 0.012290127599575783,
+      "support_normal_force": 0.5881760920594417,
+      "object_bottom_height": 0.719952004847701,
+      "placement_error_xy": 0.012312798483005422,
+      "within_placement_region": true,
+      "placement_radial_tolerance": 0.04,
+      "success": true
+    },
+    {
+      "object": 6,
+      "shape": "curved vase",
+      "sampled_candidates": 242,
+      "demo_mass_kg": 0.060000000000000005,
+      "destination": "upper tier",
+      "approach_obliquity_deg": 22.98161091797651,
+      "selected_candidate": 0,
+      "rejected": {
+        "15": "IK / joint limits",
+        "23": "scene / self collision",
+        "38": "scene / self collision",
+        "46": "IK / joint limits",
+        "54": "IK / joint limits",
+        "62": "upper-tier IK",
+        "69": "scene / self collision",
+        "77": "scene / self collision",
+        "93": "scene / self collision",
+        "101": "scene / self collision",
+        "108": "scene / self collision",
+        "116": "IK / joint limits",
+        "124": "scene / self collision",
+        "132": "scene / self collision",
+        "139": "scene / self collision",
+        "147": "IK / joint limits",
+        "155": "scene / self collision",
+        "163": "scene / self collision",
+        "171": "IK / joint limits",
+        "178": "IK / joint limits",
+        "186": "scene / self collision",
+        "194": "scene / self collision",
+        "202": "scene / self collision",
+        "209": "scene / self collision",
+        "217": "scene / self collision",
+        "225": "IK / joint limits",
+        "233": "IK / joint limits",
+        "241": "scene / self collision"
+      },
+      "costs": {
+        "0": 4.593150059139797,
+        "7": 4.803794072595208,
+        "31": 6.105294456177019,
+        "85": 5.159860471367562
+      },
+      "bilateral_contact": true,
+      "lifted_height": 1.0345087159933166,
+      "goal": [
+        0.57,
+        0.35,
+        1.2136410684741734
+      ],
+      "final_position": [
+        0.5742874711639802,
+        0.354306379935057,
+        1.2080850898831486
+      ],
+      "support_surface": "upper_tier",
+      "supported": true,
+      "released": true,
+      "settled": true,
+      "support_normal_force": 0.5885996203338997,
+      "object_bottom_height": 1.1141033709685624,
+      "placement_error_xy": 0.006076785097979303,
       "within_placement_region": true,
       "placement_radial_tolerance": 0.04,
       "success": true
     }
   ],
-  "successes": 6,
-  "total": 6,
+  "successes": 7,
+  "total": 7,
   "attachment_constraints": false,
-  "rrt_connect_queries": 6,
+  "rrt_connect_queries": 7,
   "joint_collision_resolution_rad": 0.04,
   "placement_orientation": "free"
 }

@@ -6,7 +6,7 @@ python examples/pick_place_mujoco.py --headless --report /tmp/mujoco-picks.json
 
 Uses lateral/oblique antipodal grasps, named-site Jacobian IK, RRT-Connect,
 native joint actuators, and frictional finger contact. No object attachment or
-teleportation. Ritz and cup move between shelf tiers; mug, plate and a curved
+teleportation. Ritz, cup and a bulbous vase move between shelf tiers; mug, plate and a curved
 mustard bottle move to the tabletop, and a bowl uses an oblique rim grasp.
 Viewer defaults to 2x playback and a 60 FPS refresh target. Use --suite household
 for the earlier four-object scene, or --suite classic for bottle/can/foam.
@@ -302,7 +302,7 @@ class Workstation:
         if shape == "bowl":
             world_facets = np.array([[0., 0., -1.], [.5, 0., -.866]])
         local_facets = world_facets @ world[:3, :3]
-        concave = shape in ("mug", "cup", "plate", "bowl")
+        concave = shape in ("mug", "cup", "plate", "bowl", "vase")
         sampler = GraspSampler(replace(self.sampler.config, approach_facets=tuple(map(tuple, local_facets)),
             contact_geometry_policy="mesh" if concave else "auto",
             antipodal_samples=6000 if shape == "bowl" else 1800 if concave else 600,
@@ -319,6 +319,8 @@ class Workstation:
             # Sample the actual handle region densely. Full-scene MuJoCo
             # screening still checks the complete vessel and every fixture.
             contact_mesh = contact_mesh.submesh([contact_mesh.triangles_center[:, 0] > .031], append=True)
+        if shape == "vase":
+            contact_mesh = contact_mesh.submesh([contact_mesh.triangles_center[:, 2] > .02], append=True)
         if shape == "bowl":
             contact_mesh = contact_mesh.submesh([contact_mesh.triangles_center[:, 2] > .005], append=True)
         grasps = sampler.generate(ObjMesh(contact_mesh, mesh.extents, np.eye(4), mesh.extents, "irregular"),
@@ -333,7 +335,7 @@ class Workstation:
         calibration = tcp_to_ee(np.eye(4)[None], standoff=0)[0]
         targets = PlanningGrasps.from_grasps(grasps, world, frame_id="world", tool_link="hand_tcp",
                                              tcp_to_tool=calibration,
-                                             approach_distance=.23 if shape == "ritz" else .08 if shape == "bowl" else .15,
+                                             approach_distance=.23 if shape in ("ritz", "vase") else .08 if shape == "bowl" else .15,
                                              lift_offset=(-.20, 0, .15))
         return targets, grasps, world
 
@@ -790,7 +792,7 @@ def main():
     mode.add_argument("--gui", action="store_true")
     mode.add_argument("--headless", action="store_true")
     parser.add_argument("--suite", choices=SUITES, default="expanded")
-    parser.add_argument("--objects", type=int, choices=range(1, 7))
+    parser.add_argument("--objects", type=int, choices=range(1, max(map(len, SUITES.values()))+1))
     parser.add_argument("--speed", type=float, default=2., help="Viewer playback rate; physics timestep stays unchanged")
     parser.add_argument("--fps", type=int, default=60, help="Maximum viewer refresh rate")
     parser.add_argument("--hold", action="store_true")
