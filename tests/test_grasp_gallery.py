@@ -77,7 +77,7 @@ def test_grid_keeps_all_40_objects_visible_and_grasps_rotate_with_them(tmp_path,
     gallery.decorate(scene)
     assert scene.ngeom == 6
     center = gallery.data.mocap_pos[gallery.mocaps[7]].copy()
-    depth = min(.04, item.extents.max()*.22)*item.scale
+    depth = .04*item.scale
     np.testing.assert_allclose(scene.geoms[0].pos,
                                center+[0, .03*item.scale/2, -depth/2], atol=1e-7)
 
@@ -99,3 +99,36 @@ def test_restored_compact_appearances_are_colored_and_keep_geometry(monkeypatch)
         visual = trimesh.load(restored.with_suffix(".obj"), force="mesh", process=False)
         np.testing.assert_allclose(visual.bounds, original.bounds, atol=2e-7)
         assert len(visual.faces) == len(original.faces)
+
+
+def test_franka_hard_limit_filters_oversized_or_invalid_generator_outputs(tmp_path, monkeypatch):
+    from grasp_sampler import Grasp
+
+    _, sampling = modules(monkeypatch)
+    path = tmp_path/"box.glb"
+    trimesh.creation.box(extents=[.04, .05, .06]).export(path)
+    widths = [.04, .08, .08001, .12, float("nan"), -.01]
+    configured_limits = []
+
+    def generated(self, *args, **kwargs):
+        configured_limits.append(self.config.gripper_max_width)
+        return [Grasp(np.eye(4), "antipodal", width) for width in widths]
+
+    monkeypatch.setattr(sampling.GraspSampler, "generate", generated)
+    batch = sampling.sample_batch(str(path), 1, 32, .20, 42)
+    assert [g["width"] for g in batch] == [.04, .08]
+    batch = sampling.sample_batch(str(path), 1, 32, .05, 42)
+    assert [g["width"] for g in batch] == [.04]
+    assert configured_limits == [.08, .05]
+
+
+def test_display_keeps_source_metric_sizes_instead_of_normalizing_each_object(tmp_path, monkeypatch):
+    assets, _ = modules(monkeypatch)
+    for label, size in (("small", [.03, .04, .05]), ("large", [.12, .16, .20])):
+        path = tmp_path/(label+".glb")
+        trimesh.creation.box(extents=size).export(path)
+        item = assets.prepare_item(path, tmp_path/"cache")
+        assert item.scale == 1.
+        np.testing.assert_allclose(item.extents, [size[0], size[2], size[1]], atol=1e-7)
+        visual = trimesh.load(item.mesh_path, force="mesh", process=False)
+        np.testing.assert_allclose(visual.extents, item.extents, atol=1e-7)

@@ -53,8 +53,9 @@ appearances are retained. See the
 [appearance provenance](https://github.com/ShirakuGIT/grasp-sampler/blob/feat/planner-integrations/assets/gallery_colors/README.md).
 Lighting is neutral, and objects receive no palette tint.
 
-Object display sizes are normalized for the grid. Sampling still uses original
-metric geometry and an **80 mm jaw limit**, configurable with `--jaw-width`.
+Objects, grasp TCPs and jaw openings share the **same original metre scale**.
+There is no per-object size normalization. The Franka gripper has a hard
+**80 mm maximum opening**; `--jaw-width` can request a smaller opening.
 The larger master-chef can has no feasible candidates at that width in the saved
 [40-asset audit](results/grasp-gallery-audit.json); that cell has no grasp glyphs.
 These are geometric grasp proposals, not robot IK, collision-screened motion

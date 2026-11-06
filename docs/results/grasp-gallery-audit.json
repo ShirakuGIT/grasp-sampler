@@ -8,9 +8,10 @@
         0.05779876932501793,
         0.1345718875527382
       ],
-      "display_scale": 1.7462785450483067,
+      "display_scale": 1.0,
       "unique_candidates": 60,
       "batches": 2,
+      "max_opening_m": 0.057798769325017936,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -22,9 +23,10 @@
         0.05847544968128204,
         0.10916950926184654
       ],
-      "display_scale": 2.152615703679175,
+      "display_scale": 1.0,
       "unique_candidates": 42,
       "batches": 2,
+      "max_opening_m": 0.0795864076997813,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -36,9 +38,10 @@
         0.030701682902872562,
         0.10480174422264099
       ],
-      "display_scale": 2.2423290923552344,
+      "display_scale": 1.0,
       "unique_candidates": 42,
       "batches": 2,
+      "max_opening_m": 0.03070168290287257,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -50,9 +53,10 @@
         0.05670451000332832,
         0.17095983773469925
       ],
-      "display_scale": 1.3745918521792249,
+      "display_scale": 1.0,
       "unique_candidates": 60,
       "batches": 2,
+      "max_opening_m": 0.05670451000332834,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -64,9 +68,10 @@
         0.048786355182528496,
         0.1386430785059929
       ],
-      "display_scale": 1.6949998696822217,
+      "display_scale": 1.0,
       "unique_candidates": 42,
       "batches": 2,
+      "max_opening_m": 0.0487863551825285,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -78,9 +83,10 @@
         0.08301516249775887,
         0.19054540991783142
       ],
-      "display_scale": 1.2333018155689957,
+      "display_scale": 1.0,
       "unique_candidates": 24,
       "batches": 2,
+      "max_opening_m": 0.07889567037756107,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -92,9 +98,10 @@
         0.04766453430056572,
         0.20514791458845139
       ],
-      "display_scale": 1.1455149347797908,
+      "display_scale": 1.0,
       "unique_candidates": 42,
       "batches": 2,
+      "max_opening_m": 0.07402857263047646,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -106,9 +113,10 @@
         0.03254188038408756,
         0.14418087899684906
       ],
-      "display_scale": 1.6298971239115256,
+      "display_scale": 1.0,
       "unique_candidates": 42,
       "batches": 2,
+      "max_opening_m": 0.03254188038408757,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -120,9 +128,10 @@
         0.06476737186312675,
         0.18069428950548172
       ],
-      "display_scale": 1.3005391628210299,
+      "display_scale": 1.0,
       "unique_candidates": 42,
       "batches": 2,
+      "max_opening_m": 0.06476737186312677,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -134,9 +143,10 @@
         0.07477901503443718,
         0.0720687098801136
       ],
-      "display_scale": 3.1114907405991614,
+      "display_scale": 1.0,
       "unique_candidates": 80,
       "batches": 2,
+      "max_opening_m": 0.07840137659049747,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -148,9 +158,10 @@
         0.07920335233211517,
         0.03780675423331559
       ],
-      "display_scale": 1.1993867641269913,
+      "display_scale": 1.0,
       "unique_candidates": 62,
       "batches": 2,
+      "max_opening_m": 0.07920335233211519,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -162,9 +173,10 @@
         0.07350929453969002,
         0.07256374508142471
       ],
-      "display_scale": 3.196874646553926,
+      "display_scale": 1.0,
       "unique_candidates": 80,
       "batches": 2,
+      "max_opening_m": 0.07350929453969002,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -176,9 +188,10 @@
         0.08610500209033489,
         0.2406523060053587
       ],
-      "display_scale": 0.9765125624633206,
+      "display_scale": 1.0,
       "unique_candidates": 24,
       "batches": 2,
+      "max_opening_m": 0.07787050077960564,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -190,9 +203,10 @@
         0.16384751349687576,
         0.213412806391716
       ],
-      "display_scale": 1.101152287780992,
+      "display_scale": 1.0,
       "unique_candidates": 42,
       "batches": 2,
+      "max_opening_m": 0.07166859088465573,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -204,9 +218,10 @@
         0.09032821655273438,
         0.0540547389537096
       ],
-      "display_scale": 2.6016233793656824,
+      "display_scale": 1.0,
       "unique_candidates": 62,
       "batches": 2,
+      "max_opening_m": 0.07573890967526838,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -218,9 +233,10 @@
         0.06786869466304779,
         0.088520304299891
       ],
-      "display_scale": 2.654758158126772,
+      "display_scale": 1.0,
       "unique_candidates": 60,
       "batches": 2,
+      "max_opening_m": 0.07208019808409313,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -232,9 +248,10 @@
         0.12108231708407402,
         0.018984095193445683
       ],
-      "display_scale": 1.940828402192095,
+      "display_scale": 1.0,
       "unique_candidates": 62,
       "batches": 2,
+      "max_opening_m": 0.021032104268670082,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -246,9 +263,10 @@
         0.05934367701411247,
         0.05307712033390999
       ],
-      "display_scale": 3.868062029697254,
+      "display_scale": 1.0,
       "unique_candidates": 80,
       "batches": 2,
+      "max_opening_m": 0.06075393781065941,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -260,9 +278,10 @@
         0.1024831123650074,
         0.140028215944767
       ],
-      "display_scale": 1.6782331933207937,
+      "display_scale": 1.0,
       "unique_candidates": 0,
       "batches": 2,
+      "max_opening_m": null,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -274,9 +293,10 @@
         0.05808038078248501,
         0.19171497225761414
       ],
-      "display_scale": 1.2257780247033718,
+      "display_scale": 1.0,
       "unique_candidates": 42,
       "batches": 2,
+      "max_opening_m": 0.07937519622436487,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -288,9 +308,10 @@
         0.07402250543236732,
         0.07159283757209778
       ],
-      "display_scale": 3.174710159124702,
+      "display_scale": 1.0,
       "unique_candidates": 80,
       "batches": 2,
+      "max_opening_m": 0.07402250543236732,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -302,9 +323,10 @@
         0.0626751109957695,
         0.05872461572289467
       ],
-      "display_scale": 3.749494755834772,
+      "display_scale": 1.0,
       "unique_candidates": 80,
       "batches": 2,
+      "max_opening_m": 0.06368992333080932,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -316,9 +338,10 @@
         0.10423528403043747,
         0.06648656819015741
       ],
-      "display_scale": 2.2545148908634265,
+      "display_scale": 1.0,
       "unique_candidates": 62,
       "batches": 2,
+      "max_opening_m": 0.06971287658511822,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -330,9 +353,10 @@
         0.09024068340659142,
         0.08433043584227562
       ],
-      "display_scale": 2.329165451512227,
+      "display_scale": 1.0,
       "unique_candidates": 24,
       "batches": 2,
+      "max_opening_m": 0.07734712502353368,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -344,9 +368,10 @@
         0.03874191828072071,
         0.13803723454475403
       ],
-      "display_scale": 1.7024392061680211,
+      "display_scale": 1.0,
       "unique_candidates": 42,
       "batches": 2,
+      "max_opening_m": 0.03874191828072072,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -358,9 +383,10 @@
         0.05788985267281532,
         0.07584090530872345
       ],
-      "display_scale": 3.0767926549119777,
+      "display_scale": 1.0,
       "unique_candidates": 80,
       "batches": 2,
+      "max_opening_m": 0.0763782374560833,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -372,9 +398,10 @@
         0.05381496250629425,
         0.04574463423341513
       ],
-      "display_scale": 4.366815269498964,
+      "display_scale": 1.0,
       "unique_candidates": 84,
       "batches": 2,
+      "max_opening_m": 0.06770971819122903,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -386,9 +413,10 @@
         0.09380999952554703,
         0.1759638711810112
       ],
-      "display_scale": 1.3355014209607794,
+      "display_scale": 1.0,
       "unique_candidates": 42,
       "batches": 2,
+      "max_opening_m": 0.04935956932604314,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -400,9 +428,10 @@
         0.0670417882502079,
         0.06668339320458472
       ],
-      "display_scale": 3.505276427337411,
+      "display_scale": 1.0,
       "unique_candidates": 80,
       "batches": 2,
+      "max_opening_m": 0.06716743179516711,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -414,9 +443,10 @@
         0.06752818822860718,
         0.1021665669977665
       ],
-      "display_scale": 2.300165376068058,
+      "display_scale": 1.0,
       "unique_candidates": 60,
       "batches": 2,
+      "max_opening_m": 0.0675932920366155,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -428,9 +458,10 @@
         0.03413358889520168,
         0.08521969243884087
       ],
-      "display_scale": 2.754229839841867,
+      "display_scale": 1.0,
       "unique_candidates": 42,
       "batches": 2,
+      "max_opening_m": 0.03468356582289937,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -442,9 +473,10 @@
         0.15999643504619598,
         0.0382830835878849
       ],
-      "display_scale": 1.4687500328291214,
+      "display_scale": 1.0,
       "unique_candidates": 44,
       "batches": 2,
+      "max_opening_m": 0.0382830835878849,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -456,9 +488,10 @@
         0.060102999210357666,
         0.08354300260543823
       ],
-      "display_scale": 2.302003192761847,
+      "display_scale": 1.0,
       "unique_candidates": 42,
       "batches": 2,
+      "max_opening_m": 0.07695157500850014,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -470,9 +503,10 @@
         0.08087199926376343,
         0.07217799872159958
       ],
-      "display_scale": 2.905826517699275,
+      "display_scale": 1.0,
       "unique_candidates": 44,
       "batches": 2,
+      "max_opening_m": 0.07217799872159958,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -484,9 +518,10 @@
         0.07787399739027023,
         0.0511929988861084
       ],
-      "display_scale": 3.017695352433025,
+      "display_scale": 1.0,
       "unique_candidates": 80,
       "batches": 2,
+      "max_opening_m": 0.07787399739027023,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -498,9 +533,10 @@
         0.09313099831342697,
         0.08130300045013428
       ],
-      "display_scale": 2.008821679849098,
+      "display_scale": 1.0,
       "unique_candidates": 24,
       "batches": 2,
+      "max_opening_m": 0.040975917965464057,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -512,9 +548,10 @@
         0.06662099808454514,
         0.19130100309848785
       ],
-      "display_scale": 1.2284305685475914,
+      "display_scale": 1.0,
       "unique_candidates": 42,
       "batches": 2,
+      "max_opening_m": 0.06662099808454515,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -526,9 +563,10 @@
         0.26110199093818665,
         0.026722999289631844
       ],
-      "display_scale": 0.9000314365876817,
+      "display_scale": 1.0,
       "unique_candidates": 44,
       "batches": 2,
+      "max_opening_m": 0.026722999289631844,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -540,9 +578,10 @@
         0.06476738303899765,
         0.18069428205490112
       ],
-      "display_scale": 1.3005392164462566,
+      "display_scale": 1.0,
       "unique_candidates": 42,
       "batches": 2,
+      "max_opening_m": 0.06476738303899766,
       "rotation_degrees": 360.0,
       "error": null
     },
@@ -554,15 +593,17 @@
         0.1312243938446045,
         0.18000000715255737
       ],
-      "display_scale": 1.3055555036774409,
+      "display_scale": 1.0,
       "unique_candidates": 24,
       "batches": 2,
+      "max_opening_m": 0.04960191780036451,
       "rotation_degrees": 360.0,
       "error": null
     }
   ],
   "inventory_count": 40,
   "jaw_width_m": 0.08,
+  "franka_max_opening_m": 0.08,
   "physics_execution": false,
   "layout": "grid",
   "scene_update_hz": null,

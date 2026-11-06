@@ -88,7 +88,7 @@ def prepare_item(path, cache):
               "Mustard": "Mustard Bottle", "Vase": "Blue Vase"}
     return GalleryItem(path, labels.get(label, label),
                        "SCANNED MESH" if path.parent.name == "household" else "COMPACT MESH",
-                       obj_path, png_path, obj.extents, .235/float(obj.extents.max()))
+                       obj_path, png_path, obj.extents, 1.)
 
 
 def grid_layout(count, columns=8, rows=5):

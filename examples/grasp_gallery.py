@@ -34,7 +34,7 @@ from grasp_gallery_assets import (  # noqa: E402
     prepare_item,
     scene_xml,
 )
-from grasp_gallery_sampling import sample_batch, unique_grasps  # noqa: E402
+from grasp_gallery_sampling import FRANKA_MAX_OPENING_M, sample_batch, unique_grasps  # noqa: E402
 
 
 class Gallery:
@@ -42,7 +42,7 @@ class Gallery:
                  jaw_width=.08, visible=32, seed=0, gui=True, grid=False):
         self.items, self.fps, self.seconds, self.grid = items, fps, seconds, grid
         self.positions = grid_layout(len(items)) if grid else np.zeros((len(items), 3))
-        self.batches, self.batch_size, self.jaw_width = batches, batch_size, jaw_width
+        self.batches, self.batch_size, self.jaw_width = batches, batch_size, min(jaw_width, FRANKA_MAX_OPENING_M)
         self.visible, self.seed = visible, seed
         self.model = mj.MjModel.from_xml_string(scene_xml(items, cache, grid=grid))
         self.data = mj.MjData(self.model)
@@ -127,8 +127,8 @@ class Gallery:
                     break
             indices.reverse()
             self.visibility_cache[index] = (grasps, indices)
-        depth = min(.04, float(item.extents.max())*.22)*item.scale
-        stem = min(.025, float(item.extents.max())*.15)*item.scale
+        depth = .04*item.scale
+        stem = .025*item.scale
         for i in indices:
             g = grasps[i]
             pose = np.asarray(g["pose"])
@@ -154,7 +154,7 @@ class Gallery:
                 if scene.ngeom >= scene.maxgeom:
                     return
                 geom = scene.geoms[scene.ngeom]
-                mj.mjv_initGeom(geom, mj.mjtGeom.mjGEOM_SPHERE, np.array([.0032, 0, 0]), point,
+                mj.mjv_initGeom(geom, mj.mjtGeom.mjGEOM_SPHERE, np.array([.002, 0, 0]), point,
                                 np.eye(3).reshape(-1), np.asarray(color, np.float32))
                 geom.emission = 1.
                 geom.category = mj.mjtCatBit.mjCAT_DECOR
@@ -182,6 +182,7 @@ class Gallery:
         return {"asset": str(item.path.relative_to(ROOT)), "label": item.label,
                 "source_extents_m": item.extents.tolist(), "display_scale": item.scale,
                 "unique_candidates": len(self.grasps), "batches": self.completed_batches,
+                "max_opening_m": max((g["width"] for g in self.grasps), default=None),
                 "rotation_degrees": float(np.degrees(self.angle)), "error": error}
 
     def run(self, start=0, once=False):
@@ -286,6 +287,7 @@ class GridGallery(Gallery):
         return {"asset": str(item.path.relative_to(ROOT)), "label": item.label,
                 "source_extents_m": item.extents.tolist(), "display_scale": item.scale,
                 "unique_candidates": len(self.candidates[index]), "batches": self.batch_counts[index],
+                "max_opening_m": max((g["width"] for g in self.candidates[index]), default=None),
                 "rotation_degrees": float(np.degrees(self.angle)), "error": self.errors[index]}
 
     def run(self, start=0, once=False):
@@ -370,9 +372,11 @@ def main():
     parser.add_argument("--snapshot", type=Path)
     parser.add_argument("--cache", type=Path, default=Path(tempfile.gettempdir())/"grasp-sampler-gallery")
     args = parser.parse_args()
-    if any(value <= 0 for value in (args.seconds, args.fps, args.batches, args.batch_size,
+    if any(not np.isfinite(value) or value <= 0 for value in (args.seconds, args.fps, args.batches, args.batch_size,
                                     args.jaw_width, args.visible_grasps)):
         parser.error("Timing, sampling and jaw-width values must be positive")
+    if args.jaw_width > FRANKA_MAX_OPENING_M:
+        parser.error("The Franka gripper cannot open beyond 0.08 m (80 mm)")
     paths = inventory()
     print(f"Preparing {len(paths)} original-color object assets", flush=True)
     items = [prepare_item(path, args.cache) for path in paths]
@@ -425,7 +429,8 @@ def main():
         if args.report:
             args.report.parent.mkdir(parents=True, exist_ok=True)
             args.report.write_text(json.dumps({"assets": gallery.records, "inventory_count": len(items),
-                "jaw_width_m": args.jaw_width, "physics_execution": False, "layout": args.layout,
+                "jaw_width_m": args.jaw_width, "franka_max_opening_m": FRANKA_MAX_OPENING_M,
+                "physics_execution": False, "layout": args.layout,
                 "scene_update_hz": ((len(gallery.frame_times)-1)/(gallery.frame_times[-1]-gallery.frame_times[0])
                                     if len(gallery.frame_times) > 1 else None),
                 "candidate_colors": {"violet": "primitive / OBB proposals", "cyan": "antipodal candidates",
