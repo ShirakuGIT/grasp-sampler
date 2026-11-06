@@ -118,6 +118,21 @@ class Workstation:
                 if delay > 0:
                     time.sleep(delay)
 
+    def show_for(self, seconds):
+        """Display candidate selection without changing the physical sequence.
+
+        GUI-only physics steps would change settled poses, ray samples and
+        grasp IDs relative to the headless validation run.
+        """
+        if not self.viewer:
+            return
+        deadline = time.monotonic()+seconds/self.speed
+        while time.monotonic() < deadline:
+            if not self.viewer.is_running():
+                raise KeyboardInterrupt
+            self.update_viewer()
+            time.sleep(1/self.fps)
+
     def pose(self):
         out = np.eye(4)
         out[:3, 3] = self.data.site_xpos[self.site]
@@ -545,8 +560,7 @@ class Workstation:
             targets, self.grasps, self.world = self.make_targets(i)
             if not len(targets):
                 raise RuntimeError(f"No antipodal candidates for item {i}")
-            if self.viewer:
-                self.step(1.2)
+            self.show_for(1.2)
             self.stage("IK + COLLISION SCREEN")
             self.selected, self.rejected, self.costs = self.screen(targets)
             chosen = targets.select([self.selected])
@@ -561,8 +575,7 @@ class Workstation:
                 lift[:3, :3] = tcp_to_ee(down_tcp[None], standoff=0)[0, :3, :3]
             self.pick_path = [chosen.pregrasp[0], chosen.grasp[0], unseat, retreat, lift]
             self.stage(f"SELECTED #{self.selected} / {len(self.rejected)} REJECTED")
-            if self.viewer:
-                self.step(1.5)
+            self.show_for(1.5)
             self.grip(min(.08, chosen.widths[0]+.012) if self.shapes[i] == "bowl" else .08, .15)
             self.stage("APPROACH")
             self.move_joint(chosen.pregrasp[0], 1.5,

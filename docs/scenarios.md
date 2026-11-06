@@ -113,6 +113,8 @@ are independent, and rendering is limited by wall time rather than every fixed
 number of physics steps. Sleep is batched to reduce tiny scheduler wakeups.
 Physics remains MuJoCo's compiled CPU solver at a 2 ms timestep; faster playback
 does not skip contact integration or speed up motor commands in simulation time.
+Candidate-display pauses refresh only the viewer; they do not advance physics.
+This keeps live grasp sampling consistent with the headless validation sequence.
 The requested frame rate is a target, not a hardware-independent guarantee.
 JAX/MJX is useful for batched simulation workloads; this single native viewer
 uses the existing CPU solver and does not introduce a JAX dependency.
