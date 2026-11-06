@@ -81,18 +81,32 @@ Planner packages are imported only when their adapters are called. See the
 [planning guide](docs/planning.md) for frame/tool calibration, batch shapes,
 robust-command preservation, and runnable exports/examples.
 
-Run the Panda through a complete multi-object pick-and-place using sampled
-antipodal grasps and physical finger contact:
+The default demo uses **MuJoCo and a Franka FR3v2** for constrained lateral and
+oblique grasps inside a two-tier cabinet. The mustard bottle moves from the lower
+bay to the upper tier; the can and foam brick are extracted and reoriented for
+tabletop placement. All three objects come from `assets/meshes`. Cyan glyphs show
+candidates, coral marks rejections, and gold highlights the selection and staged
+extraction path. A native HUD and cost plot explain the decisions.
+
+![MuJoCo FR3v2 with a two-tier cabinet and lateral grasp candidates](docs/results/mujoco-shelf.png)
 
 ```bash
-pip install -e ".[sim]"
-python examples/pick_place_pybullet.py --gui --hold
-# Or verify without a display:
-python examples/pick_place_pybullet.py --headless --report /tmp/pick-place.json
+pip install -e ".[mujoco,fr3]"
+python tools/prepare_fr3_mujoco.py          # pinned models and source materials
+# macOS native viewer:
+mjpython examples/pick_place_mujoco.py --gui --hold
+# Linux: python examples/pick_place_mujoco.py --gui --hold
+# Headless physical check:
+python examples/pick_place_mujoco.py --headless --report /tmp/shelf-picks.json
 ```
 
-The tabletop demo uses Cartesian waypoints and IK. For cluttered robot scenes,
-connect the same targets to a collision-aware motion planner.
+The scene follows shelf-picking / open-cabinet retrieval setups from
+MotionBenchMaker and RoboCasa; see the [paper-based scene rationale](docs/scenarios.md).
+Free-space transfers use collision-checked RRT-Connect, including the held mesh;
+insertion and extraction use Cartesian stages. Execution uses native actuators
+and finger contact, with no object attachments or teleportation. Source material
+regions preserve the FR3v2's dark accents and
+markings. The separate PyBullet demo remains in `examples/pick_place_pybullet.py`.
 
 ## Robust evaluation under perceived object uncertainty
 

@@ -190,26 +190,71 @@ scene collisions before accepting a path. `pybullet-planning` accepts the same
 tuple convention for its tool-pose helpers; its joint-space planners use the
 corresponding IK joint solution.
 
-The complete tabletop demo samples **antipodal grasps**, chooses central
-top-down candidates, applies the `panda_grasptarget` calibration, and runs a
-physical Panda gripper through approach, closure, lift, place and release:
+The complete workstation demo uses the official **FR3v2**, a raised table and
+mounting plate, a divider fixture, and a physical placement tray. It samples
+antipodal grasps on six cartons/cans/a hexagonal jar, screens IK residual,
+joint limits and scene collisions at five straight-approach samples, then ranks
+survivors by joint travel plus a contact-centering term. These costs are planning
+heuristics; they are not robustness probabilities.
+
+The FR3v2 model's named `fr3v2_hand_tcp` frame is used directly, including its
+official 0.1034 m hand offset. Its axes are calibrated to the sampler without
+adding another flange standoff. Cyan candidate glyphs, coral rejections, a gold
+selection, and an enlarged inspection model show the actual candidates. Phase
+labels follow sampling, screening, approach, closure, lift, transfer and release.
+
+![Official FR3v2, tabletop fixtures, grasp candidates and enlarged inspector](results/fr3-workstation.png)
 
 ```bash
-PYTHONPATH=src python examples/pick_place_pybullet.py --gui --hold
+pip install -e ".[sim,fr3]"
+python tools/prepare_fr3.py
+PYTHONPATH=src python examples/pick_place_pybullet.py --gui --hold --objects 6
 PYTHONPATH=src python examples/pick_place_pybullet.py --headless \
-    --objects 5 --report /tmp/pick-place.json
+    --objects 6 --report /tmp/pick-place.json --snapshot /tmp/workstation.png
 ```
 
-It uses contact friction, with no fixed grasp constraints or object teleportation.
-The JSON report checks bilateral finger contact, achieved lift height, and final
-placement error. The open scene uses interpolated Cartesian waypoints and IK;
-replace that motion routine with cuRobo/MoveIt for collision-aware arm planning.
+The preparation tool downloads a pinned [official franka_description](https://github.com/frankarobotics/franka_description)
+revision and converts visual COLLADA to OBJ for Bullet. Each source material
+region becomes a separate visual, preserving dark joint accents and markings
+instead of flattening the robot to one color. Kinematics, inertias,
+joint limits and collision meshes come from the FR3v2 description. License and
+provenance are retained in the ignored `assets/robots/fr3v2` cache. `--source`
+accepts a local upstream checkout. The older bundled Panda remains available
+with `--robot panda`; its `panda_grasptarget` frame is calibrated separately.
+
+The simulation uses contact friction, with no fixed grasp constraints or object
+teleportation. Candidate screening saves/restores the simulator to test IK poses;
+execution moves the robot with motors and corrects measured placement drift.
+The JSON report checks bilateral finger contact, achieved lift height, final
+placement error, and records rejected candidates and selection costs.
+[A recorded run](results/pybullet-pick-place.json) preserves the measured outcomes.
+The overhead transfer still uses interpolated Cartesian waypoints and IK;
+replace that routine with cuRobo/MoveIt for general collision-aware arm planning.
+
+`grasp_sampler.integrations.pybullet.draw_grasps` exposes the same reusable
+collision-free glyphs for other PyBullet scenes. Pass sampler-local grasps and
+their object world pose, a selected index and rejected indices; remove the
+returned body IDs when changing candidates. Do not pass flange poses as TCP
+glyph poses.
 The separate `pybullet_sim.collision_filter` still provides nominal gripper-body
 screening for arbitrary meshes.
 
 Reference: [pybullet-planning tool-pose IK](https://pybullet-planning.readthedocs.io/en/latest/reference/generated/pybullet_planning.interfaces.kinematics.compute_inverse_kinematics.html).
 
 ## MuJoCo
+
+For the default **FR3v2 lateral tier-to-tier and tabletop demonstration**, use the existing mesh
+assets and setup in {doc}`scenarios`. It includes native physics, a live grasp
+selection HUD/cost plot, source material colors, and recorded physical outcomes.
+Prepare it with `python tools/prepare_fr3_mujoco.py` after installing the `mujoco`
+and `fr3` extras. On macOS run its viewer with `mjpython`.
+
+`solve_site_ik(model, data, site_name, target_pose, joint_names, seed=...)` offers
+non-mutating damped Jacobian IK for named hinge/slide joints. Its result preserves
+joint order, limit-respecting positions, success status, position/orientation
+residuals and iteration count. Targets are world transforms; it does not perform
+collision checks or motion planning. The demo screens its results separately in
+a scratch `MjData` and drives the native model's actuators for execution.
 
 Install `pip install -e ".[mujoco]"` for the official `mujoco` bindings.
 `to_mujoco` exports world positions and **wxyz** quaternions without importing

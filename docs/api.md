@@ -57,9 +57,13 @@ See {doc}`planning` for frame conventions and usage.
 .. autofunction:: grasp_sampler.integrations.curobo.to_curobo
 .. autofunction:: grasp_sampler.integrations.moveit.to_pose_stamped
 .. autofunction:: grasp_sampler.integrations.pybullet.to_pybullet
+.. autofunction:: grasp_sampler.integrations.pybullet.draw_grasps
 .. autofunction:: grasp_sampler.integrations.mujoco.to_mujoco
 .. autofunction:: grasp_sampler.integrations.mujoco.set_mocap_target
 .. autofunction:: grasp_sampler.integrations.mujoco.site_world_pose
+.. autoclass:: grasp_sampler.integrations.mujoco.SiteIKResult
+   :members:
+.. autofunction:: grasp_sampler.integrations.mujoco.solve_site_ik
 .. autofunction:: grasp_sampler.integrations.mplib.to_mplib
 ```
 

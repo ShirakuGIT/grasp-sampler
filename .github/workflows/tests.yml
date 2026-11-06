@@ -39,14 +39,17 @@ jobs:
           cache: pip
       - name: Install simulator integrations and CPU tensors
         run: |
-          pip install -e ".[dev,sim,mujoco]"
+          pip install -e ".[dev,sim,mujoco,fr3]"
           pip install torch --index-url https://download.pytorch.org/whl/cpu
       - name: Test planner contracts and simulator frames
         run: pytest tests/test_planning.py -q
       - name: Physical multi-object pick and place
-        run: python examples/pick_place_pybullet.py --headless --objects 5 --report pick-place-report.json
+        run: |
+          python tools/prepare_fr3.py
+          python tools/prepare_fr3_mujoco.py
+          python examples/pick_place_mujoco.py --headless --objects 3 --report mujoco-pick-place-report.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: pick-place-report
-          path: pick-place-report.json
+          path: mujoco-pick-place-report.json

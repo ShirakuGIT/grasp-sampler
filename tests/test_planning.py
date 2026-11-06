@@ -1,6 +1,7 @@
 """Frame, command-preservation and planner-boundary regression tests."""
 import json
 import sys
+from pathlib import Path
 from types import ModuleType, SimpleNamespace
 
 import numpy as np
@@ -11,8 +12,8 @@ from scipy.spatial.transform import Rotation
 from grasp_sampler import Grasp, PlanningGrasps, mesh_world_pose, pose_components, tcp_to_ee
 from grasp_sampler.integrations.curobo import goal_arrays, to_curobo
 from grasp_sampler.integrations.mplib import to_mplib
-from grasp_sampler.integrations.mujoco import set_mocap_target, site_world_pose, to_mujoco
-from grasp_sampler.integrations.pybullet import to_pybullet
+from grasp_sampler.integrations.mujoco import set_mocap_target, site_world_pose, solve_site_ik, to_mujoco
+from grasp_sampler.integrations.pybullet import draw_grasps, to_pybullet
 from grasp_sampler.mesh import load_mesh
 from grasp_sampler.robust_set import RobustCandidate, RobustCandidateRecord, RobustGraspSetResult
 
@@ -244,3 +245,111 @@ def test_mujoco_actual_mocap_and_site():
             set_mocap_target(model, data, name, batch)
     with pytest.raises(IndexError):
         set_mocap_target(model, data, "target", batch, index=9)
+
+
+def test_pybullet_grasp_visuals_have_no_collision_geometry():
+    p = pytest.importorskip("pybullet")
+    client = p.connect(p.DIRECT)
+    try:
+        grasps = [Grasp(transform((.1 * i, 0, .2)), "antipodal", .04) for i in range(4)]
+        bodies = draw_grasps(grasps, np.eye(4), selected_index=3, rejected_indices=[0],
+                            max_grasps=2, physics_client_id=client)
+        assert len(bodies) == 2  # subsampling includes selected candidate 3
+        assert all(not p.getCollisionShapeData(body, -1, physicsClientId=client) for body in bodies)
+        np.testing.assert_allclose(p.getBasePositionAndOrientation(bodies[-1], physicsClientId=client)[0], [.3, 0, .2])
+        with pytest.raises(IndexError):
+            draw_grasps(grasps, np.eye(4), selected_index=8, physics_client_id=client)
+    finally:
+        p.disconnect(client)
+
+
+def test_mujoco_site_ik_preserves_live_state_and_reports_unreachable_goals():
+    mj = pytest.importorskip("mujoco")
+    model = mj.MjModel.from_xml_string('''<mujoco><worldbody><body>
+      <joint name="shoulder" type="hinge" axis="0 0 1" range="-1.5 1.5"/>
+      <geom type="capsule" fromto="0 0 0 1 0 0" size=".02" mass="1"/>
+      <site name="tip" pos="1 0 0"/>
+    </body></worldbody></mujoco>'''.replace('<mujoco>', '<mujoco><compiler angle="radian"/>'))
+    data = mj.MjData(model)
+    mj.mj_forward(model, data)
+    before = data.qpos.copy()
+    goal = transform((np.cos(.6), np.sin(.6), 0), (0, 0, .6))
+    result = solve_site_ik(model, data, "tip", goal, ["shoulder"])
+    assert result.success
+    np.testing.assert_allclose(result.positions, [.6], atol=.002)
+    np.testing.assert_array_equal(data.qpos, before)
+    unreachable = goal.copy(); unreachable[0, 3] = 3
+    failed = solve_site_ik(model, data, "tip", unreachable, ["shoulder"], max_iterations=20)
+    assert not failed.success
+    assert failed.position_error > 1
+    assert abs(failed.positions[0]) <= 1.5
+    with pytest.raises(ValueError, match="unknown"):
+        solve_site_ik(model, data, "missing", goal, ["shoulder"])
+
+
+def test_mujoco_placement_requires_the_correct_support_and_allows_settled_rotation(monkeypatch):
+    mj = pytest.importorskip("mujoco")
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1] / "examples"))
+    monkeypatch.setenv("GRASP_SAMPLER_DISABLE_OPEN3D", "1")
+    from pick_place_mujoco import Workstation
+
+    model = mj.MjModel.from_xml_string('''<mujoco><option timestep=".002"/><worldbody>
+      <geom name="table" type="box" pos="0 0 .71" size="1 1 .01"/>
+      <geom name="upper_tier" type="box" pos="0 0 1.11" size="1 1 .01"/>
+      <geom name="upper_tier_edge" type="box" pos="1 0 1.10" size=".01 1 .01"/>
+      <body name="gripper_hand" pos="5 0 0"><geom size=".01" contype="0" conaffinity="0"/></body>
+      <body name="item" pos="0 0 1.14" quat=".70710678 0 .70710678 0">
+        <freejoint/><geom type="box" size=".02 .03 .07" mass=".06"/>
+      </body></worldbody></mujoco>''')
+    data = mj.MjData(model)
+    demo = object.__new__(Workstation)
+    demo.model, demo.data = model, data
+    demo.body_ids, demo.finger_ids = [model.body("item").id], set()
+    demo.objects = [(trimesh.creation.box(extents=[.04, .06, .14]), "box", np.zeros(3))]
+    mj.mj_step(model, data, nstep=400)
+    passed, metrics = demo.placement_status(0, np.array([0., 0., 1.19]))
+    assert passed and metrics["supported"] and metrics["released"]
+    assert metrics["support_normal_force"] > .1
+    # Resting on the tabletop at the same XY is not an upper-tier success.
+    data.qpos[2] = .74
+    data.qvel[:] = 0
+    mj.mj_step(model, data, nstep=400)
+    passed, metrics = demo.placement_status(0, np.array([0., 0., 1.19]))
+    assert not passed
+    assert not metrics["supported"]
+
+
+def test_mujoco_joint_transit_routes_around_an_obstacle_without_moving_live_state(monkeypatch):
+    mj = pytest.importorskip("mujoco")
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1] / "examples"))
+    monkeypatch.setenv("GRASP_SAMPLER_DISABLE_OPEN3D", "1")
+    from pick_place_mujoco import Workstation
+
+    model = mj.MjModel.from_xml_string('''<mujoco><option gravity="0 0 0"/><worldbody>
+      <geom name="wall" type="box" pos="0 0 .1" size=".05 .3 .1"/>
+      <body name="robot" pos="0 0 .1">
+        <joint name="x" type="slide" axis="1 0 0" range="-1 1"/>
+        <joint name="y" type="slide" axis="0 1 0" range="-1 1"/>
+        <geom type="sphere" size=".05" mass="1"/>
+        <body name="gripper_hand"/>
+      </body></worldbody></mujoco>''')
+    demo = object.__new__(Workstation)
+    demo.model, demo.data = model, mj.MjData(model)
+    demo.q_indices, demo.joint_ids = np.array([0, 1]), [0, 1]
+    demo.robot_bodies = {model.body("robot").id, model.body("gripper_hand").id}
+    demo.held_index, demo.finger_ids, demo.planning_calls = None, set(), 0
+    demo.phase = "obstacle regression"
+    start, goal = np.array([-.6, 0.]), np.array([.6, 0.])
+    demo.data.qpos[:] = start
+    path = demo.joint_path(start, goal)
+    np.testing.assert_array_equal(demo.data.qpos, start)
+    np.testing.assert_allclose(path[0], start)
+    np.testing.assert_allclose(path[-1], goal)
+    assert len(path) > 2
+    assert max(abs(q[1]) for q in path) >= .34
+    scratch = mj.MjData(model)
+    for a, b in zip(path, path[1:]):
+        for t in np.linspace(0, 1, 40):
+            scratch.qpos[:] = (1-t)*a+t*b
+            mj.mj_forward(model, scratch)
+            assert all(c.dist >= -.0011 for c in scratch.contact[:scratch.ncon])
