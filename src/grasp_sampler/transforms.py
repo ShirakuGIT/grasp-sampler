@@ -4,6 +4,7 @@ The sampler emits grasps as TCP poses in the object's local frame. Downstream
 motion planners usually want them placed in the world and expressed in the
 robot's end-effector (flange) frame. These helpers do both, as batched arrays.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -12,9 +13,7 @@ from .types import Grasp
 
 # Map a TCP frame (+X closing, +Z approach) to the Franka end-effector / flange
 # frame (+Y closing, +Z approach). Columns are the EE axes in TCP coordinates.
-_TCP_TO_PANDA_EE = np.array([[0.0, 1.0, 0.0],
-                             [-1.0, 0.0, 0.0],
-                             [0.0, 0.0, 1.0]], float)
+_TCP_TO_PANDA_EE = np.array([[0.0, 1.0, 0.0], [-1.0, 0.0, 0.0], [0.0, 0.0, 1.0]], float)
 
 
 def stack_poses(grasps: list[Grasp]) -> np.ndarray:
@@ -34,8 +33,9 @@ def to_world(poses: np.ndarray, object_pose: np.ndarray) -> np.ndarray:
     return np.asarray(object_pose, float)[None] @ poses
 
 
-def tcp_to_ee(poses: np.ndarray, *, standoff: float = 0.105,
-              remap: np.ndarray = _TCP_TO_PANDA_EE) -> np.ndarray:
+def tcp_to_ee(
+    poses: np.ndarray, *, standoff: float = 0.105, remap: np.ndarray = _TCP_TO_PANDA_EE
+) -> np.ndarray:
     """Convert TCP poses to end-effector (flange) poses.
 
     The flange sits ``standoff`` metres behind the TCP along the approach axis
@@ -45,5 +45,5 @@ def tcp_to_ee(poses: np.ndarray, *, standoff: float = 0.105,
     poses = np.asarray(poses, float).reshape(-1, 4, 4)
     out = poses.copy()
     out[:, :3, :3] = poses[:, :3, :3] @ remap
-    out[:, :3, 3] = poses[:, :3, 3] - standoff * out[:, :3, 2]   # back off along approach
+    out[:, :3, 3] = poses[:, :3, 3] - standoff * out[:, :3, 2]  # back off along approach
     return out

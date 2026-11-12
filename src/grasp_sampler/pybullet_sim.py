@@ -9,6 +9,7 @@ plus a palm bar -- no robot URDF needed) to:
 Requires ``pybullet`` (``pip install pybullet``). Grasp poses are TCP poses in
 the object frame: +X closing, +Z approach, origin between the fingertips.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -34,7 +35,8 @@ def _as_obj(mesh_path: str) -> str:
     import tempfile
 
     from .mesh import load_mesh
-    obj = load_mesh(path)                       # upright + centered, like sampling
+
+    obj = load_mesh(path)  # upright + centered, like sampling
     tmp = tempfile.NamedTemporaryFile(suffix=".obj", delete=False)
     obj.mesh.export(tmp.name)
     return tmp.name
@@ -43,10 +45,8 @@ def _as_obj(mesh_path: str) -> str:
 def _load_object(p, mesh_path: str):
     """Spawn the mesh as a static (concave) collision body at the origin."""
     obj_file = _as_obj(mesh_path)
-    col = p.createCollisionShape(p.GEOM_MESH, fileName=obj_file,
-                                 flags=p.GEOM_FORCE_CONCAVE_TRIMESH)
-    vis = p.createVisualShape(p.GEOM_MESH, fileName=obj_file,
-                              rgbaColor=[0.8, 0.8, 0.85, 1.0])
+    col = p.createCollisionShape(p.GEOM_MESH, fileName=obj_file, flags=p.GEOM_FORCE_CONCAVE_TRIMESH)
+    vis = p.createVisualShape(p.GEOM_MESH, fileName=obj_file, rgbaColor=[0.8, 0.8, 0.85, 1.0])
     return p.createMultiBody(0, col, vis)
 
 
@@ -67,8 +67,8 @@ def _gripper_links(p, width: float, finger_len: float, *, body_only: bool):
     stem = p.createCollisionShape(p.GEOM_BOX, halfExtents=[b, b, finger_len / 2.0])
     shapes = [palm, stem]
     frames = [
-        [0.0, 0.0, -finger_len - finger_len / 2.0],          # block behind fingertips
-        [0.0, 0.0, -finger_len - 3.0 * finger_len / 2.0],    # stem toward the wrist
+        [0.0, 0.0, -finger_len - finger_len / 2.0],  # block behind fingertips
+        [0.0, 0.0, -finger_len - 3.0 * finger_len / 2.0],  # stem toward the wrist
     ]
     if not body_only:
         finger = p.createCollisionShape(p.GEOM_BOX, halfExtents=[b, b, finger_len / 2.0])
@@ -79,7 +79,7 @@ def _gripper_links(p, width: float, finger_len: float, *, body_only: bool):
 
 def _spawn_gripper(p, width: float, finger_len: float, *, body_only: bool = False):
     shapes, frames = _gripper_links(p, width, finger_len, body_only=body_only)
-    n = len(shapes) - 1                                  # links beyond the base
+    n = len(shapes) - 1  # links beyond the base
     return p.createMultiBody(
         baseMass=0,
         baseCollisionShapeIndex=shapes[0],
@@ -97,8 +97,14 @@ def _spawn_gripper(p, width: float, finger_len: float, *, body_only: bool = Fals
     )
 
 
-def collision_filter(mesh_path: str, grasps: list[Grasp], *, clearance: float = 0.0,
-                     finger_len: float = 0.04, gui: bool = False) -> np.ndarray:
+def collision_filter(
+    mesh_path: str,
+    grasps: list[Grasp],
+    *,
+    clearance: float = 0.0,
+    finger_len: float = 0.04,
+    gui: bool = False,
+) -> np.ndarray:
     """Boolean mask of grasps whose gripper body clears the object.
 
     A grasp is rejected if any gripper link comes within ``clearance`` of the
@@ -117,7 +123,7 @@ def collision_filter(mesh_path: str, grasps: list[Grasp], *, clearance: float = 
             p.resetBasePositionAndOrientation(grip, pos.tolist(), quat)
             p.performCollisionDetection()
             pts = p.getClosestPoints(obj, grip, distance=max(clearance, 1e-4))
-            worst = min((c[8] for c in pts), default=1.0)    # signed distance
+            worst = min((c[8] for c in pts), default=1.0)  # signed distance
             keep[i] = worst >= -1e-6 if clearance == 0 else worst >= clearance
             p.removeBody(grip)
         return keep
@@ -138,10 +144,12 @@ def fixed_pose_collision_check(mesh, poses, opening_width, config):
 
     p = BulletClient(connection_mode=pybullet.DIRECT)
     try:
-        shape = p.createCollisionShape(p.GEOM_MESH,
+        shape = p.createCollisionShape(
+            p.GEOM_MESH,
             vertices=np.asarray(mesh.vertices).tolist(),
             indices=np.asarray(mesh.faces).ravel().tolist(),
-            flags=p.GEOM_FORCE_CONCAVE_TRIMESH)
+            flags=p.GEOM_FORCE_CONCAVE_TRIMESH,
+        )
         obj = p.createMultiBody(baseMass=0, baseCollisionShapeIndex=shape)
         shapes, frames = _gripper_links(p, opening_width, config.finger_len, body_only=True)
         # Place each proxy component at its actual TCP-local offset. The legacy
@@ -159,8 +167,14 @@ def fixed_pose_collision_check(mesh, poses, opening_width, config):
         p.disconnect()
 
 
-def show_grasps(mesh_path: str, grasps: list[Grasp], *, max_grasps: int | None = None,
-                finger_len: float = 0.04, hold: bool = True) -> None:
+def show_grasps(
+    mesh_path: str,
+    grasps: list[Grasp],
+    *,
+    max_grasps: int | None = None,
+    finger_len: float = 0.04,
+    hold: bool = True,
+) -> None:
     """Open a PyBullet GUI with the object and a gripper proxy at each grasp."""
     import pybullet as p
 
@@ -173,10 +187,10 @@ def show_grasps(mesh_path: str, grasps: list[Grasp], *, max_grasps: int | None =
     _load_object(p, mesh_path)
     for g in grasps:
         grip = _spawn_gripper(p, g.width, finger_len)
-        p.resetBasePositionAndOrientation(
-            grip, g.pose[:3, 3].tolist(), _quat_from_matrix(g.pose[:3, :3]))
+        p.resetBasePositionAndOrientation(grip, g.pose[:3, 3].tolist(), _quat_from_matrix(g.pose[:3, :3]))
     if hold:
         import time
+
         print("PyBullet GUI open; Ctrl-C to quit.")
         try:
             while p.isConnected():

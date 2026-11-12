@@ -2,6 +2,7 @@
 
 Uses trimesh's built-in viewer (pyglet). No simulator or robot model required.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -19,14 +20,15 @@ _KIND_COLORS = {
 _DEFAULT_COLOR = (180, 180, 180)
 
 
-def gripper_glyph(pose: np.ndarray, width: float, *, finger_len: float = 0.04,
-                  stem: float = 0.06, color=_DEFAULT_COLOR) -> trimesh.path.Path3D:
+def gripper_glyph(
+    pose: np.ndarray, width: float, *, finger_len: float = 0.04, stem: float = 0.06, color=_DEFAULT_COLOR
+) -> trimesh.path.Path3D:
     """Build a parallel-jaw gripper wireframe at a TCP ``pose``.
 
     The TCP frame is +X closing, +Z approach, origin between the fingertips.
     """
     half = width / 2.0
-    tip_l = np.array([half, 0, 0.0])             # fingertips straddle the object
+    tip_l = np.array([half, 0, 0.0])  # fingertips straddle the object
     tip_r = np.array([-half, 0, 0.0])
     base_l = tip_l - np.array([0, 0, finger_len])  # fingers run back along -Z
     base_r = tip_r - np.array([0, 0, finger_len])
@@ -34,7 +36,7 @@ def gripper_glyph(pose: np.ndarray, width: float, *, finger_len: float = 0.04,
     wrist = palm - np.array([0, 0, stem])
 
     verts = np.array([tip_l, base_l, tip_r, base_r, palm, wrist])
-    edges = [[0, 1], [2, 3], [1, 3], [4, 5]]      # 2 fingers, palm bar, stem
+    edges = [[0, 1], [2, 3], [1, 3], [4, 5]]  # 2 fingers, palm bar, stem
     verts = trimesh.transform_points(verts, pose)
 
     path = trimesh.load_path(verts[np.asarray(edges)])
@@ -42,19 +44,20 @@ def gripper_glyph(pose: np.ndarray, width: float, *, finger_len: float = 0.04,
     return path
 
 
-def show_grasps(obj: ObjMesh, grasps: list[Grasp], *, max_grasps: int | None = None,
-                finger_len: float = 0.04):
+def show_grasps(
+    obj: ObjMesh, grasps: list[Grasp], *, max_grasps: int | None = None, finger_len: float = 0.04
+):
     """Open an interactive window with the mesh and gripper glyphs.
 
     Pass ``max_grasps`` to subsample evenly when there are many grasps.
     """
-    scene = trimesh.Scene(build_scene(obj, grasps, max_grasps=max_grasps,
-                                      finger_len=finger_len))
+    scene = trimesh.Scene(build_scene(obj, grasps, max_grasps=max_grasps, finger_len=finger_len))
     scene.show()
 
 
-def build_scene(obj: ObjMesh, grasps: list[Grasp], *, max_grasps: int | None = None,
-                finger_len: float = 0.04) -> list:
+def build_scene(
+    obj: ObjMesh, grasps: list[Grasp], *, max_grasps: int | None = None, finger_len: float = 0.04
+) -> list:
     """Return the mesh + glyph geometries (handy for headless rendering)."""
     mesh = obj.mesh.copy()
     mesh.visual.face_colors = (200, 200, 210, 255)

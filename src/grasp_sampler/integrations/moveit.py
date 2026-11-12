@@ -1,4 +1,5 @@
 """ROS 2 PoseStamped targets for MoveIt 2's moveit_py planning component."""
+
 from __future__ import annotations
 
 from ..planning import PlanningGrasps, Stage
@@ -23,7 +24,8 @@ def to_pose_stamped(targets: PlanningGrasps, *, stage: Stage = "grasp", stamp=No
         if stamp is not None:
             msg.header.stamp = stamp
         msg.pose.position.x, msg.pose.position.y, msg.pose.position.z = map(float, position)
-        (msg.pose.orientation.x, msg.pose.orientation.y,
-         msg.pose.orientation.z, msg.pose.orientation.w) = map(float, quaternion)
+        (msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w) = (
+            map(float, quaternion)
+        )
         messages.append(msg)
     return messages

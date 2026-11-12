@@ -12,6 +12,7 @@ opposing surface contact. Accept the pair if the closing line lies inside both
 friction cones and the width fits the gripper. Then emit one or more approach
 directions whose gripper body provably clears the mesh.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -21,17 +22,17 @@ from .collision import bodies_clear, friction_cones_valid, ray_cast_proxy
 from .types import Grasp, GraspConfig, ObjMesh
 
 
-def antipodal_grasps(obj: ObjMesh, cfg: GraspConfig,
-                     rng: np.random.Generator | None = None) -> list[Grasp]:
+def antipodal_grasps(obj: ObjMesh, cfg: GraspConfig, rng: np.random.Generator | None = None) -> list[Grasp]:
     """Sample force-closure antipodal grasps on ``obj``."""
     rng = rng or np.random.default_rng(0)
     mesh = obj.mesh
-    proxy = ray_cast_proxy(mesh, cfg)            # solid we trace rays against
-    cone = np.cos(np.arctan(cfg.friction_coef))   # friction-cone gate
+    proxy = ray_cast_proxy(mesh, cfg)  # solid we trace rays against
+    cone = np.cos(np.arctan(cfg.friction_coef))  # friction-cone gate
     facets = cfg.approach_facet_array()
 
     points, face_idx = trimesh.sample.sample_surface(
-        proxy, cfg.antipodal_samples, seed=int(rng.integers(1 << 31)))
+        proxy, cfg.antipodal_samples, seed=int(rng.integers(1 << 31))
+    )
     points = np.asarray(points, float)
     normals = np.asarray(proxy.face_normals[face_idx], float)
 
@@ -49,16 +50,24 @@ def antipodal_grasps(obj: ObjMesh, cfg: GraspConfig,
             if ny < 1e-9:
                 continue
             y /= ny
-            z = np.cross(closing, y)              # re-orthonormalize approach
+            z = np.cross(closing, y)  # re-orthonormalize approach
             if not bodies_clear(mesh, [(center, width / 2.0)], closing, z, cfg):
                 continue
             pose = np.eye(4)
             pose[:3, :3] = np.column_stack([closing, y, z])
             pose[:3, 3] = center
-            grasps.append(Grasp(pose, "antipodal", width,
-                                meta={"facet": int(facet_id),
-                                      "contact_geometry": "mesh" if proxy is mesh else "convex_hull",
-                                      "contact_geometry_policy": cfg.contact_geometry_policy}))
+            grasps.append(
+                Grasp(
+                    pose,
+                    "antipodal",
+                    width,
+                    meta={
+                        "facet": int(facet_id),
+                        "contact_geometry": "mesh" if proxy is mesh else "convex_hull",
+                        "contact_geometry_policy": cfg.contact_geometry_policy,
+                    },
+                )
+            )
             if len(grasps) >= cfg.antipodal_max_grasps:
                 return grasps
     return grasps
@@ -67,18 +76,19 @@ def antipodal_grasps(obj: ObjMesh, cfg: GraspConfig,
 def _opposing_contact(proxy, p1, n1, cone, cfg):
     """Ray-cast from ``p1`` along ``-n1`` to the nearest valid opposing contact."""
     locs, _, tri = proxy.ray.intersects_location(
-        (p1 - n1 * 1e-4)[None, :], (-n1)[None, :], multiple_hits=True)
+        (p1 - n1 * 1e-4)[None, :], (-n1)[None, :], multiple_hits=True
+    )
     if len(locs) == 0:
         return None
     dists = np.linalg.norm(locs - p1, axis=1)
     for j in np.argsort(dists):
         width = float(dists[j])
         if width < cfg.antipodal_min_width:
-            continue                              # too narrow: skip thin-wall hits
+            continue  # too narrow: skip thin-wall hits
         if width > cfg.gripper_max_width:
-            break                                 # all farther hits are wider too
+            break  # all farther hits are wider too
         n2 = proxy.face_normals[tri[j]]
-        closing = (locs[j] - p1) / width          # unit closing line p1 -> p2
+        closing = (locs[j] - p1) / width  # unit closing line p1 -> p2
         # Force closure: closing line inside both friction cones.
         if friction_cones_valid(n1, n2, closing, cone):
             return locs[j], n2, width, closing
@@ -102,18 +112,17 @@ def _approach_dirs(closing, facets, cfg):
     # small spread) when it falls within the facet's cone.
     cone_cos = np.cos(np.radians(cfg.cone_deg))
     for facet_id, facet in enumerate(facets):
-        a = facet - np.dot(facet, closing) * closing      # project into the plane
+        a = facet - np.dot(facet, closing) * closing  # project into the plane
         na = np.linalg.norm(a)
         if na < 1e-6:
-            continue                                       # closing parallel to facet
+            continue  # closing parallel to facet
         a /= na
         if np.dot(a, facet) < cone_cos:
-            continue                                       # outside the facet cone
+            continue  # outside the facet cone
         perp = np.cross(closing, a)
         room = np.radians(cfg.cone_deg) - np.arccos(np.clip(np.dot(a, facet), -1, 1))
         room = float(min(max(room, 0.0), np.radians(30.0)))
-        deltas = ([0.0] if cfg.directed_spread <= 1
-                  else np.linspace(-room, room, cfg.directed_spread))
+        deltas = [0.0] if cfg.directed_spread <= 1 else np.linspace(-room, room, cfg.directed_spread)
         for d in deltas:
             z = np.cos(d) * a + np.sin(d) * perp
             yield z / np.linalg.norm(z), facet_id

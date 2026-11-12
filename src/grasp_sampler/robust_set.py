@@ -6,6 +6,7 @@ contribute most failure mass.  Every candidate is converted to one immutable
 world command before cross-evaluation.  Final acceptance uses only the
 independent validation-bank weighted success probability ``R``.
 """
+
 from __future__ import annotations
 
 from collections import Counter
@@ -28,16 +29,16 @@ _ROUND_SEED_STRIDE = {"failure_guided": 1009, "representative": 2003, "blind_poo
 @dataclass
 class RobustSetConfig:
     candidate_budget: int = 1000
-    nominal_fraction: float = .7
+    nominal_fraction: float = 0.7
     augmentation_rounds: int = 2
     guided_hypotheses_per_round: int = 2
     max_validation_candidates: int | None = None
-    dedup_translation: float = .001
+    dedup_translation: float = 0.001
     dedup_angle: float = np.deg2rad(3)
     jaw_symmetry: bool = True
-    diversity_translation: float = .01
+    diversity_translation: float = 0.01
     diversity_angle: float = np.deg2rad(20)
-    strategy: Strategy = "failure_guided"   # the others exist for benchmarking
+    strategy: Strategy = "failure_guided"  # the others exist for benchmarking
     require_nominal_valid: bool = False
 
     def __post_init__(self):
@@ -84,25 +85,28 @@ class RobustGraspSetResult:
 
     @property
     def world_commands(self):
-        return (np.stack([r.candidate.world_command for r in self.selected])
-                if self.selected else np.empty((0, 4, 4)))
+        return (
+            np.stack([r.candidate.world_command for r in self.selected])
+            if self.selected
+            else np.empty((0, 4, 4))
+        )
 
 
 class _Bank(NamedTuple):
     hypotheses: list
-    weights: np.ndarray            # normalized to sum to one
+    weights: np.ndarray  # normalized to sum to one
 
 
 class _Score(NamedTuple):
-    weighted: float                # weighted success probability R
+    weighted: float  # weighted success probability R
     successes: int
-    failures: dict                 # failure reason -> count
-    passed: np.ndarray             # per-hypothesis bool
+    failures: dict  # failure reason -> count
+    passed: np.ndarray  # per-hypothesis bool
 
 
 class _Ranked(NamedTuple):
     candidate: RobustCandidate
-    score: _Score                  # on the search bank
+    score: _Score  # on the search bank
     nominal_valid: bool
 
 
@@ -155,9 +159,11 @@ def _dedup(candidates, cfg):
 
 def _is_diverse(record, selected, cfg):
     a = record.candidate.world_command
-    return all(np.linalg.norm(a[:3, 3] - q.candidate.world_command[:3, 3]) > cfg.diversity_translation
-               or _rot_distance(a, q.candidate.world_command) > cfg.diversity_angle
-               for q in selected)
+    return all(
+        np.linalg.norm(a[:3, 3] - q.candidate.world_command[:3, 3]) > cfg.diversity_translation
+        or _rot_distance(a, q.candidate.world_command) > cfg.diversity_angle
+        for q in selected
+    )
 
 
 def _select_diverse(accepted, requested_count, cfg):
@@ -183,16 +189,24 @@ def _generate(source, nominal_pose, cap, samples, seed, source_id, grasp_config)
     if cap <= 0:
         return []
     cfg = replace(grasp_config, antipodal_max_grasps=cap, antipodal_samples=max(1, samples))
-    return [_source_candidate(g, source, nominal_pose, source_id)
-            for g in antipodal_grasps(_as_obj_mesh(source.mesh), cfg, np.random.default_rng(seed))]
+    return [
+        _source_candidate(g, source, nominal_pose, source_id)
+        for g in antipodal_grasps(_as_obj_mesh(source.mesh), cfg, np.random.default_rng(seed))
+    ]
 
 
 def _score_candidate(candidate, bank, backend, opening, nominal_pose) -> _Score:
     """Evaluate the candidate's fixed world command on every hypothesis in ``bank``."""
-    outcomes = [backend.evaluate(h.mesh, object_world_pose=h.world_pose,
-                                 world_gripper_command=candidate.world_command,
-                                 opening_width=opening, nominal_object_pose=nominal_pose)
-                for h in bank.hypotheses]
+    outcomes = [
+        backend.evaluate(
+            h.mesh,
+            object_world_pose=h.world_pose,
+            world_gripper_command=candidate.world_command,
+            opening_width=opening,
+            nominal_object_pose=nominal_pose,
+        )
+        for h in bank.hypotheses
+    ]
     passed = np.asarray([o.valid for o in outcomes], bool)
     failures = dict(Counter(o.reason for o in outcomes if not o.valid))
     return _Score(float(np.dot(bank.weights, passed)), int(passed.sum()), failures, passed)
@@ -224,19 +238,26 @@ def _propose(cfg, round_id, scorer, remaining, nominal_pose, seed, grasp_config,
     """Generate candidates from search-bank hypotheses chosen by ``cfg.strategy``."""
     bank = scorer.bank
     if cfg.strategy == "failure_guided":
-        order = np.argsort(-scorer.failure_mass, kind="stable")[:cfg.guided_hypotheses_per_round]
+        order = np.argsort(-scorer.failure_mass, kind="stable")[: cfg.guided_hypotheses_per_round]
         label = "failure_hypothesis"
     elif cfg.strategy == "blind_pooling":
         order, label = np.arange(len(bank.hypotheses)), "source_hypothesis"
     else:  # representative: the highest-weight hypotheses
-        order, label = np.argsort(-bank.weights)[:cfg.guided_hypotheses_per_round], "source_hypothesis"
+        order, label = np.argsort(-bank.weights)[: cfg.guided_hypotheses_per_round], "source_hypothesis"
     cap_each = max(1, remaining // max(1, len(order)))
     stride = _ROUND_SEED_STRIDE[cfg.strategy]
     proposals = []
     for j in map(int, order):
         source_id = f"{label}:{j}"
-        proposals += _generate(bank.hypotheses[j], nominal_pose, cap_each, cap_each * 8,
-                               seed + stride * round_id + j, source_id, grasp_config)
+        proposals += _generate(
+            bank.hypotheses[j],
+            nominal_pose,
+            cap_each,
+            cap_each * 8,
+            seed + stride * round_id + j,
+            source_id,
+            grasp_config,
+        )
         if cfg.strategy == "failure_guided":
             usage[source_id] += 1
     return proposals
@@ -246,8 +267,9 @@ def _collect_raw_candidates(mesh, nominal_pose, scorer, cfg, grasp_config, seed)
     """Nominal proposals first, then strategy-driven augmentation rounds."""
     nominal_cap = int(round(cfg.candidate_budget * cfg.nominal_fraction))
     nominal = ObjectHypothesis(mesh, nominal_pose)
-    raw = _generate(nominal, nominal_pose, nominal_cap, max(1, nominal_cap * 8), seed, "nominal",
-                    grasp_config)
+    raw = _generate(
+        nominal, nominal_pose, nominal_cap, max(1, nominal_cap * 8), seed, "nominal", grasp_config
+    )
     usage = Counter(["nominal"] if nominal_cap else [])
     # Score nominal proposals before choosing guided sources; otherwise
     # augmentation would be blind pooling in disguise.
@@ -258,37 +280,63 @@ def _collect_raw_candidates(mesh, nominal_pose, scorer, cfg, grasp_config, seed)
         return _propose(cfg, round_id, scorer, remaining, nominal_pose, seed, grasp_config, usage)
 
     if cfg.strategy in ("representative", "blind_pooling") and not raw:
-        raw += propose(0, cfg.candidate_budget)       # no nominal proposals: seed from the bank
+        raw += propose(0, cfg.candidate_budget)  # no nominal proposals: seed from the bank
     if cfg.strategy != "nominal":
         for round_id in range(1, cfg.augmentation_rounds + 1):
             remaining = cfg.candidate_budget - len(raw)
             if remaining <= 0:
                 break
             raw += propose(round_id, remaining)
-    return raw[:cfg.candidate_budget], usage
+    return raw[: cfg.candidate_budget], usage
 
 
 def _rank_on_search_bank(unique, scorer, mesh, cfg):
-    ranked = [_Ranked(c, scorer.score(c), scorer.backend.evaluate(
-                  mesh, object_world_pose=scorer.nominal_pose, world_gripper_command=c.world_command,
-                  opening_width=scorer.opening, nominal_object_pose=scorer.nominal_pose).valid)
-              for c in unique]
+    ranked = [
+        _Ranked(
+            c,
+            scorer.score(c),
+            scorer.backend.evaluate(
+                mesh,
+                object_world_pose=scorer.nominal_pose,
+                world_gripper_command=c.world_command,
+                opening_width=scorer.opening,
+                nominal_object_pose=scorer.nominal_pose,
+            ).valid,
+        )
+        for c in unique
+    ]
     ranked.sort(key=lambda r: r.score.weighted, reverse=True)
     if cfg.require_nominal_valid:
         ranked = [r for r in ranked if r.nominal_valid]
     if cfg.max_validation_candidates is not None:
-        ranked = ranked[:cfg.max_validation_candidates]
+        ranked = ranked[: cfg.max_validation_candidates]
     return ranked
 
 
-def _resolve_banks(mesh, nominal_pose, search_hypotheses, validation_hypotheses, hypothesis_count,
-                   validation_count, pose_uncertainty, geometry_uncertainty, seed):
+def _resolve_banks(
+    mesh,
+    nominal_pose,
+    search_hypotheses,
+    validation_hypotheses,
+    hypothesis_count,
+    validation_count,
+    pose_uncertainty,
+    geometry_uncertainty,
+    seed,
+):
     if search_hypotheses is None:
         streams = np.random.SeedSequence(seed).spawn(2)
+
         def sample(count, stream):
-            return sample_hypotheses(mesh, nominal_pose, count, pose_uncertainty=pose_uncertainty,
-                                     geometry_uncertainty=geometry_uncertainty,
-                                     rng=np.random.default_rng(stream))
+            return sample_hypotheses(
+                mesh,
+                nominal_pose,
+                count,
+                pose_uncertainty=pose_uncertainty,
+                geometry_uncertainty=geometry_uncertainty,
+                rng=np.random.default_rng(stream),
+            )
+
         search_hypotheses = sample(hypothesis_count, streams[0])
         validation_hypotheses = sample(validation_count or hypothesis_count, streams[1])
     elif validation_hypotheses is None:
@@ -296,11 +344,24 @@ def _resolve_banks(mesh, nominal_pose, search_hypotheses, validation_hypotheses,
     return _make_bank(search_hypotheses), _make_bank(validation_hypotheses)
 
 
-def generate_robust_grasp_set(mesh, estimated_pose, *, requested_count=20,
-        robustness_threshold=.95, search_hypotheses=None, validation_hypotheses=None,
-        hypothesis_count=100, validation_count=None, pose_uncertainty=None,
-        geometry_uncertainty=None, config=None, grasp_config=None, backend=None,
-        opening_width=None, seed=0):
+def generate_robust_grasp_set(
+    mesh,
+    estimated_pose,
+    *,
+    requested_count=20,
+    robustness_threshold=0.95,
+    search_hypotheses=None,
+    validation_hypotheses=None,
+    hypothesis_count=100,
+    validation_count=None,
+    pose_uncertainty=None,
+    geometry_uncertainty=None,
+    config=None,
+    grasp_config=None,
+    backend=None,
+    opening_width=None,
+    seed=0,
+):
     """Generate up to ``requested_count`` validated fixed-command grasps.
 
     If banks are sampled internally, independent random streams create search
@@ -312,8 +373,17 @@ def generate_robust_grasp_set(mesh, estimated_pose, *, requested_count=20,
     if requested_count < 1 or not 0 <= robustness_threshold <= 1:
         raise ValueError("invalid requested_count or threshold")
     nominal_pose = validate_pose(estimated_pose)
-    search, validation = _resolve_banks(mesh, nominal_pose, search_hypotheses, validation_hypotheses,
-        hypothesis_count, validation_count, pose_uncertainty, geometry_uncertainty, seed)
+    search, validation = _resolve_banks(
+        mesh,
+        nominal_pose,
+        search_hypotheses,
+        validation_hypotheses,
+        hypothesis_count,
+        validation_count,
+        pose_uncertainty,
+        geometry_uncertainty,
+        seed,
+    )
     backend = backend or GeometricGraspBackend(gcfg)
     opening = gcfg.gripper_max_width if opening_width is None else opening_width
     scorer = _SearchScorer(search, backend, opening, nominal_pose)
@@ -326,20 +396,37 @@ def generate_robust_grasp_set(mesh, estimated_pose, *, requested_count=20,
     records = []
     for r in ranked:
         v = _score_candidate(r.candidate, validation, backend, opening, nominal_pose)
-        records.append(RobustCandidateRecord(r.candidate, r.score.weighted, v.weighted,
-            r.score.successes, v.successes, r.score.failures, v.failures,
-            v.weighted >= robustness_threshold, r.nominal_valid))
+        records.append(
+            RobustCandidateRecord(
+                r.candidate,
+                r.score.weighted,
+                v.weighted,
+                r.score.successes,
+                v.successes,
+                r.score.failures,
+                v.failures,
+                v.weighted >= robustness_threshold,
+                r.nominal_valid,
+            )
+        )
     accepted = [r for r in records if r.accepted]
     selected = _select_diverse(accepted, requested_count, cfg)
 
-    diagnostics = {"strategy": cfg.strategy, "requested_count": requested_count,
-        "returned_count": len(selected), "robustness_threshold": robustness_threshold,
-        "raw_generated": len(raw), "unique_candidates": len(unique),
-        "search_candidates": len(ranked), "search_hypotheses": len(search.hypotheses),
+    diagnostics = {
+        "strategy": cfg.strategy,
+        "requested_count": requested_count,
+        "returned_count": len(selected),
+        "robustness_threshold": robustness_threshold,
+        "raw_generated": len(raw),
+        "unique_candidates": len(unique),
+        "search_candidates": len(ranked),
+        "search_hypotheses": len(search.hypotheses),
         "validation_hypotheses": len(validation.hypotheses),
         "search_evaluations": scorer.evaluations,
         "validation_evaluations": len(records) * len(validation.hypotheses),
-        "robust_candidates": len(accepted), "source_usage": dict(usage),
+        "robust_candidates": len(accepted),
+        "source_usage": dict(usage),
         "independent_validation_bank": True,
-        "failure_guided": cfg.strategy == "failure_guided"}
+        "failure_guided": cfg.strategy == "failure_guided",
+    }
     return RobustGraspSetResult(selected, records, diagnostics)

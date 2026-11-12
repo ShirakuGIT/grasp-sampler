@@ -6,6 +6,7 @@ Used by the antipodal sampler (nominal generation) and the robust evaluator
 Gripper-body clearance uses Open3D signed-distance queries (Embree BVH, float32)
 when the mesh is watertight, and falls back to trimesh otherwise.
 """
+
 from __future__ import annotations
 
 import os
@@ -42,7 +43,7 @@ def ray_cast_proxy(mesh: trimesh.Trimesh, cfg: GraspConfig) -> trimesh.Trimesh:
         hull = mesh.convex_hull
         if hull.volume > 0 and mesh.volume / hull.volume < cfg.hull_volume_ratio:
             return hull
-    except (RuntimeError, ValueError):   # degenerate hull (scipy QhullError is a RuntimeError)
+    except (RuntimeError, ValueError):  # degenerate hull (scipy QhullError is a RuntimeError)
         pass
     return mesh
 
@@ -93,7 +94,9 @@ def _signed_distance_scene(mesh: trimesh.Trimesh):
     scene = _SCENES.get(mesh)
     if scene is None:
         scene = _o3d.t.geometry.RaycastingScene()
-        scene.add_triangles(_o3d.core.Tensor(np.asarray(mesh.vertices, np.float32)),
-                            _o3d.core.Tensor(np.asarray(mesh.faces, np.uint32)))
+        scene.add_triangles(
+            _o3d.core.Tensor(np.asarray(mesh.vertices, np.float32)),
+            _o3d.core.Tensor(np.asarray(mesh.faces, np.uint32)),
+        )
         _SCENES[mesh] = scene
     return scene

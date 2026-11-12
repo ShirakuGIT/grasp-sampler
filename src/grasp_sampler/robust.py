@@ -8,6 +8,7 @@ V1 uses point contacts, outward mesh normals, symmetric closing along TCP X,
 and sampled palm/stem clearance along -TCP Z to pregrasp. This is a geometric
 screen, not a force/dynamic lift test or a continuous swept-volume guarantee.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
@@ -39,8 +40,10 @@ class ValidityBackend(Protocol):
     ``nominal_object_pose`` is the perception estimate the command was built
     from; backends that do not model it may ignore it.
     """
-    def evaluate(self, mesh, *, object_world_pose, world_gripper_command,
-                 opening_width, nominal_object_pose=None) -> FixedGraspResult: ...
+
+    def evaluate(
+        self, mesh, *, object_world_pose, world_gripper_command, opening_width, nominal_object_pose=None
+    ) -> FixedGraspResult: ...
 
 
 class GeometricGraspBackend:
@@ -52,16 +55,28 @@ class GeometricGraspBackend:
     callable ``(mesh, object_local_poses, opening_width, config) -> bool``.
     """
 
-    def __init__(self, config=None, *, geometry_policy: ContactGeometryPolicy = "mesh",
-                 contact_tolerance=0.002, approach_distance=0.05,
-                 approach_steps=6, check_body=True, collision_checker=None):
-        self.config = replace(config or GraspConfig(),
-                              contact_geometry_policy=geometry_policy)
+    def __init__(
+        self,
+        config=None,
+        *,
+        geometry_policy: ContactGeometryPolicy = "mesh",
+        contact_tolerance=0.002,
+        approach_distance=0.05,
+        approach_steps=6,
+        check_body=True,
+        collision_checker=None,
+    ):
+        self.config = replace(config or GraspConfig(), contact_geometry_policy=geometry_policy)
         if geometry_policy not in get_args(ContactGeometryPolicy):
             raise ValueError("unknown geometry policy")
-        if (not np.isfinite(contact_tolerance) or contact_tolerance < 0
-                or not np.isfinite(approach_distance) or approach_distance < 0
-                or not isinstance(approach_steps, int) or approach_steps < 2):
+        if (
+            not np.isfinite(contact_tolerance)
+            or contact_tolerance < 0
+            or not np.isfinite(approach_distance)
+            or approach_distance < 0
+            or not isinstance(approach_steps, int)
+            or approach_steps < 2
+        ):
             raise ValueError("invalid contact tolerance or approach sampling")
         self.contact_tolerance = contact_tolerance
         self.approach_distance = approach_distance
@@ -70,21 +85,30 @@ class GeometricGraspBackend:
         # Optional callable(mesh, object-local poses, opening_width, config).
         self.collision_checker = collision_checker
 
-    def evaluate(self, mesh, *, object_world_pose, world_gripper_command, opening_width,
-                 nominal_object_pose=None):
+    def evaluate(
+        self, mesh, *, object_world_pose, world_gripper_command, opening_width, nominal_object_pose=None
+    ):
         pose = np.linalg.inv(validate_pose(object_world_pose)) @ validate_pose(world_gripper_command)
         cfg = self.config
         proxy = ray_cast_proxy(mesh, cfg)
-        metadata = {"contact_geometry_policy": cfg.contact_geometry_policy,
-                    "contact_geometry": "mesh" if proxy is mesh else "convex_hull",
-                    "collision_geometry": "mesh", "mesh_watertight": bool(mesh.is_watertight),
-                    "body_checked": self.check_body, "dynamic_validation": False,
-                    "opening_width": opening_width,
-                    "approach_steps": self.approach_steps}
+        metadata = {
+            "contact_geometry_policy": cfg.contact_geometry_policy,
+            "contact_geometry": "mesh" if proxy is mesh else "convex_hull",
+            "collision_geometry": "mesh",
+            "mesh_watertight": bool(mesh.is_watertight),
+            "body_checked": self.check_body,
+            "dynamic_validation": False,
+            "opening_width": opening_width,
+            "approach_steps": self.approach_steps,
+        }
+
         def result(valid, reason, width=None, contacts=None):
             return FixedGraspResult(valid, reason, width, contacts, metadata.copy())
-        if (not np.isfinite(opening_width)
-                or not cfg.gripper_min_width <= opening_width <= cfg.gripper_max_width):
+
+        if (
+            not np.isfinite(opening_width)
+            or not cfg.gripper_min_width <= opening_width <= cfg.gripper_max_width
+        ):
             return result(False, "opening_width")
         center, closing, approach = pose[:3, 3], pose[:3, 0], pose[:3, 2]
         half = opening_width / 2
@@ -109,8 +133,7 @@ class GeometricGraspBackend:
         offsets = (contacts - center) @ closing
         width = float(offsets[1] - offsets[0])
         metadata["contact_offsets_x"] = offsets.tolist()
-        if (width < cfg.gripper_min_width or width > opening_width + 1e-9
-                or offsets[0] > 0 or offsets[1] < 0):
+        if width < cfg.gripper_min_width or width > opening_width + 1e-9 or offsets[0] > 0 or offsets[1] < 0:
             return result(False, "contact_width", width, contacts)
         if abs(offsets.sum()) > self.contact_tolerance:
             return result(False, "asymmetric_contacts", width, contacts)
@@ -120,8 +143,9 @@ class GeometricGraspBackend:
         poses[:, :3, 3] -= np.linspace(0, self.approach_distance, self.approach_steps)[:, None] * approach
         if self.check_body:
             # Check both fixed open width during approach and final contact width.
-            if not bodies_clear(mesh, [(p[:3, 3], half) for p in poses] + [(center, width / 2)],
-                                closing, approach, cfg):
+            if not bodies_clear(
+                mesh, [(p[:3, 3], half) for p in poses] + [(center, width / 2)], closing, approach, cfg
+            ):
                 return result(False, "body_or_approach_collision", width, contacts)
         if self.collision_checker is not None:
             metadata["additional_collision_checker"] = True
@@ -168,20 +192,30 @@ class FinitePadQuasistaticBackend(FinitePadFixedObjectBackend):
     after contact. The correction is bounded and recorded in diagnostics.
     """
 
-    def __init__(self, config=None, *, max_object_translation=0.004,
-                 max_object_rotation=_DEFAULT_MAX_ROTATION, **kwargs):
+    def __init__(
+        self,
+        config=None,
+        *,
+        max_object_translation=0.004,
+        max_object_rotation=_DEFAULT_MAX_ROTATION,
+        **kwargs,
+    ):
         super().__init__(config, **kwargs)
         if max_object_translation < 0 or max_object_rotation < 0:
             raise ValueError("quasistatic bounds must be nonnegative")
         self.max_object_translation = float(max_object_translation)
         self.max_object_rotation = float(max_object_rotation)
 
-    def evaluate(self, mesh, *, object_world_pose, world_gripper_command, opening_width,
-                 nominal_object_pose=None):
+    def evaluate(
+        self, mesh, *, object_world_pose, world_gripper_command, opening_width, nominal_object_pose=None
+    ):
         original_pose = validate_pose(object_world_pose)
-        first = super().evaluate(mesh, object_world_pose=original_pose,
-                                 world_gripper_command=world_gripper_command,
-                                 opening_width=opening_width)
+        first = super().evaluate(
+            mesh,
+            object_world_pose=original_pose,
+            world_gripper_command=world_gripper_command,
+            opening_width=opening_width,
+        )
         first.metadata["closure_backend"] = "finite_pad_quasistatic"
         first.metadata["max_object_translation"] = self.max_object_translation
         first.metadata["max_object_rotation_rad"] = self.max_object_rotation
@@ -205,13 +239,22 @@ class FinitePadQuasistaticBackend(FinitePadFixedObjectBackend):
         elif self.max_object_rotation == 0:
             rotvec[:] = 0
         corrected[:3, :3] = Rotation.from_rotvec(rotvec).as_matrix() @ original_pose[:3, :3]
-        second = FinitePadFixedObjectBackend.evaluate(self, mesh,
-            object_world_pose=corrected, world_gripper_command=world_gripper_command,
-            opening_width=opening_width)
-        second.metadata.update({"closure_backend": "finite_pad_quasistatic",
-            "object_motion": True, "object_translation_correction": delta.tolist(),
-            "object_rotation_correction_rad": float(np.linalg.norm(rotvec)),
-            "uncorrected_reason": first.reason})
+        second = FinitePadFixedObjectBackend.evaluate(
+            self,
+            mesh,
+            object_world_pose=corrected,
+            world_gripper_command=world_gripper_command,
+            opening_width=opening_width,
+        )
+        second.metadata.update(
+            {
+                "closure_backend": "finite_pad_quasistatic",
+                "object_motion": True,
+                "object_translation_correction": delta.tolist(),
+                "object_rotation_correction_rad": float(np.linalg.norm(rotvec)),
+                "uncorrected_reason": first.reason,
+            }
+        )
         return second
 
 
@@ -247,6 +290,7 @@ class RobustGraspEvaluator:
     an execution opening command. Override opening_width to model a narrower
     fixed opening. Contact tolerance approximates finite pad compliance only.
     """
+
     def __init__(self, nominal_mesh, config=None, *, backend=None, opening_width=None, **backend_options):
         self.nominal_mesh = nominal_mesh
         self.config = config or GraspConfig()
@@ -258,26 +302,48 @@ class RobustGraspEvaluator:
         command = nominal_pose @ validate_pose(grasp.pose)  # ONCE, outside loop
         hypotheses = list(hypotheses)
         weights = np.array([h.weight for h in hypotheses], float)
-        if (not len(weights) or not np.isfinite(weights).all() or (weights < 0).any()
-                or not np.isfinite(weights.sum()) or weights.sum() <= 0):
+        if (
+            not len(weights)
+            or not np.isfinite(weights).all()
+            or (weights < 0).any()
+            or not np.isfinite(weights.sum())
+            or weights.sum() <= 0
+        ):
             raise ValueError("hypotheses need finite nonnegative weights with positive total")
+
         def check(mesh, pose):
-            return self.backend.evaluate(mesh, object_world_pose=pose.copy(),
-                world_gripper_command=command.copy(), opening_width=self.opening_width,
-                nominal_object_pose=nominal_pose.copy())
+            return self.backend.evaluate(
+                mesh,
+                object_world_pose=pose.copy(),
+                world_gripper_command=command.copy(),
+                opening_width=self.opening_width,
+                nominal_object_pose=nominal_pose.copy(),
+            )
+
         nominal = check(self.nominal_mesh, nominal_pose)
         outcomes = []
         for h in hypotheses:
             pose = validate_pose(h.world_pose)
             relative = np.linalg.inv(pose) @ command
             validity = check(h.mesh, pose)
-            outcomes.append(HypothesisGraspResult(validity.valid, h.weight,
-                command.copy(), relative, validity, dict(h.metadata)))
+            outcomes.append(
+                HypothesisGraspResult(
+                    validity.valid, h.weight, command.copy(), relative, validity, dict(h.metadata)
+                )
+            )
         successes = np.array([r.success for r in outcomes], bool)
-        return RobustGraspResult(float(successes.mean()),
-            float(np.dot(weights / weights.sum(), successes)), bool(successes.all()),
-            int(successes.sum()), len(outcomes), nominal.valid, outcomes, nominal,
-            command.copy(), {"fixed_world_command": True, "opening_width": self.opening_width})
+        return RobustGraspResult(
+            float(successes.mean()),
+            float(np.dot(weights / weights.sum(), successes)),
+            bool(successes.all()),
+            int(successes.sum()),
+            len(outcomes),
+            nominal.valid,
+            outcomes,
+            nominal,
+            command.copy(),
+            {"fixed_world_command": True, "opening_width": self.opening_width},
+        )
 
 
 @dataclass
@@ -290,8 +356,15 @@ class RankedGrasp:
 RankingCriterion = Literal["expected_success", "worst_case_valid"]
 
 
-def rank_grasps(grasps, evaluator, *, nominal_object_pose, hypotheses,
-                nominal_scores=None, criterion: RankingCriterion = "expected_success"):
+def rank_grasps(
+    grasps,
+    evaluator,
+    *,
+    nominal_object_pose,
+    hypotheses,
+    nominal_scores=None,
+    criterion: RankingCriterion = "expected_success",
+):
     """Preserve supplied nominal scores; repository generators have no score.
 
     Expected success normalizes weights; worst-case includes zero-weight
@@ -303,7 +376,20 @@ def rank_grasps(grasps, evaluator, *, nominal_object_pose, hypotheses,
     scores = list(nominal_scores) if nominal_scores is not None else [None] * len(grasps)
     if len(scores) != len(grasps):
         raise ValueError("nominal_scores length must match grasps")
-    rows = [RankedGrasp(i, scores[i], evaluator.evaluate(g,
-        nominal_object_pose=nominal_object_pose, hypotheses=hypotheses)) for i, g in enumerate(grasps)]
-    return sorted(rows, key=lambda r: (r.result.weighted_success_probability
-        if criterion == "expected_success" else r.result.worst_case_valid), reverse=True)
+    rows = [
+        RankedGrasp(
+            i,
+            scores[i],
+            evaluator.evaluate(g, nominal_object_pose=nominal_object_pose, hypotheses=hypotheses),
+        )
+        for i, g in enumerate(grasps)
+    ]
+    return sorted(
+        rows,
+        key=lambda r: (
+            r.result.weighted_success_probability
+            if criterion == "expected_success"
+            else r.result.worst_case_valid
+        ),
+        reverse=True,
+    )

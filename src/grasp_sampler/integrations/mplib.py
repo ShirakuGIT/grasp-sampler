@@ -1,4 +1,5 @@
 """MPlib Pose goals (including MPlib/SAPIEN workflows)."""
+
 from __future__ import annotations
 
 from ..planning import PlanningGrasps, Stage

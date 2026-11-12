@@ -1,4 +1,5 @@
 """The high-level ``GraspSampler`` facade."""
+
 from __future__ import annotations
 
 import numpy as np
@@ -36,12 +37,14 @@ class GraspSampler:
         grasps: list[Grasp] = []
         if "primitives" in methods:
             ex = obj.extents
-            for pose, meta in top_grasps(ex, max_width=cfg.gripper_max_width,
-                                         yaw_steps=cfg.primitive_yaw_steps):
+            for pose, meta in top_grasps(
+                ex, max_width=cfg.gripper_max_width, yaw_steps=cfg.primitive_yaw_steps
+            ):
                 pose[:3, 3] += obj.mesh.bounding_box.centroid
                 grasps.append(Grasp(pose, meta["type"], meta["span"], meta))
-            for pose, meta in side_grasps(ex, max_width=cfg.gripper_max_width,
-                                          roll_steps=cfg.primitive_roll_steps):
+            for pose, meta in side_grasps(
+                ex, max_width=cfg.gripper_max_width, roll_steps=cfg.primitive_roll_steps
+            ):
                 pose[:3, 3] += obj.mesh.bounding_box.centroid
                 grasps.append(Grasp(pose, meta["type"], meta["span"], meta))
         if "obb_face" in methods:
@@ -50,8 +53,9 @@ class GraspSampler:
             grasps += antipodal_grasps(obj, cfg, np.random.default_rng(seed))
         return grasps
 
-    def sample(self, path, *, methods=_METHODS, seed: int = 0,
-               load_kwargs: dict | None = None) -> list[Grasp]:
+    def sample(
+        self, path, *, methods=_METHODS, seed: int = 0, load_kwargs: dict | None = None
+    ) -> list[Grasp]:
         """Load a mesh and generate grasps in one call."""
         obj = self.load(path, **(load_kwargs or {}))
         return self.generate(obj, methods=methods, seed=seed)
