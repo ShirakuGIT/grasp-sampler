@@ -1,0 +1,486 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Robust grasp evaluation" href="uncertainty.html"><link rel="prev" title="Robot planning and simulation" href="planning.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>Constrained shelf retrieval and transfer - grasp-sampler</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">grasp-sampler</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <span class="sidebar-brand-text">grasp-sampler</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planning.html">Robot planning and simulation</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Constrained shelf retrieval and transfer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uncertainty.html">Robust grasp evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/scenarios.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="constrained-shelf-retrieval-and-transfer">
+<h1>Constrained shelf retrieval and transfer<a class="headerlink" href="#constrained-shelf-retrieval-and-transfer" title="Link to this heading">¶</a></h1>
+<p>The default MuJoCo demonstration uses a <strong>single FR3v2 and a two-tier cabinet</strong>.
+The default <code class="docutils literal notranslate"><span class="pre">--suite</span> <span class="pre">expanded</span></code> includes a Ritz box, mug, cup, plate, bowl,
+curved mustard bottle and blue vase, preserving original mesh colors. The box, cup and vase move
+from the lower tier to separate upper-tier slots. Mug, plate and bottle move
+to the tabletop, while the bowl uses an oblique rim grasp to move across the
+table. <code class="docutils literal notranslate"><span class="pre">--suite</span> <span class="pre">household</span></code> retains the earlier four-object demonstration. <code class="docutils literal notranslate"><span class="pre">--suite</span> <span class="pre">classic</span></code> selects the
+earlier mustard-bottle, can and foam-brick sequence.
+The lower bay retains 28 cm tier spacing; the expanded scene has a taller
+40 cm upper bay for the bottle. Approach clearance still matters. Its purpose is to make
+grasp generation, rejection, selection, physical closure, and extraction visible.
+This is an illustrative scene inspired by the references below, not a
+reproduction of their benchmarks or a claim of comparable performance.</p>
+<video controls muted playsinline preload="none" width="1280" height="800"
+  poster="_static/videos/mujoco-live-pick-place.jpg"
+  aria-label="Fresh grasp sampling, candidate selection and seven physical FR3v2 shelf transfers in MuJoCo"
+  style="width: 100%; height: auto; border-radius: 8px;">
+  <source src="_static/videos/mujoco-live-pick-place.mp4" type="video/mp4">
+  <a href="_static/videos/mujoco-live-pick-place.mp4">Download the MuJoCo demonstration</a>.
+</video>
+<p>Fresh antipodal candidates, collision screening and physical finger contacts. Playback is 2×;
+cyan shows candidates, coral shows rejections and gold marks the selected grasp.
+<a href="https://youtu.be/lQIbH18UIP4">Earlier recording on YouTube</a>.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Reference</p></th>
+<th class="head"><p>Published setup</p></th>
+<th class="head"><p>Design consequence here</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://arxiv.org/html/2112.06402v1">MotionBenchMaker (RA-L 2022)</a></p></td>
+<td><p>Shelf picking, including a UR5/cylinder example with varied shelf/object poses; box picking with Panda</p></td>
+<td><p>Use a compact shelf and object-relative grasps, with explicit clearance checks</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://robocasa.ai/assets/robocasa_rss24.pdf">RoboCasa (RSS 2024)</a></p></td>
+<td><p>Cabinet-to-counter atomic pick-and-place starts with the cabinet already open</p></td>
+<td><p>Keep retrieval separate from articulated door opening</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://robotwin-platform.github.io/doc/tasks/">RoboTwin 2.0</a></p></td>
+<td><p>Dual-arm handover, dual-bottle picking, pot lifting and cabinet-placement tasks</p></td>
+<td><p>Bimanual handover is a possible separate extension, with joint grasp-pair and inter-arm collision reasoning</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://aloha-2.github.io/">ALOHA 2</a></p></td>
+<td><p>Bimanual teleoperation hardware, with an identified MuJoCo model</p></td>
+<td><p>Useful reference for a future two-arm task; does not require adding a second arm to this grasp demonstration</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The scenes use original textured workspace scans in <code class="docutils literal notranslate"><span class="pre">assets/household/</span></code>.
+YCB objects retain source UV coordinates and texture pixels. The Ritz box retains
+the existing decimated geometry, with original dense reconstruction vertex colors
+baked onto a UV atlas. No object palette overrides these appearances. See
+<a class="reference external" href="https://github.com/ShirakuGIT/grasp-sampler/blob/master/assets/household/README.md">asset attribution and preparation</a>.</p>
+<p>Mug, cup and plate contact geometry consists of separate CoACD convex pieces,
+leaving the handle opening and vessel cavities unfilled. Grasp sampling uses their
+actual scanned surfaces, including a handle-region filter for the mug and a rim
+filter with vertical finger closure for the plate. Box and classic objects use
+convex hull contact geometry. These decompositions approximate the scans; demo
+masses are 60 g (30 g for the lightweight plate) and do not claim YCB inertia fidelity. The household gripper has
+a 16 N tendon preload and higher closing stiffness, within the native +/-40 N actuator
+limit, to hold thin handle and rim contacts. Household pads use six-dimensional
+frictional contact, with 8 mm rolling-resistance length representing their
+finite 17 mm rubber contact surface. The central pad proxy extends 1.5 mm toward
+the midline so the pads meet at zero opening, removing the stock proxy’s 3 mm
+dead gap for thin rims. Placement remeasures the object after transit and uses
+pose feedback during descent to account for settling within the finger pads.</p>
+<p>Mesh normalization and world poses stay consistent. Frontal and tilted world approach facets are transformed into
+the current object frame, including after physical settling/tipping. Candidate
+generation is not restricted to a vertical approach.</p>
+<p>The sequence approaches, closes, lifts slightly to unseat the object, extracts
+through the cabinet opening, then lifts outside the shelf. The box is inserted
+into the upper tier; vessels and the plate turn around the vertical axis to
+approach the table edge while preserving their pickup orientation relative to
+gravity. Rim release uses a small opening before retracting, keeping the lower
+finger above the table. The classic suite reorients its table objects from the side.
+No object attachment constraints or object teleportation are used.
+Joint IK and contact screening use a scratch MuJoCo data instance; the live
+world is advanced with native actuators and frictional contacts. The box’s
+candidate screening checks upper-tier IK and collisions as well as pickup
+feasibility. Household screening also checks extraction/lift IK, collisions with
+the carried geometry at lift, and table placement IK over several yaw angles.
+The approach reuses its screened IK solution. Selection combines joint travel
+and contact-centering costs, with a preference for horizontal rim insertion on
+the plate. These costs describe selection heuristics, not grasp probabilities.</p>
+<p>Free-space joint moves are collision checked against the complete MuJoCo scene,
+including the held object’s measured tool-relative geometry. A direct joint path
+is used when clear; otherwise a small bidirectional RRT-Connect planner finds a
+route and collision-checks its shortcuts. All of this happens in scratch data:
+the live object is carried by contact, not by a weld or state reset. Joint edges
+are checked at a maximum 0.04-radian spacing; this is discrete collision checking,
+not a continuous swept-volume guarantee. The planner adapters can replace this
+demonstration controller with an application’s production motion planner.</p>
+<p>Cyan TCP glyphs are sampled candidates, coral glyphs are rejected, and gold
+highlights the selected command and staging targets. The viewer has no text HUD
+or cost chart. Phase updates appear in the terminal, and feasible selection
+costs and rejection reasons are saved in the JSON report. Those costs are not
+robustness probabilities. The robot’s full source visual material regions preserve the
+white shell, dark accents and markings; native Menagerie dynamics are retained.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[mujoco,fr3]&quot;</span>
+python<span class="w"> </span>tools/prepare_fr3_mujoco.py
+<span class="c1"># macOS: use mjpython for the native viewer</span>
+<span class="nv">PYTHONPATH</span><span class="o">=</span>src<span class="w"> </span>mjpython<span class="w"> </span>examples/pick_place_mujoco.py<span class="w"> </span>--gui<span class="w"> </span>--hold
+<span class="c1"># Linux: python examples/pick_place_mujoco.py --gui --hold</span>
+</pre></div>
+</div>
+<p>On macOS the example selects the trimesh collision backend via
+<code class="docutils literal notranslate"><span class="pre">GRASP_SAMPLER_DISABLE_OPEN3D=1</span></code> to avoid Open3D/MuJoCo’s duplicate GLFW classes.
+The default backend for other callers is unchanged.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">PYTHONPATH</span><span class="o">=</span>src<span class="w"> </span>python<span class="w"> </span>examples/pick_place_mujoco.py<span class="w"> </span>--headless<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--report<span class="w"> </span>/tmp/shelf-picks.json<span class="w"> </span>--snapshot<span class="w"> </span>/tmp/shelf.png
+</pre></div>
+</div>
+<p>The household and classic MuJoCo runs check force-bearing bilateral
+finger contact and a lift of at least 8 cm above the initial object height.
+Placement requires load-bearing contact on the requested tier/table, separation
+from the gripper, low settling velocity, a bottom height within 15 mm of the
+surface, and less than 4 cm XY error in both suites. Reports expose the actual
+error and the tolerance used.
+Placement orientation is free: a bottle
+settled on its side can pass, while the same bottle on the wrong tier cannot.
+Candidate IDs, rejection reasons, approach obliquity, selection costs and support
+forces are recorded. This is a single seeded demonstration, not a multi-seed
+benchmark success-rate estimate.</p>
+<section id="playback-performance">
+<h2>Playback performance<a class="headerlink" href="#playback-performance" title="Link to this heading">¶</a></h2>
+<p>The native viewer defaults to <code class="docutils literal notranslate"><span class="pre">--speed</span> <span class="pre">2</span> <span class="pre">--fps</span> <span class="pre">60</span></code>. Playback pacing and redraws
+are independent, and rendering is limited by wall time rather than every fixed
+number of physics steps. Sleep is batched while honoring the next frame deadline. Frame deadlines
+include synchronization work rather than adding a full interval afterward.
+Static glyphs are cached, and viewer synchronization sends integration state
+instead of repeatedly copying the complete visual model.
+Physics remains MuJoCo’s compiled CPU solver at a 2 ms timestep; faster playback
+does not skip contact integration or speed up motor commands in simulation time.
+Candidate-display pauses refresh only the viewer; they do not advance physics.
+This keeps live grasp sampling consistent with the headless validation sequence.
+The requested frame rate is a target, not a hardware-independent guarantee.
+JAX/MJX is useful for batched simulation workloads; this single native viewer
+uses the existing CPU solver and does not introduce a JAX dependency.</p>
+<p>The expanded seven-object physical run
+completed all seven transfers, including three lower-to-upper shelf placements.
+Maximum XY placement error was 3.82 cm against the unchanged 4 cm tolerance.
+The run requires bilateral finger forces, an 8 cm lift, released and settled
+load-bearing contact on the requested support, and the correct object-bottom
+height. The recording above shows the full scene and transfers.</p>
+<p>A local M4 / Retina timing check measured 60.0 scene updates per second, with
+a 95th-percentile update interval of 16.94 ms, after removing bitmap-text HUDs,
+disabling the table mirror pass, and using 2048-pixel shadows. The earlier loop
+measured 27.1 updates/s. These measurements describe scene-state
+synchronization, not physical display presentation; performance depends on the machine and workload.</p>
+</section>
+<section id="arm-mounting-and-curved-vase">
+<h2>Arm mounting and curved vase<a class="headerlink" href="#arm-mounting-and-curved-vase" title="Link to this heading">¶</a></h2>
+<p>The arm sits on a 240 × 240 × 12 mm aluminum plate with chamfered corners,
+beveled edges, four 22 mm counterbores and 9 mm through holes. The counterbore
+shoulders support the washers and recessed cap screws. A 23 mm pedestal and
+registration ring keep the original robot base height. This is illustrative
+mounting hardware, rather than a manufacturer-certified plate design. It is
+fixed visual geometry, as was the previous mount; robot dynamics are unchanged.</p>
+<p>The blue vase has a bulbous body and narrow neck. Its original image and UVs
+are retained, with 29 convex contact pieces. Sampling uses the neck’s actual
+surface, and a longer extraction clears the wide body before lifting. Its
+lower-to-upper transfer passed with a 6 mm XY placement error in the complete
+seven-object physical run. Like the other example objects, its mass and inertia
+are illustrative rather than measured hardware parameters.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="uncertainty.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Robust grasp evaluation</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="planning.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Robot planning and simulation</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, grasp-sampler contributors
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Constrained shelf retrieval and transfer</a><ul>
+<li><a class="reference internal" href="#playback-performance">Playback performance</a></li>
+<li><a class="reference internal" href="#arm-mounting-and-curved-vase">Arm mounting and curved vase</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

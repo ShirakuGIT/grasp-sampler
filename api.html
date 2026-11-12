@@ -1,0 +1,1226 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="prev" title="Configuration" href="configuration.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>API reference - grasp-sampler</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">grasp-sampler</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <span class="sidebar-brand-text">grasp-sampler</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planning.html">Robot planning and simulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scenarios.html">Constrained shelf retrieval and transfer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uncertainty.html">Robust grasp evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/api.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="api-reference">
+<h1>API reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h1>
+<section id="sampler">
+<h2>Sampler<a class="headerlink" href="#sampler" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="grasp_sampler.GraspSampler">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">GraspSampler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/sampler.html#GraspSampler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.GraspSampler" title="Link to this definition">¶</a></dt>
+<dd><p>Generate parallel-jaw grasps for a mesh.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sampler</span> <span class="o">=</span> <span class="n">GraspSampler</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grasps</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;mug.glb&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">grasps</span><span class="p">)</span>
+<span class="go">87</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<a class="reference internal" href="#grasp_sampler.types.GraspConfig" title="grasp_sampler.types.GraspConfig"><em>GraspConfig</em></a><em> | </em><em>None</em>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="grasp_sampler.GraspSampler.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/sampler.html#GraspSampler.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.GraspSampler.load" title="Link to this definition">¶</a></dt>
+<dd><p>Load and normalize a mesh file (see <code class="xref py py-func docutils literal notranslate"><span class="pre">grasp_sampler.mesh.load_mesh()</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#grasp_sampler.types.ObjMesh" title="grasp_sampler.types.ObjMesh"><em>ObjMesh</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grasp_sampler.GraspSampler.generate">
+<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">methods</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('primitives',</span> <span class="pre">'obb_face',</span> <span class="pre">'antipodal')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/sampler.html#GraspSampler.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.GraspSampler.generate" title="Link to this definition">¶</a></dt>
+<dd><p>Run the requested generators on an already-loaded mesh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<a class="reference internal" href="#grasp_sampler.types.ObjMesh" title="grasp_sampler.types.ObjMesh"><em>ObjMesh</em></a>)</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)">list</a>[<a class="reference internal" href="#grasp_sampler.types.Grasp" title="grasp_sampler.types.Grasp"><em>Grasp</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grasp_sampler.GraspSampler.sample">
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">methods</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('primitives',</span> <span class="pre">'obb_face',</span> <span class="pre">'antipodal')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/sampler.html#GraspSampler.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.GraspSampler.sample" title="Link to this definition">¶</a></dt>
+<dd><p>Load a mesh and generate grasps in one call.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+<li><p><strong>load_kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><em>dict</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)">list</a>[<a class="reference internal" href="#grasp_sampler.types.Grasp" title="grasp_sampler.types.Grasp"><em>Grasp</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="data-types">
+<h2>Data types<a class="headerlink" href="#data-types" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="grasp_sampler.types.Grasp">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">grasp_sampler.types.</span></span><span class="sig-name descname"><span class="pre">Grasp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/types.html#Grasp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.types.Grasp" title="Link to this definition">¶</a></dt>
+<dd><p>A single parallel-jaw grasp in the object’s local frame.</p>
+<p>The pose follows the standard tool-center-point (TCP) convention:</p>
+<blockquote>
+<div><dl class="option-list">
+<dt><kbd><span class="option">+Z</span></kbd></dt>
+<dd><p>approach axis  (the hand travels along +Z to reach the object)</p>
+</dd>
+<dt><kbd><span class="option">+X</span></kbd></dt>
+<dd><p>closing axis   (the line joining the two fingertips)</p>
+</dd>
+<dt><kbd><span class="option">+Y</span></kbd></dt>
+<dd><p>right-handed completion</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>The TCP sits at the midpoint between the two fingertips.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pose</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>kind</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'top'</em><em>, </em><em>'side'</em><em>, </em><em>'obb_face'</em><em>, </em><em>'antipodal'</em><em>]</em>)</p></li>
+<li><p><strong>width</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><em>dict</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grasp_sampler.types.ObjMesh">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">grasp_sampler.types.</span></span><span class="sig-name descname"><span class="pre">ObjMesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obb_transform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obb_extents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geom_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_to_mesh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/types.html#ObjMesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.types.ObjMesh" title="Link to this definition">¶</a></dt>
+<dd><p>Loaded geometry and the transform from file/scene frame to mesh frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mesh</strong> (<a class="reference external" href="https://trimesh.org/trimesh.base.html#trimesh.base.Trimesh" title="(in trimesh)"><em>Trimesh</em></a>)</p></li>
+<li><p><strong>extents</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>obb_transform</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>obb_extents</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>geom_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'box'</em><em>, </em><em>'cylinder'</em><em>, </em><em>'sphere'</em><em>, </em><em>'irregular'</em><em>]</em>)</p></li>
+<li><p><strong>source_to_mesh</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grasp_sampler.types.GraspConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">grasp_sampler.types.</span></span><span class="sig-name descname"><span class="pre">GraspConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gripper_max_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gripper_min_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.005</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primitive_yaw_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primitive_roll_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antipodal_min_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antipodal_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antipodal_rolls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antipodal_max_grasps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">friction_coef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wrist_stem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">finger_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spine_clearance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.005</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hull_volume_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">approach_facets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">((0.0,</span> <span class="pre">-1.0,</span> <span class="pre">0.0),</span> <span class="pre">(1.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0),</span> <span class="pre">(-1.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0),</span> <span class="pre">(0.0,</span> <span class="pre">0.0,</span> <span class="pre">1.0))</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cone_deg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directed_spread</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_geometry_policy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/types.html#GraspConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.types.GraspConfig" title="Link to this definition">¶</a></dt>
+<dd><p>All sampler tunables in one place. Defaults target a Franka Panda gripper.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gripper_max_width</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>gripper_min_width</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>primitive_yaw_steps</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+<li><p><strong>primitive_roll_steps</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+<li><p><strong>antipodal_min_width</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>antipodal_samples</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+<li><p><strong>antipodal_rolls</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+<li><p><strong>antipodal_max_grasps</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+<li><p><strong>friction_coef</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>wrist_stem</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>finger_len</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>spine_clearance</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>hull_volume_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>directed</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>)</p></li>
+<li><p><strong>approach_facets</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><em>tuple</em></a>)</p></li>
+<li><p><strong>cone_deg</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>directed_spread</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+<li><p><strong>contact_geometry_policy</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'mesh'</em><em>, </em><em>'convex_hull'</em><em>, </em><em>'auto'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="grasp_sampler.types.GraspConfig.approach_facet_array">
+<span class="sig-name descname"><span class="pre">approach_facet_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/types.html#GraspConfig.approach_facet_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.types.GraspConfig.approach_facet_array" title="Link to this definition">¶</a></dt>
+<dd><p>Unit approach facets as an (N, 3) array; degenerate facets dropped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="mesh-loading">
+<h2>Mesh loading<a class="headerlink" href="#mesh-loading" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.load_mesh">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">load_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">upright_transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([[1.,</span> <span class="pre">0.,</span> <span class="pre">0.,</span> <span class="pre">0.],</span> <span class="pre">[0.,</span> <span class="pre">0.,</span> <span class="pre">-1.,</span> <span class="pre">0.],</span> <span class="pre">[0.,</span> <span class="pre">1.,</span> <span class="pre">0.,</span> <span class="pre">0.],</span> <span class="pre">[0.,</span> <span class="pre">0.,</span> <span class="pre">0.,</span> <span class="pre">1.]])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/mesh.html#load_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.load_mesh" title="Link to this definition">¶</a></dt>
+<dd><p>Load geometry, optionally orient it and center its axis-aligned bounds.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">center=False,</span> <span class="pre">upright_transform=None</span></code> to preserve the file frame.
+Scene node transforms are baked into scene coordinates. <code class="docutils literal notranslate"><span class="pre">source_to_mesh</span></code>
+maps those coordinates into the returned mesh frame; compose a perception
+pose as <code class="docutils literal notranslate"><span class="pre">T_W_mesh</span> <span class="pre">=</span> <span class="pre">T_W_source</span> <span class="pre">&#64;</span> <span class="pre">inv(obj.source_to_mesh)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em> or </em><em>Path</em>) – Any format trimesh can read (GLB, OBJ, STL, PLY, …).</p></li>
+<li><p><strong>upright_transform</strong> (<em>(</em><em>4</em><em>, </em><em>4</em><em>) </em><em>array</em><em> or </em><em>None</em>) – Applied before centering. Defaults to a Y-up -&gt; Z-up rotation. Pass
+<code class="docutils literal notranslate"><span class="pre">None</span></code> if the mesh is already oriented as you want it.</p></li>
+<li><p><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>) – Translate the axis-aligned bounds centroid to zero (default True).</p></li>
+<li><p><strong>process</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>) – Retain trimesh’s default vertex merging/cleanup. Set False to preserve
+raw vertices/topology too; this is independent of frame preservation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#grasp_sampler.types.ObjMesh" title="grasp_sampler.types.ObjMesh"><em>ObjMesh</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="generators">
+<h2>Generators<a class="headerlink" href="#generators" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.top_grasps">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">top_grasps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extents</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaw_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grasp_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">under</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/primitives.html#top_grasps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.top_grasps" title="Link to this definition">¶</a></dt>
+<dd><p>Top-down grasps on a box: the hand descends along -Z onto the top face.</p>
+<p>A yaw whose finger span exceeds <code class="docutils literal notranslate"><span class="pre">max_width</span></code> is dropped (object too wide).
+<code class="docutils literal notranslate"><span class="pre">under</span></code> also emits each grasp flipped 180 deg about its approach axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_width</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>yaw_steps</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+<li><p><strong>grasp_length</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>under</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.side_grasps">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">side_grasps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extents</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roll_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grasp_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">under</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">faces</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">1,</span> <span class="pre">2,</span> <span class="pre">3)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/primitives.html#side_grasps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.side_grasps" title="Link to this definition">¶</a></dt>
+<dd><p>Lateral grasps into the four vertical side faces of a box.</p>
+<p><code class="docutils literal notranslate"><span class="pre">roll=0</span></code> makes the fingers span the object height; <code class="docutils literal notranslate"><span class="pre">roll=pi/2</span></code> spans the
+cross dimension. Faces whose straddled dimension exceeds <code class="docutils literal notranslate"><span class="pre">max_width</span></code> drop.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_width</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>roll_steps</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+<li><p><strong>grasp_length</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>under</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.obb_face_grasps">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">obb_face_grasps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/obb.html#obb_face_grasps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.obb_face_grasps" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<a class="reference internal" href="#grasp_sampler.types.ObjMesh" title="grasp_sampler.types.ObjMesh"><em>ObjMesh</em></a>)</p></li>
+<li><p><strong>cfg</strong> (<a class="reference internal" href="#grasp_sampler.types.GraspConfig" title="grasp_sampler.types.GraspConfig"><em>GraspConfig</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)">list</a>[<a class="reference internal" href="#grasp_sampler.types.Grasp" title="grasp_sampler.types.Grasp"><em>Grasp</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.antipodal_grasps">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">antipodal_grasps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/antipodal.html#antipodal_grasps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.antipodal_grasps" title="Link to this definition">¶</a></dt>
+<dd><p>Sample force-closure antipodal grasps on <code class="docutils literal notranslate"><span class="pre">obj</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<a class="reference internal" href="#grasp_sampler.types.ObjMesh" title="grasp_sampler.types.ObjMesh"><em>ObjMesh</em></a>)</p></li>
+<li><p><strong>cfg</strong> (<a class="reference internal" href="#grasp_sampler.types.GraspConfig" title="grasp_sampler.types.GraspConfig"><em>GraspConfig</em></a>)</p></li>
+<li><p><strong>rng</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.5)"><em>Generator</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)">list</a>[<a class="reference internal" href="#grasp_sampler.types.Grasp" title="grasp_sampler.types.Grasp"><em>Grasp</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="transforms">
+<h2>Transforms<a class="headerlink" href="#transforms" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.stack_poses">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">stack_poses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grasps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/transforms.html#stack_poses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.stack_poses" title="Link to this definition">¶</a></dt>
+<dd><p>Collect <code class="docutils literal notranslate"><span class="pre">Grasp.pose</span></code> matrices into a single (N, 4, 4) array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>grasps</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><em>list</em></a><em>[</em><a class="reference internal" href="#grasp_sampler.types.Grasp" title="grasp_sampler.types.Grasp"><em>Grasp</em></a><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.to_world">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">to_world</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">poses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_pose</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/transforms.html#to_world"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.to_world" title="Link to this definition">¶</a></dt>
+<dd><p>Place object-local TCP poses into the world: <code class="docutils literal notranslate"><span class="pre">object_pose</span> <span class="pre">&#64;</span> <span class="pre">pose</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">object_pose</span></code> is the (4, 4) world pose of the object whose local frame the
+grasps were sampled in.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>poses</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>object_pose</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.tcp_to_ee">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">tcp_to_ee</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">poses</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">standoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.105</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([[0.,</span> <span class="pre">1.,</span> <span class="pre">0.],</span> <span class="pre">[-1.,</span> <span class="pre">0.,</span> <span class="pre">0.],</span> <span class="pre">[0.,</span> <span class="pre">0.,</span> <span class="pre">1.]])</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/transforms.html#tcp_to_ee"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.tcp_to_ee" title="Link to this definition">¶</a></dt>
+<dd><p>Convert TCP poses to end-effector (flange) poses.</p>
+<p>The flange sits <code class="docutils literal notranslate"><span class="pre">standoff</span></code> metres behind the TCP along the approach axis
+(0.105 m for a Franka Panda). <code class="docutils literal notranslate"><span class="pre">remap</span></code> rotates the closing axis from the TCP
+convention (+X) to the gripper convention (+Y by default).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>poses</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>standoff</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>remap</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="planning-targets-and-optional-adapters">
+<h2>Planning targets and optional adapters<a class="headerlink" href="#planning-targets-and-optional-adapters" title="Link to this heading">¶</a></h2>
+<p>See <a class="reference internal" href="planning.html"><span class="doc">Robot planning and simulation</span></a> for frame conventions and usage.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="grasp_sampler.PlanningGrasps">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">PlanningGrasps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grasp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pregrasp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lift</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidate_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool_link</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/planning.html#PlanningGrasps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.PlanningGrasps" title="Link to this definition">¶</a></dt>
+<dd><p>Aligned grasp/pregrasp/lift tool targets in one named planning frame.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">from_grasps</span></code> for nominal/local grasps or <code class="docutils literal notranslate"><span class="pre">from_robust_result</span></code> to
+preserve the exact world commands accepted by robust evaluation. No IK,
+path feasibility, or physical grasp guarantee is implied by these targets.
+Widths are total jaw opening, not individual actuator positions. Scores,
+when present, are validation-bank contact-model frequencies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grasp</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>pregrasp</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>lift</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>widths</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>candidate_ids</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>frame_id</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>)</p></li>
+<li><p><strong>tool_link</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>)</p></li>
+<li><p><strong>scores</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="grasp_sampler.PlanningGrasps.from_grasps">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_grasps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grasps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_world_pose</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/planning.html#PlanningGrasps.from_grasps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.PlanningGrasps.from_grasps" title="Link to this definition">¶</a></dt>
+<dd><p>Place local grasps using the world pose of their <em>mesh</em> frame.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">mesh_world_pose</span></code> first when perception gives the file/source
+frame instead. Identity tool calibration means the planner targets the
+sampler TCP itself; specify <code class="docutils literal notranslate"><span class="pre">tcp_to_tool</span></code> for a flange or other link.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>grasps</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><em>list</em></a><em>[</em><a class="reference internal" href="#grasp_sampler.types.Grasp" title="grasp_sampler.types.Grasp"><em>Grasp</em></a><em>]</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grasp_sampler.PlanningGrasps.from_robust_result">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_robust_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/planning.html#PlanningGrasps.from_robust_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.PlanningGrasps.from_robust_result" title="Link to this definition">¶</a></dt>
+<dd><p>Use selected commands directly, without recomputing from object pose.</p>
+<p>IDs refer to indices in <code class="docutils literal notranslate"><span class="pre">result.records</span></code>. Selection/order and held-out
+validation scores are preserved.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grasp_sampler.PlanningGrasps.from_world_commands">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_world_commands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">world_tcp_poses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widths</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool_link</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tcp_to_tool</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">world_to_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">approach_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lift_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidate_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/planning.html#PlanningGrasps.from_world_commands"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.PlanningGrasps.from_world_commands" title="Link to this definition">¶</a></dt>
+<dd><p>Build targets from fixed world TCP commands.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tcp_to_tool</span></code> is T_tcp_tool; <code class="docutils literal notranslate"><span class="pre">world_to_frame</span></code> is T_frame_world.
+Both default to identity. <code class="docutils literal notranslate"><span class="pre">lift_offset</span></code> is an XYZ vector in <em>world</em>
+axes. Pregrasp backs off along each original TCP’s negative Z, before
+tool calibration; lift translates the grasp without changing rotation.
+The strings label the supplied frames; no TF lookup is performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame_id</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>)</p></li>
+<li><p><strong>tool_link</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>)</p></li>
+<li><p><strong>approach_distance</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grasp_sampler.PlanningGrasps.poses">
+<span class="sig-name descname"><span class="pre">poses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'grasp'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/planning.html#PlanningGrasps.poses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.PlanningGrasps.poses" title="Link to this definition">¶</a></dt>
+<dd><p>Return a copy of a stage’s (N,4,4) tool transforms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stage</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'grasp'</em><em>, </em><em>'pregrasp'</em><em>, </em><em>'lift'</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grasp_sampler.PlanningGrasps.components">
+<span class="sig-name descname"><span class="pre">components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'grasp'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">quaternion_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xyzw'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/planning.html#PlanningGrasps.components"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.PlanningGrasps.components" title="Link to this definition">¶</a></dt>
+<dd><p>Return position/quaternion arrays in an explicit component order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stage</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'grasp'</em><em>, </em><em>'pregrasp'</em><em>, </em><em>'lift'</em><em>]</em>)</p></li>
+<li><p><strong>quaternion_order</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'xyzw'</em><em>, </em><em>'wxyz'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grasp_sampler.PlanningGrasps.select">
+<span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/planning.html#PlanningGrasps.select"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.PlanningGrasps.select" title="Link to this definition">¶</a></dt>
+<dd><p>Subset/reorder by integer indices or a boolean IK/planner success mask.</p>
+<p>IDs, widths and scores stay aligned. Repeated indices are rejected.
+Convert CUDA success tensors via <code class="docutils literal notranslate"><span class="pre">success.detach().cpu().numpy()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#grasp_sampler.PlanningGrasps" title="grasp_sampler.planning.PlanningGrasps"><em>PlanningGrasps</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grasp_sampler.PlanningGrasps.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/planning.html#PlanningGrasps.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.PlanningGrasps.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>JSON-compatible, versioned matrices in metres with explicit frame labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grasp_sampler.PlanningGrasps.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/planning.html#PlanningGrasps.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.PlanningGrasps.from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Read the schema emitted by <code class="docutils literal notranslate"><span class="pre">to_dict</span></code> (without pickle).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><em>dict</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#grasp_sampler.PlanningGrasps" title="grasp_sampler.planning.PlanningGrasps"><em>PlanningGrasps</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.mesh_world_pose">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">mesh_world_pose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_world_pose</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/planning.html#mesh_world_pose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.mesh_world_pose" title="Link to this definition">¶</a></dt>
+<dd><p>Convert a perception/file-frame pose to the processed mesh’s world pose.</p>
+<p>Accounts for centering and upright rotation applied by <code class="docutils literal notranslate"><span class="pre">load_mesh</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> (<a class="reference internal" href="#grasp_sampler.types.ObjMesh" title="grasp_sampler.types.ObjMesh"><em>ObjMesh</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.pose_components">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">pose_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">poses</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">quaternion_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xyzw'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/planning.html#pose_components"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.pose_components" title="Link to this definition">¶</a></dt>
+<dd><p>Return position (N,3) and unit quaternion (N,4), including empty batches.</p>
+<p>A nonnegative scalar quaternion component makes serialization deterministic
+except at the usual 180-degree rotation ambiguity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>quaternion_order</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'xyzw'</em><em>, </em><em>'wxyz'</em><em>]</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.integrations.curobo.goal_arrays">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.integrations.curobo.</span></span><span class="sig-name descname"><span class="pre">goal_arrays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'grasp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'current'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'goalset'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/integrations/curobo.html#goal_arrays"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.integrations.curobo.goal_arrays" title="Link to this definition">¶</a></dt>
+<dd><p>Return NumPy position/quaternion arrays with cuRobo’s required axes.</p>
+<p>Current: [batch,horizon,tool,goalset,xyz/quat]. Legacy: [batch,goalset,xyz/quat]
+for a goalset or [batch,xyz/quat] for batch planning. A goalset lets one
+start choose among N targets; batch mode pairs N starts with N targets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>targets</strong> (<a class="reference internal" href="#grasp_sampler.PlanningGrasps" title="grasp_sampler.planning.PlanningGrasps"><em>PlanningGrasps</em></a>)</p></li>
+<li><p><strong>stage</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'grasp'</em><em>, </em><em>'pregrasp'</em><em>, </em><em>'lift'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.integrations.curobo.to_curobo">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.integrations.curobo.</span></span><span class="sig-name descname"><span class="pre">to_curobo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'grasp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'current'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'goalset'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cuda:0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/integrations/curobo.html#to_curobo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.integrations.curobo.to_curobo" title="Link to this definition">¶</a></dt>
+<dd><p>Create current <code class="docutils literal notranslate"><span class="pre">GoalToolPose</span></code> or legacy <code class="docutils literal notranslate"><span class="pre">curobo.types.math.Pose</span></code>.</p>
+<p>Install cuRobo and PyTorch using NVIDIA’s instructions for your CUDA stack.
+Pass the same device/dtype as your planner. Current export represents one
+tool link; multi-tool tasks must add their other link goals explicitly.
+This converts goals only and never starts planning or execution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>targets</strong> (<a class="reference internal" href="#grasp_sampler.PlanningGrasps" title="grasp_sampler.planning.PlanningGrasps"><em>PlanningGrasps</em></a>)</p></li>
+<li><p><strong>stage</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'grasp'</em><em>, </em><em>'pregrasp'</em><em>, </em><em>'lift'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.integrations.moveit.to_pose_stamped">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.integrations.moveit.</span></span><span class="sig-name descname"><span class="pre">to_pose_stamped</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'grasp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/integrations/moveit.html#to_pose_stamped"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.integrations.moveit.to_pose_stamped" title="Link to this definition">¶</a></dt>
+<dd><p>Create geometry_msgs/PoseStamped messages in <code class="docutils literal notranslate"><span class="pre">targets.frame_id</span></code>.</p>
+<p>Source your ROS 2 workspace first. <code class="docutils literal notranslate"><span class="pre">stamp</span></code> may be a builtin_interfaces/Time
+(e.g. node.get_clock().now().to_msg()); otherwise ROS’s zero stamp is used.
+No TF conversion is performed by this adapter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>targets</strong> (<a class="reference internal" href="#grasp_sampler.PlanningGrasps" title="grasp_sampler.planning.PlanningGrasps"><em>PlanningGrasps</em></a>)</p></li>
+<li><p><strong>stage</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'grasp'</em><em>, </em><em>'pregrasp'</em><em>, </em><em>'lift'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.integrations.pybullet.to_pybullet">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.integrations.pybullet.</span></span><span class="sig-name descname"><span class="pre">to_pybullet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'grasp'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/integrations/pybullet.html#to_pybullet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.integrations.pybullet.to_pybullet" title="Link to this definition">¶</a></dt>
+<dd><p>Return [((x,y,z), (qx,qy,qz,qw)), …] tool-link targets.</p>
+<p>Supply simulation-world transforms when building <code class="docutils literal notranslate"><span class="pre">targets</span></code>. These can
+be passed to calculateInverseKinematics or pybullet-planning’s IK helpers.
+They are link-frame poses, not inertial/centre-of-mass poses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>targets</strong> (<a class="reference internal" href="#grasp_sampler.PlanningGrasps" title="grasp_sampler.planning.PlanningGrasps"><em>PlanningGrasps</em></a>)</p></li>
+<li><p><strong>stage</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'grasp'</em><em>, </em><em>'pregrasp'</em><em>, </em><em>'lift'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.integrations.pybullet.draw_grasps">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.integrations.pybullet.</span></span><span class="sig-name descname"><span class="pre">draw_grasps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grasps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_world_pose</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rejected_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_grasps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">24</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">physics_client_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/integrations/pybullet.html#draw_grasps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.integrations.pybullet.draw_grasps" title="Link to this definition">¶</a></dt>
+<dd><p>Render real gripper glyphs: cyan candidates, coral rejects, gold selection.</p>
+<p>Returns visual-only body IDs; remove them with removeBody when advancing
+the visualization. Glyphs use the sampler’s TCP axes (not a planner tool’s
+axes), and have no collision geometry. <code class="docutils literal notranslate"><span class="pre">object_world_pose</span></code> can also place
+a scaled inspection inset, provided local translations scale with it.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.integrations.mujoco.to_mujoco">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.integrations.mujoco.</span></span><span class="sig-name descname"><span class="pre">to_mujoco</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'grasp'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/integrations/mujoco.html#to_mujoco"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.integrations.mujoco.to_mujoco" title="Link to this definition">¶</a></dt>
+<dd><p>Return (position[N,3], quaternion[N,4]) arrays; quaternion order is wxyz.</p>
+<p>Targets must be in the simulation world. Apply tool calibration if the
+controlled site/mocap body differs from the sampler TCP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>targets</strong> (<a class="reference internal" href="#grasp_sampler.PlanningGrasps" title="grasp_sampler.planning.PlanningGrasps"><em>PlanningGrasps</em></a>)</p></li>
+<li><p><strong>stage</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'grasp'</em><em>, </em><em>'pregrasp'</em><em>, </em><em>'lift'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.integrations.mujoco.set_mocap_target">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.integrations.mujoco.</span></span><span class="sig-name descname"><span class="pre">set_mocap_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'grasp'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/integrations/mujoco.html#set_mocap_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.integrations.mujoco.set_mocap_target" title="Link to this definition">¶</a></dt>
+<dd><p>Set one named mocap body’s world target and refresh forward kinematics.</p>
+<p>Mutates only that body’s mocap position/orientation, then calls mj_forward.
+The XML must supply the mocap body and any controller/weld to the robot.
+This does not solve IK or write robot joints/controls.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>body_name</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>)</p></li>
+<li><p><strong>targets</strong> (<a class="reference internal" href="#grasp_sampler.PlanningGrasps" title="grasp_sampler.planning.PlanningGrasps"><em>PlanningGrasps</em></a>)</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+<li><p><strong>stage</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'grasp'</em><em>, </em><em>'pregrasp'</em><em>, </em><em>'lift'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.integrations.mujoco.site_world_pose">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.integrations.mujoco.</span></span><span class="sig-name descname"><span class="pre">site_world_pose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/integrations/mujoco.html#site_world_pose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.integrations.mujoco.site_world_pose" title="Link to this definition">¶</a></dt>
+<dd><p>Read a site’s 4x4 world transform after refreshing forward kinematics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>site_name</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grasp_sampler.integrations.mujoco.SiteIKResult">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">grasp_sampler.integrations.mujoco.</span></span><span class="sig-name descname"><span class="pre">SiteIKResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">joint_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">success</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position_error</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orientation_error</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/integrations/mujoco.html#SiteIKResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.integrations.mujoco.SiteIKResult" title="Link to this definition">¶</a></dt>
+<dd><p>Joint-order-explicit IK result; no trajectory or collision guarantee.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>joint_names</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><em>tuple</em></a>)</p></li>
+<li><p><strong>positions</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>success</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>)</p></li>
+<li><p><strong>position_error</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>orientation_error</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>iterations</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.integrations.mujoco.solve_site_ik">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.integrations.mujoco.</span></span><span class="sig-name descname"><span class="pre">solve_site_ik</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_pose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joint_names</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orientation_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">damping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/integrations/mujoco.html#solve_site_ik"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.integrations.mujoco.solve_site_ik" title="Link to this definition">¶</a></dt>
+<dd><p>Damped site IK on named hinge/slide joints, without mutating <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p>
+<p>Targets are world SE(3) matrices. Uses MuJoCo’s analytic Jacobian, respects
+joint limits, and returns explicit residuals. Collision/path checks remain
+separate. Free/ball joints must not appear in <code class="docutils literal notranslate"><span class="pre">joint_names</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#grasp_sampler.integrations.mujoco.SiteIKResult" title="grasp_sampler.integrations.mujoco.SiteIKResult"><em>SiteIKResult</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.integrations.mplib.to_mplib">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.integrations.mplib.</span></span><span class="sig-name descname"><span class="pre">to_mplib</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'grasp'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/integrations/mplib.html#to_mplib"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.integrations.mplib.to_mplib" title="Link to this definition">¶</a></dt>
+<dd><p>Return mplib.Pose targets in the frame expected by Planner.plan_pose.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>targets</strong> (<a class="reference internal" href="#grasp_sampler.PlanningGrasps" title="grasp_sampler.planning.PlanningGrasps"><em>PlanningGrasps</em></a>)</p></li>
+<li><p><strong>stage</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'grasp'</em><em>, </em><em>'pregrasp'</em><em>, </em><em>'lift'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="robust-evaluation-under-object-uncertainty">
+<h2>Robust evaluation under object uncertainty<a class="headerlink" href="#robust-evaluation-under-object-uncertainty" title="Link to this heading">¶</a></h2>
+<p>See <a class="reference internal" href="uncertainty.html"><span class="doc">Robust grasp evaluation</span></a> for the workflow.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="grasp_sampler.PoseUncertainty">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">PoseUncertainty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">translation_std_xyz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_std_rpy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">translation_bounds_xyz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_bounds_rpy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'world'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/uncertainty.html#PoseUncertainty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.PoseUncertainty" title="Link to this definition">¶</a></dt>
+<dd><p>Independent Gaussian or bounded translation and RPY deltas.</p>
+<p>Bounds have shape (3, 2). RPY means D = Rz(yaw) &#64; Ry(pitch) &#64; Rx(roll).
+world: R_i = D &#64; R_est, t_i = t_est + dt (rotate about object origin).
+object: R_i = R_est &#64; D, t_i = t_est + R_est &#64; dt.
+Thus world rotations never orbit the object around the world origin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>translation_std_xyz</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><em>object</em></a>)</p></li>
+<li><p><strong>rotation_std_rpy</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><em>object</em></a>)</p></li>
+<li><p><strong>translation_bounds_xyz</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><em>object</em></a>)</p></li>
+<li><p><strong>rotation_bounds_rpy</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><em>object</em></a>)</p></li>
+<li><p><strong>frame</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'world'</em><em>, </em><em>'object'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grasp_sampler.GeometryUncertainty">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">GeometryUncertainty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scale_bounds_xyz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_std_xyz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pivot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/uncertainty.html#GeometryUncertainty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.GeometryUncertainty" title="Link to this definition">¶</a></dt>
+<dd><p>Anisotropic scale about an explicit mesh-local pivot, default origin.</p>
+<p>Scale bounds are three [lower, upper] pairs (absolute scale factors).
+Gaussian scales are centered at one; nonpositive draws raise an error.
+No recentering or change to the mesh coordinate frame is performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scale_bounds_xyz</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><em>object</em></a>)</p></li>
+<li><p><strong>scale_std_xyz</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><em>object</em></a>)</p></li>
+<li><p><strong>pivot</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><em>object</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grasp_sampler.ObjectHypothesis">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">ObjectHypothesis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'trimesh.Trimesh'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">world_pose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'np.ndarray'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'dict'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/uncertainty.html#ObjectHypothesis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.ObjectHypothesis" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mesh</strong> (<a class="reference external" href="https://trimesh.org/trimesh.base.html#trimesh.base.Trimesh" title="(in trimesh)"><em>Trimesh</em></a>)</p></li>
+<li><p><strong>world_pose</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><em>dict</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.sample_hypotheses">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">sample_hypotheses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nominal_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nominal_object_pose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">pose_uncertainty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_uncertainty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/uncertainty.html#sample_hypotheses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.sample_hypotheses" title="Link to this definition">¶</a></dt>
+<dd><p>Sample independent mesh/pose hypotheses with equal weights.</p>
+<p>Supply either an explicit Generator or a seed. Explicit hypotheses can have
+correlated geometry/poses and arbitrary nonnegative weights instead.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grasp_sampler.RobustGraspEvaluator">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">RobustGraspEvaluator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nominal_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opening_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">backend_options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/robust.html#RobustGraspEvaluator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.RobustGraspEvaluator" title="Link to this definition">¶</a></dt>
+<dd><p>Nominal mesh must share the frame used by Grasp.pose.</p>
+<p>Default deterministic command: open to configured maximum, approach along
+TCP +Z, close symmetrically. Grasp.width is the nominal required span, not
+an execution opening command. Override opening_width to model a narrower
+fixed opening. Contact tolerance approximates finite pad compliance only.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.rank_grasps">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">rank_grasps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grasps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluator</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">nominal_object_pose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hypotheses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nominal_scores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'expected_success'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/robust.html#rank_grasps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.rank_grasps" title="Link to this definition">¶</a></dt>
+<dd><p>Preserve supplied nominal scores; repository generators have no score.</p>
+<p>Expected success normalizes weights; worst-case includes zero-weight
+hypotheses as well. Ties preserve candidate order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>criterion</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'expected_success'</em><em>, </em><em>'worst_case_valid'</em><em>]</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grasp_sampler.RobustSetConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">RobustSetConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidate_budget</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nominal_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">augmentation_rounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guided_hypotheses_per_round</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_validation_candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int</span> <span class="pre">|</span> <span class="pre">None'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dedup_translation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dedup_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">np.float64(0.05235987755982989)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jaw_symmetry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'bool'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diversity_translation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diversity_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">np.float64(0.3490658503988659)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Strategy'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'failure_guided'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_nominal_valid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'bool'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/robust_set.html#RobustSetConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.RobustSetConfig" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>candidate_budget</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+<li><p><strong>nominal_fraction</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>augmentation_rounds</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+<li><p><strong>guided_hypotheses_per_round</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>)</p></li>
+<li><p><strong>max_validation_candidates</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>dedup_translation</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>dedup_angle</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>jaw_symmetry</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>)</p></li>
+<li><p><strong>diversity_translation</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>diversity_angle</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>strategy</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.15)"><em>Literal</em></a><em>[</em><em>'failure_guided'</em><em>, </em><em>'nominal'</em><em>, </em><em>'representative'</em><em>, </em><em>'blind_pooling'</em><em>]</em>)</p></li>
+<li><p><strong>require_nominal_valid</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.generate_robust_grasp_set">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">generate_robust_grasp_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimated_pose</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robustness_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_hypotheses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_hypotheses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hypothesis_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pose_uncertainty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_uncertainty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grasp_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opening_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/robust_set.html#generate_robust_grasp_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.generate_robust_grasp_set" title="Link to this definition">¶</a></dt>
+<dd><p>Generate up to <code class="docutils literal notranslate"><span class="pre">requested_count</span></code> validated fixed-command grasps.</p>
+<p>If banks are sampled internally, independent random streams create search
+and validation banks. Explicit banks preserve correlated <code class="docutils literal notranslate"><span class="pre">(mesh,</span> <span class="pre">pose)</span></code>
+pairs and weights. <code class="docutils literal notranslate"><span class="pre">R</span></code> is always weighted binary closure success.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grasp_sampler.RobustGraspSetResult">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">grasp_sampler.</span></span><span class="sig-name descname"><span class="pre">RobustGraspSetResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'list[RobustCandidateRecord]'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">records</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'list[RobustCandidateRecord]'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diagnostics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'dict'</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/robust_set.html#RobustGraspSetResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.RobustGraspSetResult" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>selected</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><em>list</em></a><em>[</em><em>RobustCandidateRecord</em><em>]</em>)</p></li>
+<li><p><strong>records</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><em>list</em></a><em>[</em><em>RobustCandidateRecord</em><em>]</em>)</p></li>
+<li><p><strong>diagnostics</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><em>dict</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Validity backends: <code class="docutils literal notranslate"><span class="pre">GeometricGraspBackend</span></code>, <code class="docutils literal notranslate"><span class="pre">SymmetricPointBackend</span></code>,
+<code class="docutils literal notranslate"><span class="pre">FinitePadFixedObjectBackend</span></code>, <code class="docutils literal notranslate"><span class="pre">FinitePadQuasistaticBackend</span></code>.</p>
+</section>
+<section id="pybullet-integration">
+<h2>PyBullet integration<a class="headerlink" href="#pybullet-integration" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.pybullet_sim.collision_filter">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.pybullet_sim.</span></span><span class="sig-name descname"><span class="pre">collision_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grasps</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">clearance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">finger_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gui</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/pybullet_sim.html#collision_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.pybullet_sim.collision_filter" title="Link to this definition">¶</a></dt>
+<dd><p>Boolean mask of grasps whose gripper body clears the object.</p>
+<p>A grasp is rejected if any gripper link comes within <code class="docutils literal notranslate"><span class="pre">clearance</span></code> of the
+object mesh (<code class="docutils literal notranslate"><span class="pre">clearance=0</span></code> rejects only actual penetration).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mesh_path</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>)</p></li>
+<li><p><strong>grasps</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><em>list</em></a><em>[</em><a class="reference internal" href="#grasp_sampler.types.Grasp" title="grasp_sampler.types.Grasp"><em>Grasp</em></a><em>]</em>)</p></li>
+<li><p><strong>clearance</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>finger_len</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>gui</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grasp_sampler.pybullet_sim.show_grasps">
+<span class="sig-prename descclassname"><span class="pre">grasp_sampler.pybullet_sim.</span></span><span class="sig-name descname"><span class="pre">show_grasps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grasps</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_grasps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">finger_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grasp_sampler/pybullet_sim.html#show_grasps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grasp_sampler.pybullet_sim.show_grasps" title="Link to this definition">¶</a></dt>
+<dd><p>Open a PyBullet GUI with the object and a gripper proxy at each grasp.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mesh_path</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>)</p></li>
+<li><p><strong>grasps</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><em>list</em></a><em>[</em><a class="reference internal" href="#grasp_sampler.types.Grasp" title="grasp_sampler.types.Grasp"><em>Grasp</em></a><em>]</em>)</p></li>
+<li><p><strong>max_grasps</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>finger_len</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>)</p></li>
+<li><p><strong>hold</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          <a class="prev-page" href="configuration.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Configuration</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, grasp-sampler contributors
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">API reference</a><ul>
+<li><a class="reference internal" href="#sampler">Sampler</a><ul>
+<li><a class="reference internal" href="#grasp_sampler.GraspSampler"><code class="docutils literal notranslate"><span class="pre">GraspSampler</span></code></a><ul>
+<li><a class="reference internal" href="#grasp_sampler.GraspSampler.load"><code class="docutils literal notranslate"><span class="pre">GraspSampler.load()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.GraspSampler.generate"><code class="docutils literal notranslate"><span class="pre">GraspSampler.generate()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.GraspSampler.sample"><code class="docutils literal notranslate"><span class="pre">GraspSampler.sample()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data-types">Data types</a><ul>
+<li><a class="reference internal" href="#grasp_sampler.types.Grasp"><code class="docutils literal notranslate"><span class="pre">Grasp</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.types.ObjMesh"><code class="docutils literal notranslate"><span class="pre">ObjMesh</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.types.GraspConfig"><code class="docutils literal notranslate"><span class="pre">GraspConfig</span></code></a><ul>
+<li><a class="reference internal" href="#grasp_sampler.types.GraspConfig.approach_facet_array"><code class="docutils literal notranslate"><span class="pre">GraspConfig.approach_facet_array()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mesh-loading">Mesh loading</a><ul>
+<li><a class="reference internal" href="#grasp_sampler.load_mesh"><code class="docutils literal notranslate"><span class="pre">load_mesh()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#generators">Generators</a><ul>
+<li><a class="reference internal" href="#grasp_sampler.top_grasps"><code class="docutils literal notranslate"><span class="pre">top_grasps()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.side_grasps"><code class="docutils literal notranslate"><span class="pre">side_grasps()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.obb_face_grasps"><code class="docutils literal notranslate"><span class="pre">obb_face_grasps()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.antipodal_grasps"><code class="docutils literal notranslate"><span class="pre">antipodal_grasps()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#transforms">Transforms</a><ul>
+<li><a class="reference internal" href="#grasp_sampler.stack_poses"><code class="docutils literal notranslate"><span class="pre">stack_poses()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.to_world"><code class="docutils literal notranslate"><span class="pre">to_world()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.tcp_to_ee"><code class="docutils literal notranslate"><span class="pre">tcp_to_ee()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#planning-targets-and-optional-adapters">Planning targets and optional adapters</a><ul>
+<li><a class="reference internal" href="#grasp_sampler.PlanningGrasps"><code class="docutils literal notranslate"><span class="pre">PlanningGrasps</span></code></a><ul>
+<li><a class="reference internal" href="#grasp_sampler.PlanningGrasps.from_grasps"><code class="docutils literal notranslate"><span class="pre">PlanningGrasps.from_grasps()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.PlanningGrasps.from_robust_result"><code class="docutils literal notranslate"><span class="pre">PlanningGrasps.from_robust_result()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.PlanningGrasps.from_world_commands"><code class="docutils literal notranslate"><span class="pre">PlanningGrasps.from_world_commands()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.PlanningGrasps.poses"><code class="docutils literal notranslate"><span class="pre">PlanningGrasps.poses()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.PlanningGrasps.components"><code class="docutils literal notranslate"><span class="pre">PlanningGrasps.components()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.PlanningGrasps.select"><code class="docutils literal notranslate"><span class="pre">PlanningGrasps.select()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.PlanningGrasps.to_dict"><code class="docutils literal notranslate"><span class="pre">PlanningGrasps.to_dict()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.PlanningGrasps.from_dict"><code class="docutils literal notranslate"><span class="pre">PlanningGrasps.from_dict()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#grasp_sampler.mesh_world_pose"><code class="docutils literal notranslate"><span class="pre">mesh_world_pose()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.pose_components"><code class="docutils literal notranslate"><span class="pre">pose_components()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.integrations.curobo.goal_arrays"><code class="docutils literal notranslate"><span class="pre">goal_arrays()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.integrations.curobo.to_curobo"><code class="docutils literal notranslate"><span class="pre">to_curobo()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.integrations.moveit.to_pose_stamped"><code class="docutils literal notranslate"><span class="pre">to_pose_stamped()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.integrations.pybullet.to_pybullet"><code class="docutils literal notranslate"><span class="pre">to_pybullet()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.integrations.pybullet.draw_grasps"><code class="docutils literal notranslate"><span class="pre">draw_grasps()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.integrations.mujoco.to_mujoco"><code class="docutils literal notranslate"><span class="pre">to_mujoco()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.integrations.mujoco.set_mocap_target"><code class="docutils literal notranslate"><span class="pre">set_mocap_target()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.integrations.mujoco.site_world_pose"><code class="docutils literal notranslate"><span class="pre">site_world_pose()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.integrations.mujoco.SiteIKResult"><code class="docutils literal notranslate"><span class="pre">SiteIKResult</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.integrations.mujoco.solve_site_ik"><code class="docutils literal notranslate"><span class="pre">solve_site_ik()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.integrations.mplib.to_mplib"><code class="docutils literal notranslate"><span class="pre">to_mplib()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#robust-evaluation-under-object-uncertainty">Robust evaluation under object uncertainty</a><ul>
+<li><a class="reference internal" href="#grasp_sampler.PoseUncertainty"><code class="docutils literal notranslate"><span class="pre">PoseUncertainty</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.GeometryUncertainty"><code class="docutils literal notranslate"><span class="pre">GeometryUncertainty</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.ObjectHypothesis"><code class="docutils literal notranslate"><span class="pre">ObjectHypothesis</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.sample_hypotheses"><code class="docutils literal notranslate"><span class="pre">sample_hypotheses()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.RobustGraspEvaluator"><code class="docutils literal notranslate"><span class="pre">RobustGraspEvaluator</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.rank_grasps"><code class="docutils literal notranslate"><span class="pre">rank_grasps()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.RobustSetConfig"><code class="docutils literal notranslate"><span class="pre">RobustSetConfig</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.generate_robust_grasp_set"><code class="docutils literal notranslate"><span class="pre">generate_robust_grasp_set()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.RobustGraspSetResult"><code class="docutils literal notranslate"><span class="pre">RobustGraspSetResult</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pybullet-integration">PyBullet integration</a><ul>
+<li><a class="reference internal" href="#grasp_sampler.pybullet_sim.collision_filter"><code class="docutils literal notranslate"><span class="pre">collision_filter()</span></code></a></li>
+<li><a class="reference internal" href="#grasp_sampler.pybullet_sim.show_grasps"><code class="docutils literal notranslate"><span class="pre">show_grasps()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

@@ -1,0 +1,646 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Constrained shelf retrieval and transfer" href="scenarios.html"><link rel="prev" title="Usage" href="usage.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>Robot planning and simulation - grasp-sampler</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">grasp-sampler</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <span class="sidebar-brand-text">grasp-sampler</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Robot planning and simulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scenarios.html">Constrained shelf retrieval and transfer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uncertainty.html">Robust grasp evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/planning.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="robot-planning-and-simulation">
+<h1>Robot planning and simulation<a class="headerlink" href="#robot-planning-and-simulation" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">PlanningGrasps</span></code> turns nominal grasps or accepted robust commands into aligned
+grasp, pregrasp and lift targets. It keeps widths, candidate IDs and validation
+scores alongside the poses so filtering by IK or planning success retains their
+meaning. Optional adapters cover cuRobo, MoveIt 2, PyBullet, MuJoCo, and MPlib.
+Importing <code class="docutils literal notranslate"><span class="pre">grasp_sampler</span></code> does not import any of these frameworks.</p>
+<section id="frames-and-calibration">
+<h2>Frames and calibration<a class="headerlink" href="#frames-and-calibration" title="Link to this heading">¶</a></h2>
+<p>Every transform is a right-handed SE(3) matrix; positions/distances are metres.
+<code class="docutils literal notranslate"><span class="pre">T_A_B</span></code> transforms B coordinates into A coordinates. The sampler’s TCP has +X
+closing and +Z approach. The pose requested by a planner belongs to its
+configured tool link, which may differ from that TCP:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>T_frame_tool = T_frame_world @ T_world_mesh @ T_mesh_tcp @ T_tcp_tool
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">tcp_to_tool</span></code> is <strong>T_tcp_tool</strong>, the tool link expressed in the grasp TCP.
+If your calibration is T_tool_tcp, invert it first. Identity means the tool link
+is the sampler TCP; naming a flange does not apply its calibration automatically.
+<code class="docutils literal notranslate"><span class="pre">world_to_frame</span></code> is T_frame_world, usually the inverse of the robot base’s world
+pose. <code class="docutils literal notranslate"><span class="pre">frame_id</span></code> and <code class="docutils literal notranslate"><span class="pre">tool_link</span></code> label the result; there is no automatic TF lookup.</p>
+<p><code class="docutils literal notranslate"><span class="pre">load_mesh</span></code> normally rotates and centers input geometry. If perception gives the
+pose of the original file/scene frame, call <code class="docutils literal notranslate"><span class="pre">mesh_world_pose(obj,</span> <span class="pre">T_world_source)</span></code>
+to account for that processing. Alternatively load with <code class="docutils literal notranslate"><span class="pre">center=False</span></code> and
+<code class="docutils literal notranslate"><span class="pre">upright_transform=None</span></code> to preserve the source frame.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">grasp_sampler</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraspSampler</span><span class="p">,</span> <span class="n">PlanningGrasps</span><span class="p">,</span> <span class="n">mesh_world_pose</span><span class="p">,</span> <span class="n">tcp_to_ee</span>
+
+<span class="n">sampler</span> <span class="o">=</span> <span class="n">GraspSampler</span><span class="p">()</span>
+<span class="n">obj</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;object.glb&quot;</span><span class="p">)</span>
+<span class="n">grasps</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">T_world_source</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>                  <span class="c1"># replace with your perception pose</span>
+<span class="n">T_world_source</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">.2</span><span class="p">]</span>
+<span class="n">T_frame_world</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>                  <span class="c1"># replace if robot base differs from world</span>
+
+<span class="c1"># Example only: existing Panda flange convention (+Y closing, 0.105 m offset).</span>
+<span class="c1"># For other tool links use their actual calibrated T_tcp_tool.</span>
+<span class="n">T_tcp_tool</span> <span class="o">=</span> <span class="n">tcp_to_ee</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="kc">None</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">targets</span> <span class="o">=</span> <span class="n">PlanningGrasps</span><span class="o">.</span><span class="n">from_grasps</span><span class="p">(</span>
+    <span class="n">grasps</span><span class="p">,</span> <span class="n">mesh_world_pose</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">T_world_source</span><span class="p">),</span>
+    <span class="n">frame_id</span><span class="o">=</span><span class="s2">&quot;panda_link0&quot;</span><span class="p">,</span> <span class="n">tool_link</span><span class="o">=</span><span class="s2">&quot;panda_link8&quot;</span><span class="p">,</span>
+    <span class="n">world_to_frame</span><span class="o">=</span><span class="n">T_frame_world</span><span class="p">,</span> <span class="n">tcp_to_tool</span><span class="o">=</span><span class="n">T_tcp_tool</span><span class="p">,</span>
+    <span class="n">approach_distance</span><span class="o">=</span><span class="mf">.12</span><span class="p">,</span> <span class="n">lift_offset</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">.15</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">positions</span><span class="p">,</span> <span class="n">quaternions</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">components</span><span class="p">(</span><span class="s2">&quot;pregrasp&quot;</span><span class="p">,</span> <span class="n">quaternion_order</span><span class="o">=</span><span class="s2">&quot;xyzw&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Check the configured planner link against your robot model. For example,
+PyBullet’s <code class="docutils literal notranslate"><span class="pre">panda_grasptarget</span></code> already includes the hand-to-fingertip offset, and
+has the hand’s rotation rather than the flange’s rotation. Applying the flange
+calibration again would displace its target.</p>
+<p>Pregrasp moves backwards along the <strong>original TCP’s negative Z</strong>, before tool
+calibration. Lift adds <code class="docutils literal notranslate"><span class="pre">lift_offset</span></code> along <strong>world axes</strong>. Both preserve the
+grasp orientation. These are endpoint targets; the planner/controller chooses
+the motion between them.</p>
+</section>
+<section id="preserve-robustness-decisions">
+<h2>Preserve robustness decisions<a class="headerlink" href="#preserve-robustness-decisions" title="Link to this heading">¶</a></h2>
+<p>Use the selected commands directly after robust generation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># result = generate_robust_grasp_set(...)</span>
+<span class="n">targets</span> <span class="o">=</span> <span class="n">PlanningGrasps</span><span class="o">.</span><span class="n">from_robust_result</span><span class="p">(</span>
+    <span class="n">result</span><span class="p">,</span> <span class="n">frame_id</span><span class="o">=</span><span class="s2">&quot;world&quot;</span><span class="p">,</span> <span class="n">tool_link</span><span class="o">=</span><span class="s2">&quot;tcp&quot;</span><span class="p">,</span>
+    <span class="n">approach_distance</span><span class="o">=</span><span class="mf">.12</span><span class="p">,</span> <span class="n">lift_offset</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">.15</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>This preserves each accepted fixed world command, selected order, and
+<code class="docutils literal notranslate"><span class="pre">validation_R</span></code>. Candidate IDs index <code class="docutils literal notranslate"><span class="pre">result.records</span></code>. It does not place a grasp
+again using another hypothesis or a new object estimate. Scores remain
+contact-model frequencies; robot reachability and path collisions are separate
+checks. Pregrasp and lift motions have not been evaluated by that contact score.</p>
+<p>After a per-candidate IK/planning query:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># success_mask must have one boolean per candidate. For a CUDA tensor:</span>
+<span class="c1"># success_mask = result.success.detach().cpu().numpy().reshape(-1)</span>
+<span class="n">reachable</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">success_mask</span><span class="p">)</span>
+<span class="c1"># Or reorder without losing IDs, widths, or scores:</span>
+<span class="n">ordered</span> <span class="o">=</span> <span class="n">reachable</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">reachable</span><span class="p">)))))</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">widths</span></code> is the <strong>total jaw opening</strong>, not a joint command. For two symmetric
+directly driven fingers, each joint may need <code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">/</span> <span class="pre">2</span></code>; coupled grippers require
+their own transmission mapping and limits. Open with a calibrated margin, close
+after reaching the grasp, then plan lift from the actual measured state.</p>
+</section>
+<section id="curobo-current-api-and-legacy-0-7">
+<h2>cuRobo: current API and legacy 0.7<a class="headerlink" href="#curobo-current-api-and-legacy-0-7" title="Link to this heading">¶</a></h2>
+<p>Install PyTorch/cuRobo following NVIDIA’s instructions for your CUDA stack;
+there is no automatic cuRobo pip extra here. The two API families are explicit
+because their pose types and batch axes differ.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>API</p></th>
+<th class="head"><p>Export</p></th>
+<th class="head"><p>Goalset positions</p></th>
+<th class="head"><p>Batch positions</p></th>
+<th class="head"><p>Quaternion</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">current</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">curobo.types.GoalToolPose</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(1,1,1,N,3)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(N,1,1,1,3)</span></code></p></td>
+<td><p>wxyz</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">legacy</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">curobo.types.math.Pose</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(1,N,3)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(N,3)</span></code></p></td>
+<td><p>wxyz</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Quaternion arrays have a final dimension of 4. Current axes are batch, horizon,
+tool, goalset, components. Export covers one tool link. Multi-tool applications
+must add the other configured link goals. Use the same device and dtype as the
+planner:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">grasp_sampler.integrations.curobo</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_curobo</span>
+
+<span class="c1"># Current MotionPlanner: choose one candidate from a goalset for one start.</span>
+<span class="n">goal</span> <span class="o">=</span> <span class="n">to_curobo</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">api</span><span class="o">=</span><span class="s2">&quot;current&quot;</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;pregrasp&quot;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">)</span>
+<span class="c1"># Configure MotionPlannerCfg.create(..., max_goalset=len(targets)) before warmup.</span>
+<span class="c1"># result = planner.plan_pose(goal, start_joint_state)</span>
+
+<span class="c1"># Legacy MotionGen 0.7:</span>
+<span class="n">goal</span> <span class="o">=</span> <span class="n">to_curobo</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">api</span><span class="o">=</span><span class="s2">&quot;legacy&quot;</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;pregrasp&quot;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">)</span>
+<span class="c1"># planner.warmup(n_goalset=len(targets))</span>
+<span class="c1"># result = planner.plan_goalset(start_joint_state, goal, plan_config)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">layout=&quot;goalset&quot;</span></code> lets one start choose among N targets; its success result
+describes the planning problem, <strong>not N individual candidate outcomes</strong>. Use
+<code class="docutils literal notranslate"><span class="pre">layout=&quot;batch&quot;</span></code> to pair N starts with N targets (current <code class="docutils literal notranslate"><span class="pre">BatchMotionPlanner</span></code>,
+legacy <code class="docutils literal notranslate"><span class="pre">MotionGen.plan_batch</span></code>); repeat or provide the starting joint state with
+the matching batch size and joint order. Configure maximum batch/goalset sizes
+before CUDA graph warmup. <code class="docutils literal notranslate"><span class="pre">goal_arrays</span></code> exports the same arrays without importing
+PyTorch/cuRobo.</p>
+<p><code class="docutils literal notranslate"><span class="pre">examples/plan_curobo.py</span></code> loads an exported set, checks the configured tool name,
+warms up the appropriate API, and plans from the default/retract state. It does
+not execute a robot. Add your application’s collision scene, measured start
+state, and object attachment handling when using the resulting trajectory.</p>
+<p>Official references: <a class="reference external" href="https://raw.githubusercontent.com/NVlabs/curobo/main/curobo/_src/types/tool_pose.py">current types</a>,
+<a class="reference external" href="https://nvlabs.github.io/curobo/latest/getting-started/motion_planning.html">current planning</a>,
+<a class="reference external" href="https://nvlabs.github.io/curobo/v0.7.6/_api/curobo.types.math.html">0.7 Pose</a>,
+<a class="reference external" href="https://nvlabs.github.io/curobo/v0.7.6/_api/curobo.wrap.reacher.motion_gen.html">0.7 MotionGen</a>.</p>
+</section>
+<section id="moveit-2-ros-2">
+<h2>MoveIt 2 / ROS 2<a class="headerlink" href="#moveit-2-ros-2" title="Link to this heading">¶</a></h2>
+<p>Source your ROS workspace so <code class="docutils literal notranslate"><span class="pre">geometry_msgs</span></code> and <code class="docutils literal notranslate"><span class="pre">moveit_py</span></code> are importable.
+The adapter creates <code class="docutils literal notranslate"><span class="pre">PoseStamped</span></code> messages in the supplied frame, using xyzw
+quaternion fields. It does not spin a node, transform frames, or execute motion.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">grasp_sampler.integrations.moveit</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_pose_stamped</span>
+
+<span class="n">messages</span> <span class="o">=</span> <span class="n">to_pose_stamped</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;pregrasp&quot;</span><span class="p">,</span>
+                           <span class="n">stamp</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">get_clock</span><span class="p">()</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">to_msg</span><span class="p">())</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">message</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">messages</span><span class="p">):</span>
+    <span class="n">planning_component</span><span class="o">.</span><span class="n">set_start_state_to_current_state</span><span class="p">()</span>
+    <span class="n">planning_component</span><span class="o">.</span><span class="n">set_goal_state</span><span class="p">(</span><span class="n">pose_stamped_msg</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">pose_link</span><span class="o">=</span><span class="n">targets</span><span class="o">.</span><span class="n">tool_link</span><span class="p">)</span>
+    <span class="n">plan</span> <span class="o">=</span> <span class="n">planning_component</span><span class="o">.</span><span class="n">plan</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">plan</span><span class="p">:</span>
+        <span class="n">candidate</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">break</span>
+</pre></div>
+</div>
+<p>For a pick workflow, use that same candidate for approach, grasp and lift; after
+closing, update the planning scene’s attached object and allowed finger contacts.
+Plan each segment from the actual or preceding planned end state. Three
+independent plans from the original start do not form one executable trajectory.
+See the <a class="reference external" href="https://moveit.picknik.ai/main/doc/examples/motion_planning_python_api/motion_planning_python_api_tutorial.html">MoveIt Python planning tutorial</a>.</p>
+</section>
+<section id="pybullet-pybullet-planning">
+<h2>PyBullet / pybullet-planning<a class="headerlink" href="#pybullet-pybullet-planning" title="Link to this heading">¶</a></h2>
+<p>Install <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">&quot;.[sim]&quot;</span></code>. <code class="docutils literal notranslate"><span class="pre">to_pybullet</span></code> needs only NumPy/SciPy and returns
+standard <code class="docutils literal notranslate"><span class="pre">(position_xyz,</span> <span class="pre">quaternion_xyzw)</span></code> tuples. Supply targets in the
+simulation world for the actual link being controlled:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pybullet</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">p</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">grasp_sampler.integrations.pybullet</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_pybullet</span>
+
+<span class="n">position</span><span class="p">,</span> <span class="n">quaternion</span> <span class="o">=</span> <span class="n">to_pybullet</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;pregrasp&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">joints</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">calculateInverseKinematics</span><span class="p">(</span><span class="n">robot_id</span><span class="p">,</span> <span class="n">tool_link_index</span><span class="p">,</span>
+                                      <span class="n">position</span><span class="p">,</span> <span class="n">quaternion</span><span class="p">,</span>
+                                      <span class="n">physicsClientId</span><span class="o">=</span><span class="n">client_id</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>IK results follow the model’s movable-DOF order, which is not necessarily its
+link/joint index order. Check joint limits, FK residual, self collisions and
+scene collisions before accepting a path. <code class="docutils literal notranslate"><span class="pre">pybullet-planning</span></code> accepts the same
+tuple convention for its tool-pose helpers; its joint-space planners use the
+corresponding IK joint solution.</p>
+<p>The complete workstation demo uses the official <strong>FR3v2</strong>, a raised table and
+mounting plate, a divider fixture, and a physical placement tray. It samples
+antipodal grasps on six cartons/cans/a hexagonal jar, screens IK residual,
+joint limits and scene collisions at five straight-approach samples, then ranks
+survivors by joint travel plus a contact-centering term. These costs are planning
+heuristics; they are not robustness probabilities.</p>
+<p>The FR3v2 model’s named <code class="docutils literal notranslate"><span class="pre">fr3v2_hand_tcp</span></code> frame is used directly, including its
+official 0.1034 m hand offset. Its axes are calibrated to the sampler without
+adding another flange standoff. Cyan candidate glyphs, coral rejections, a gold
+selection, and an enlarged inspection model show the actual candidates. Phase
+labels follow sampling, screening, approach, closure, lift, transfer and release.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[sim,fr3]&quot;</span>
+python<span class="w"> </span>tools/prepare_fr3.py
+<span class="nv">PYTHONPATH</span><span class="o">=</span>src<span class="w"> </span>python<span class="w"> </span>examples/pick_place_pybullet.py<span class="w"> </span>--gui<span class="w"> </span>--hold<span class="w"> </span>--objects<span class="w"> </span><span class="m">6</span>
+<span class="nv">PYTHONPATH</span><span class="o">=</span>src<span class="w"> </span>python<span class="w"> </span>examples/pick_place_pybullet.py<span class="w"> </span>--headless<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--objects<span class="w"> </span><span class="m">6</span><span class="w"> </span>--report<span class="w"> </span>/tmp/pick-place.json<span class="w"> </span>--snapshot<span class="w"> </span>/tmp/workstation.png
+</pre></div>
+</div>
+<p>The preparation tool downloads a pinned <a class="reference external" href="https://github.com/frankarobotics/franka_description">official franka_description</a>
+revision and converts visual COLLADA to OBJ for Bullet. Each source material
+region becomes a separate visual, preserving dark joint accents and markings
+instead of flattening the robot to one color. Kinematics, inertias,
+joint limits and collision meshes come from the FR3v2 description. License and
+provenance are retained in the ignored <code class="docutils literal notranslate"><span class="pre">assets/robots/fr3v2</span></code> cache. <code class="docutils literal notranslate"><span class="pre">--source</span></code>
+accepts a local upstream checkout. The older bundled Panda remains available
+with <code class="docutils literal notranslate"><span class="pre">--robot</span> <span class="pre">panda</span></code>; its <code class="docutils literal notranslate"><span class="pre">panda_grasptarget</span></code> frame is calibrated separately.</p>
+<p>The simulation uses contact friction, with no fixed grasp constraints or object
+teleportation. Candidate screening saves/restores the simulator to test IK poses;
+execution moves the robot with motors and corrects measured placement drift.
+The JSON report checks bilateral finger contact, achieved lift height, final
+placement error, and records rejected candidates and selection costs.
+The overhead transfer still uses interpolated Cartesian waypoints and IK;
+replace that routine with cuRobo/MoveIt for general collision-aware arm planning.</p>
+<p><code class="docutils literal notranslate"><span class="pre">grasp_sampler.integrations.pybullet.draw_grasps</span></code> exposes the same reusable
+collision-free glyphs for other PyBullet scenes. Pass sampler-local grasps and
+their object world pose, a selected index and rejected indices; remove the
+returned body IDs when changing candidates. Do not pass flange poses as TCP
+glyph poses.
+The separate <code class="docutils literal notranslate"><span class="pre">pybullet_sim.collision_filter</span></code> still provides nominal gripper-body
+screening for arbitrary meshes.</p>
+<p>Reference: <a class="reference external" href="https://pybullet-planning.readthedocs.io/en/latest/reference/generated/pybullet_planning.interfaces.kinematics.compute_inverse_kinematics.html">pybullet-planning tool-pose IK</a>.</p>
+</section>
+<section id="mujoco">
+<h2>MuJoCo<a class="headerlink" href="#mujoco" title="Link to this heading">¶</a></h2>
+<p>For the default <strong>FR3v2 lateral tier-to-tier and tabletop demonstration</strong>, use the existing mesh
+assets and setup in <a class="reference internal" href="scenarios.html"><span class="doc">Constrained shelf retrieval and transfer</span></a>. It includes native physics, a live grasp
+selection glyphs, source material colors, and recorded physical outcomes.
+Prepare it with <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">tools/prepare_fr3_mujoco.py</span></code> after installing the <code class="docutils literal notranslate"><span class="pre">mujoco</span></code>
+and <code class="docutils literal notranslate"><span class="pre">fr3</span></code> extras. On macOS run its viewer with <code class="docutils literal notranslate"><span class="pre">mjpython</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">solve_site_ik(model,</span> <span class="pre">data,</span> <span class="pre">site_name,</span> <span class="pre">target_pose,</span> <span class="pre">joint_names,</span> <span class="pre">seed=...)</span></code> offers
+non-mutating damped Jacobian IK for named hinge/slide joints. Its result preserves
+joint order, limit-respecting positions, success status, position/orientation
+residuals and iteration count. Targets are world transforms; it does not perform
+collision checks or motion planning. The demo screens its results separately in
+a scratch <code class="docutils literal notranslate"><span class="pre">MjData</span></code> and drives the native model’s actuators for execution.</p>
+<p>Install <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">&quot;.[mujoco]&quot;</span></code> for the official <code class="docutils literal notranslate"><span class="pre">mujoco</span></code> bindings.
+<code class="docutils literal notranslate"><span class="pre">to_mujoco</span></code> exports world positions and <strong>wxyz</strong> quaternions without importing
+MuJoCo. For models that use mocap goals:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">grasp_sampler.integrations.mujoco</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_mocap_target</span><span class="p">,</span> <span class="n">site_world_pose</span><span class="p">,</span> <span class="n">to_mujoco</span>
+
+<span class="n">positions</span><span class="p">,</span> <span class="n">quaternions</span> <span class="o">=</span> <span class="n">to_mujoco</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;pregrasp&quot;</span><span class="p">)</span>
+<span class="n">set_mocap_target</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="s2">&quot;gripper_target&quot;</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;pregrasp&quot;</span><span class="p">)</span>
+<span class="n">actual_tcp</span> <span class="o">=</span> <span class="n">site_world_pose</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="s2">&quot;tcp_site&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">set_mocap_target</span></code> validates the named body and updates its mocap arrays, then
+calls <code class="docutils literal notranslate"><span class="pre">mj_forward</span></code>. It does not modify qpos or controls. Your scene must provide
+the mocap body and the weld/controller connecting it to the robot. The controlled
+body/site needs the same tool calibration used to construct the targets.
+For joint-driven controllers or external IK (e.g. a MuJoCo site IK controller),
+use the exported matrices/arrays as Cartesian goals instead. <code class="docutils literal notranslate"><span class="pre">site_world_pose</span></code>
+refreshes FK and reads a named site’s current transform without overwriting it.</p>
+<p><code class="docutils literal notranslate"><span class="pre">examples/mujoco_targets.py</span> <span class="pre">/tmp/grasps.json</span></code> checks every stage with a minimal
+mocap/site model, headlessly. See MuJoCo’s <a class="reference external" href="https://mujoco.readthedocs.io/en/latest/programming/simulation.html">pose and mocap conventions</a>.</p>
+</section>
+<section id="mplib-sapien-and-other-planners">
+<h2>MPlib / SAPIEN, and other planners<a class="headerlink" href="#mplib-sapien-and-other-planners" title="Link to this heading">¶</a></h2>
+<p>Install <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">&quot;.[mplib]&quot;</span></code> in a compatible MPlib environment:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">grasp_sampler.integrations.mplib</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_mplib</span>
+
+<span class="n">goal</span> <span class="o">=</span> <span class="n">to_mplib</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;pregrasp&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">planner</span><span class="o">.</span><span class="n">plan_pose</span><span class="p">(</span><span class="n">goal</span><span class="p">,</span> <span class="n">current_qpos</span><span class="p">,</span> <span class="n">wrt_world</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># Check result[&quot;status&quot;] == &quot;Success&quot; before consuming its trajectory.</span>
+</pre></div>
+</div>
+<p>MPlib poses use wxyz quaternions. Set the planner’s robot base pose consistently
+and export world targets for <code class="docutils literal notranslate"><span class="pre">wrt_world=True</span></code>, or base-frame targets for
+<code class="docutils literal notranslate"><span class="pre">wrt_world=False</span></code>. SAPIEN applications using MPlib can consume these same goals.
+See the official <a class="reference external" href="https://motion-planning-lib.readthedocs.io/latest/reference/Planner.html">Planner</a>
+and <a class="reference external" href="https://motion-planning-lib.readthedocs.io/v0.2.0a1/reference/utils/pose.html">Pose conventions</a>.</p>
+<p>Other Cartesian IK stacks can consume <code class="docutils literal notranslate"><span class="pre">targets.poses(stage)</span></code> or
+<code class="docutils literal notranslate"><span class="pre">targets.components(stage,</span> <span class="pre">quaternion_order=...)</span></code>. OMPL itself plans in a
+configured state space; use IK to map these targets to robot joint states before
+calling its joint-space planner. This library leaves robot models, collision
+worlds, joint ordering, timing, and execution under the application’s control.</p>
+</section>
+<section id="portable-export">
+<h2>Portable export<a class="headerlink" href="#portable-export" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">PYTHONPATH</span><span class="o">=</span>src<span class="w"> </span>python<span class="w"> </span>examples/export_planning.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>assets/meshes/pocky_box_metric_fp.glb<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--object-position<span class="w"> </span>.5<span class="w"> </span><span class="m">0</span><span class="w"> </span>.2<span class="w"> </span>--frame-id<span class="w"> </span>panda_link0<span class="w"> </span>--tool-link<span class="w"> </span>panda_link8<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--panda-flange<span class="w"> </span>--output<span class="w"> </span>/tmp/grasps.json
+</pre></div>
+</div>
+<p>Object position/quaternion describe the source/file frame in world coordinates.
+The optional <code class="docutils literal notranslate"><span class="pre">--world-to-frame</span></code> and <code class="docutils literal notranslate"><span class="pre">--tcp-to-tool</span></code> inputs are JSON 4x4 matrices;
+<code class="docutils literal notranslate"><span class="pre">--object-quaternion</span></code> uses xyzw. Without a tool calibration, the output targets
+the sampler TCP. Without a frame transform, output coordinates remain world
+coordinates regardless of the frame label supplied.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">grasp_sampler</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlanningGrasps</span>
+
+<span class="n">Path</span><span class="p">(</span><span class="s2">&quot;grasps.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">targets</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()))</span>
+<span class="n">restored</span> <span class="o">=</span> <span class="n">PlanningGrasps</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;grasps.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()))</span>
+</pre></div>
+</div>
+<p>The versioned schema stores frame/tool labels, metre units, candidate IDs, jaw
+widths, optional validation scores, and all three 4x4 pose batches. Empty batches
+round-trip. Unknown schema versions/units and malformed transforms are rejected.</p>
+</section>
+<section id="validation-scope">
+<h2>Validation scope<a class="headerlink" href="#validation-scope" title="Link to this heading">¶</a></h2>
+<p>The tests cover nontrivial base/tool rotations and translations, source mesh
+normalization, fixed robust commands, filtering/serialization, quaternion orders,
+and both cuRobo batch layouts. Optional tests exercise actual PyBullet FK/IK and
+MuJoCo mocap/site round trips. cuRobo constructor tests use real CPU PyTorch with
+public-constructor test doubles; MoveIt and MPlib message/pose contracts use test
+doubles. These checks do not substitute for CUDA planning or a configured ROS
+robot integration run. The PyBullet demo’s report records its physical execution.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="scenarios.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Constrained shelf retrieval and transfer</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="usage.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Usage</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, grasp-sampler contributors
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Robot planning and simulation</a><ul>
+<li><a class="reference internal" href="#frames-and-calibration">Frames and calibration</a></li>
+<li><a class="reference internal" href="#preserve-robustness-decisions">Preserve robustness decisions</a></li>
+<li><a class="reference internal" href="#curobo-current-api-and-legacy-0-7">cuRobo: current API and legacy 0.7</a></li>
+<li><a class="reference internal" href="#moveit-2-ros-2">MoveIt 2 / ROS 2</a></li>
+<li><a class="reference internal" href="#pybullet-pybullet-planning">PyBullet / pybullet-planning</a></li>
+<li><a class="reference internal" href="#mujoco">MuJoCo</a></li>
+<li><a class="reference internal" href="#mplib-sapien-and-other-planners">MPlib / SAPIEN, and other planners</a></li>
+<li><a class="reference internal" href="#portable-export">Portable export</a></li>
+<li><a class="reference internal" href="#validation-scope">Validation scope</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>
