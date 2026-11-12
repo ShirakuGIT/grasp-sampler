@@ -28,7 +28,7 @@ The scenes use original textured workspace scans in `assets/household/`.
 YCB objects retain source UV coordinates and texture pixels. The Ritz box retains
 the existing decimated geometry, with original dense reconstruction vertex colors
 baked onto a UV atlas. No object palette overrides these appearances. See
-[asset attribution and preparation](https://github.com/ShirakuGIT/grasp-sampler/blob/feat/planner-integrations/assets/household/README.md).
+[asset attribution and preparation](https://github.com/ShirakuGIT/grasp-sampler/blob/master/assets/household/README.md).
 
 Mug, cup and plate contact geometry consists of separate CoACD convex pieces,
 leaving the handle opening and vessel cavities unfilled. Grasp sampling uses their
@@ -97,8 +97,7 @@ PYTHONPATH=src python examples/pick_place_mujoco.py --headless \
     --report /tmp/shelf-picks.json --snapshot /tmp/shelf.png
 ```
 
-The [household run](results/mujoco-household-pick-place.json) and
-[classic MuJoCo run](results/mujoco-shelf-pick-place.json) check force-bearing bilateral
+The household and classic MuJoCo runs check force-bearing bilateral
 finger contact and a lift of at least 8 cm above the initial object height.
 Placement requires load-bearing contact on the requested tier/table, separation
 from the gripper, low settling velocity, a bottom height within 15 mm of the
@@ -126,17 +125,17 @@ The requested frame rate is a target, not a hardware-independent guarantee.
 JAX/MJX is useful for batched simulation workloads; this single native viewer
 uses the existing CPU solver and does not introduce a JAX dependency.
 
-The [expanded seven-object physical run](results/mujoco-expanded-pick-place.json)
+The expanded seven-object physical run
 completed all seven transfers, including three lower-to-upper shelf placements.
 Maximum XY placement error was 3.82 cm against the unchanged 4 cm tolerance.
 The run requires bilateral finger forces, an 8 cm lift, released and settled
 load-bearing contact on the requested support, and the correct object-bottom
-height. [Expanded scene snapshot](results/mujoco-expanded.png).
+height. The recording above shows the full scene and transfers.
 
 A local M4 / Retina timing check measured 60.0 scene updates per second, with
 a 95th-percentile update interval of 16.94 ms, after removing bitmap-text HUDs,
 disabling the table mirror pass, and using 2048-pixel shadows. The earlier loop
-measured 27.1 updates/s. The [timing record](results/mujoco-viewer-timing.json) measures scene-state
+measured 27.1 updates/s. These measurements describe scene-state
 synchronization, not physical display presentation; performance depends on the machine and workload.
 
 ## Arm mounting and curved vase

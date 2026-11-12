@@ -58,8 +58,8 @@ Lighting is neutral, and objects receive no palette tint.
 Objects, grasp TCPs and jaw openings share the **same original metre scale**.
 There is no per-object size normalization. The Franka gripper has a hard
 **80 mm maximum opening**; `--jaw-width` can request a smaller opening.
-The larger master-chef can has no feasible candidates at that width in the saved
-[40-asset audit](results/grasp-gallery-audit.json); that cell has no grasp glyphs.
+The larger master-chef can has no feasible candidates at that width in the
+40-object gallery; that cell has no grasp glyphs.
 These are geometric grasp proposals, not robot IK, collision-screened motion
 plans or verified physical picks. Glyph finger/stem lengths are schematic;
 TCP positions, orientation and jaw opening follow the actual sampler outputs.
@@ -73,26 +73,24 @@ pip install -e ".[mujoco,fr3]" "mujoco==3.17.0"
 PYTHONPATH=src python examples/grasp_gallery.py --headless --once \
   --seconds 60 --fps 30 --batches 8 \
   --record docs/_static/videos/grasp-gallery-live.mp4 \
-  --report docs/results/grasp-gallery-recording.json
+  --report /tmp/grasp-gallery-recording.json
 PYTHONPATH=src python examples/pick_place_mujoco.py --headless \
   --fps 30 --speed 2 --record docs/_static/videos/mujoco-live-pick-place.mp4 \
-  --report docs/results/mujoco-recording-pick-place.json
+  --report /tmp/mujoco-recording-pick-place.json
 ```
 
 The gallery recording uses the same live worker loop as the interactive viewer;
 candidate sets are generated during capture. Without `--record`, `--headless`
 retains the faster asset-audit behavior. `--once` stops after a complete gallery
 revolution and all requested batches. The MP4s use H.264, 30 FPS and progressive
-loading. The [gallery capture report](results/grasp-gallery-recording.json)
-records all 320 batch arrival times in video seconds.
+loading. The optional gallery report records batch arrival times in video seconds.
 
 The robot recording samples each object's current settled pose, displays the
 candidate and selected grasp sets, and captures the native physics run at 2×.
 Selection holds freeze physics just as they do in the interactive viewer.
 Physics retains its 2 ms timestep. These recordings use MuJoCo 3.17.0; physical
-outcomes can vary across simulator versions. The accompanying
-[physical report](results/mujoco-recording-pick-place.json) records measured
-contacts, lifts and placements for this capture.
+outcomes can vary across simulator versions. The optional physical report records
+measured contacts, lifts and placements for each capture.
 
 ## Interactive uncertainty viewer
 

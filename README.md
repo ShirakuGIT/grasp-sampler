@@ -95,7 +95,7 @@ candidates, coral marks rejections, and gold highlights the selection and staged
 extraction path. Selection costs and rejection reasons are saved in the JSON
 report; the viewer keeps the scene free of text panels and charts.
 
-![MuJoCo FR3v2 with original household scan textures](docs/results/mujoco-expanded.png)
+![MuJoCo FR3v2 with original household scan textures](docs/_static/videos/mujoco-live-pick-place.jpg)
 
 [Watch the freshly sampled MuJoCo demonstration and live grasp gallery](https://shivaram.net/grasp-sampler/).
 The [robot MP4](docs/_static/videos/mujoco-live-pick-place.mp4) and
@@ -233,6 +233,26 @@ examples/
   visualize.py    generate + view
   robust_grasp_demo.py, visualize_robust.py, visualize_robust_set.py
 ```
+
+## Publish the documentation
+
+The website serves prebuilt HTML from the `gh-pages` branch. To rebuild locally:
+
+```bash
+pip install -e ".[docs]"
+PYTHONPATH=src python tools/publish_docs.py
+```
+
+Preview `docs/_build/html/`, then commit source changes and publish with:
+
+```bash
+PYTHONPATH=src python tools/publish_docs.py --publish
+```
+
+The publisher creates a fresh Sphinx build and pushes only generated website
+files, including the demo videos, to `gh-pages`. GitHub Pages serves the branch
+root with Jekyll disabled. The optional docs Action only validates pull requests;
+it does not publish the website.
 
 ## License
 

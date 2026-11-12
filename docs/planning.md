@@ -203,8 +203,6 @@ adding another flange standoff. Cyan candidate glyphs, coral rejections, a gold
 selection, and an enlarged inspection model show the actual candidates. Phase
 labels follow sampling, screening, approach, closure, lift, transfer and release.
 
-![Official FR3v2, tabletop fixtures, grasp candidates and enlarged inspector](results/fr3-workstation.png)
-
 ```bash
 pip install -e ".[sim,fr3]"
 python tools/prepare_fr3.py
@@ -227,7 +225,6 @@ teleportation. Candidate screening saves/restores the simulator to test IK poses
 execution moves the robot with motors and corrects measured placement drift.
 The JSON report checks bilateral finger contact, achieved lift height, final
 placement error, and records rejected candidates and selection costs.
-[A recorded run](results/pybullet-pick-place.json) preserves the measured outcomes.
 The overhead transfer still uses interpolated Cartesian waypoints and IK;
 replace that routine with cuRobo/MoveIt for general collision-aware arm planning.
 
