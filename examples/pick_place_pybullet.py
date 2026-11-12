@@ -36,7 +36,6 @@ class Demo:
         floor = p.loadURDF("plane.urdf")
         p.changeVisualShape(floor, -1, textureUniqueId=-1, rgbaColor=[.12, .15, .19, 1])
         self.fixtures, self.place_surface = build_workstation()
-        self.robot_name = robot
         urdf = (Path(__file__).resolve().parents[1] / "assets/robots/fr3v2/fr3v2.urdf"
                 if robot == "fr3v2" else "franka_panda/panda.urdf")
         if robot == "fr3v2" and not urdf.exists():

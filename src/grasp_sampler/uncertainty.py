@@ -13,18 +13,24 @@ import numpy as np
 import trimesh
 from scipy.spatial.transform import Rotation
 
+# Preserve the existing import path while geometry owns transform validation.
+from .transforms import validate_pose as validate_pose
 
-def validate_pose(value):
-    pose = np.asarray(value, float)
+
+def _normalized_weights(hypotheses) -> np.ndarray:
+    """Validate one hypothesis bank's weights before normalizing them."""
+    weights = np.asarray([h.weight for h in hypotheses], float)
+    with np.errstate(over="ignore", invalid="ignore"):
+        total = weights.sum()
     if (
-        pose.shape != (4, 4)
-        or not np.isfinite(pose).all()
-        or not np.allclose(pose[3], [0, 0, 0, 1])
-        or not np.allclose(pose[:3, :3].T @ pose[:3, :3], np.eye(3), atol=1e-7)
-        or not np.isclose(np.linalg.det(pose[:3, :3]), 1)
+        not len(weights)
+        or not np.isfinite(weights).all()
+        or (weights < 0).any()
+        or not np.isfinite(total)
+        or total <= 0
     ):
-        raise ValueError("pose must be a finite 4x4 SE(3) transform")
-    return pose.copy()
+        raise ValueError("hypotheses need finite nonnegative weights with positive finite total")
+    return weights / total
 
 
 def _vector(value, name):

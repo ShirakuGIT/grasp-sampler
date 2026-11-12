@@ -18,14 +18,17 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from .collision import bodies_clear, friction_cones_valid, ray_cast_proxy
+from .transforms import validate_pose
 from .types import ContactGeometryPolicy, GraspConfig
-from .uncertainty import validate_pose
+from .uncertainty import _normalized_weights
 
 _DEFAULT_MAX_ROTATION = np.deg2rad(5)
 
 
 @dataclass
 class FixedGraspResult:
+    """One fixed command's validity, failure reason and mesh-local contacts."""
+
     valid: bool
     reason: str
     contact_width: float | None = None
@@ -157,10 +160,6 @@ class GeometricGraspBackend:
 class SymmetricPointBackend(GeometricGraspBackend):
     """Named baseline backend: the original symmetric point-contact model."""
 
-    def __init__(self, config=None, **kwargs):
-        kwargs.setdefault("contact_tolerance", 0.002)
-        super().__init__(config, **kwargs)
-
 
 class FinitePadFixedObjectBackend(GeometricGraspBackend):
     """Finite contact-pad approximation with the object held fixed.
@@ -201,8 +200,12 @@ class FinitePadQuasistaticBackend(FinitePadFixedObjectBackend):
         **kwargs,
     ):
         super().__init__(config, **kwargs)
-        if max_object_translation < 0 or max_object_rotation < 0:
-            raise ValueError("quasistatic bounds must be nonnegative")
+        if (
+            not np.isfinite([max_object_translation, max_object_rotation]).all()
+            or max_object_translation < 0
+            or max_object_rotation < 0
+        ):
+            raise ValueError("quasistatic bounds must be finite and nonnegative")
         self.max_object_translation = float(max_object_translation)
         self.max_object_rotation = float(max_object_rotation)
 
@@ -260,6 +263,8 @@ class FinitePadQuasistaticBackend(FinitePadFixedObjectBackend):
 
 @dataclass
 class HypothesisGraspResult:
+    """One hypothesis outcome, retaining both world and object-local commands."""
+
     success: bool
     weight: float
     world_gripper_command: np.ndarray
@@ -270,6 +275,12 @@ class HypothesisGraspResult:
 
 @dataclass
 class RobustGraspResult:
+    """Aggregate validity frequencies and every evaluated fixed-command outcome.
+
+    Weighted success normalizes the bank's weights. Worst-case validity includes
+    zero-weight hypotheses. Neither quantity is a dynamic grasp guarantee.
+    """
+
     success_probability: float
     weighted_success_probability: float
     worst_case_valid: bool
@@ -291,25 +302,31 @@ class RobustGraspEvaluator:
     fixed opening. Contact tolerance approximates finite pad compliance only.
     """
 
-    def __init__(self, nominal_mesh, config=None, *, backend=None, opening_width=None, **backend_options):
+    def __init__(
+        self,
+        nominal_mesh,
+        config=None,
+        *,
+        backend: ValidityBackend | None = None,
+        opening_width=None,
+        **backend_options,
+    ):
         self.nominal_mesh = nominal_mesh
         self.config = config or GraspConfig()
-        self.backend = backend or GeometricGraspBackend(self.config, **backend_options)
+        if backend is not None and backend_options:
+            raise ValueError(
+                "backend_options configure the default backend; configure a custom backend directly"
+            )
+        self.backend: ValidityBackend = (
+            GeometricGraspBackend(self.config, **backend_options) if backend is None else backend
+        )
         self.opening_width = self.config.gripper_max_width if opening_width is None else opening_width
 
-    def evaluate(self, grasp, *, nominal_object_pose, hypotheses):
+    def evaluate(self, grasp, *, nominal_object_pose, hypotheses) -> RobustGraspResult:
         nominal_pose = validate_pose(nominal_object_pose)
         command = nominal_pose @ validate_pose(grasp.pose)  # ONCE, outside loop
         hypotheses = list(hypotheses)
-        weights = np.array([h.weight for h in hypotheses], float)
-        if (
-            not len(weights)
-            or not np.isfinite(weights).all()
-            or (weights < 0).any()
-            or not np.isfinite(weights.sum())
-            or weights.sum() <= 0
-        ):
-            raise ValueError("hypotheses need finite nonnegative weights with positive total")
+        weights = _normalized_weights(hypotheses)
 
         def check(mesh, pose):
             return self.backend.evaluate(
@@ -328,26 +345,33 @@ class RobustGraspEvaluator:
             validity = check(h.mesh, pose)
             outcomes.append(
                 HypothesisGraspResult(
-                    validity.valid, h.weight, command.copy(), relative, validity, dict(h.metadata)
+                    success=validity.valid,
+                    weight=h.weight,
+                    world_gripper_command=command.copy(),
+                    object_gripper_command=relative,
+                    validity=validity,
+                    metadata=dict(h.metadata),
                 )
             )
         successes = np.array([r.success for r in outcomes], bool)
         return RobustGraspResult(
-            float(successes.mean()),
-            float(np.dot(weights / weights.sum(), successes)),
-            bool(successes.all()),
-            int(successes.sum()),
-            len(outcomes),
-            nominal.valid,
-            outcomes,
-            nominal,
-            command.copy(),
-            {"fixed_world_command": True, "opening_width": self.opening_width},
+            success_probability=float(successes.mean()),
+            weighted_success_probability=float(np.dot(weights, successes)),
+            worst_case_valid=bool(successes.all()),
+            num_successes=int(successes.sum()),
+            num_hypotheses=len(outcomes),
+            nominal_valid=nominal.valid,
+            per_hypothesis_results=outcomes,
+            nominal_result=nominal,
+            world_gripper_command=command.copy(),
+            metadata={"fixed_world_command": True, "opening_width": self.opening_width},
         )
 
 
 @dataclass
 class RankedGrasp:
+    """Original candidate index and nominal score paired with its evaluation."""
+
     grasp_id: int
     nominal_score: float | None
     result: RobustGraspResult

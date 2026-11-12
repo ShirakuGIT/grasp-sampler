@@ -16,6 +16,24 @@ from .types import Grasp
 _TCP_TO_PANDA_EE = np.array([[0.0, 1.0, 0.0], [-1.0, 0.0, 0.0], [0.0, 0.0, 1.0]], float)
 
 
+def validate_pose(value) -> np.ndarray:
+    """Return an independent copy of a finite, rigid (4, 4) transform.
+
+    Reject scale, shear, reflections and invalid homogeneous coordinates.
+    This shared boundary check keeps planning independent of uncertainty models.
+    """
+    pose = np.asarray(value, float)
+    if (
+        pose.shape != (4, 4)
+        or not np.isfinite(pose).all()
+        or not np.allclose(pose[3], [0, 0, 0, 1])
+        or not np.allclose(pose[:3, :3].T @ pose[:3, :3], np.eye(3), atol=1e-7)
+        or not np.isclose(np.linalg.det(pose[:3, :3]), 1)
+    ):
+        raise ValueError("pose must be a finite 4x4 SE(3) transform")
+    return pose.copy()
+
+
 def stack_poses(grasps: list[Grasp]) -> np.ndarray:
     """Collect ``Grasp.pose`` matrices into a single (N, 4, 4) array."""
     if not grasps:

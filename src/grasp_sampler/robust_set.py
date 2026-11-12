@@ -16,9 +16,10 @@ from typing import Literal, NamedTuple, get_args
 import numpy as np
 
 from .antipodal import antipodal_grasps
-from .robust import GeometricGraspBackend
+from .robust import GeometricGraspBackend, ValidityBackend
+from .transforms import validate_pose
 from .types import Grasp, GraspConfig, ObjMesh
-from .uncertainty import ObjectHypothesis, sample_hypotheses, validate_pose
+from .uncertainty import ObjectHypothesis, _normalized_weights, sample_hypotheses
 
 Strategy = Literal["failure_guided", "nominal", "representative", "blind_pooling"]
 _STRATEGIES = get_args(Strategy)
@@ -28,6 +29,13 @@ _ROUND_SEED_STRIDE = {"failure_guided": 1009, "representative": 2003, "blind_poo
 
 @dataclass
 class RobustSetConfig:
+    """Proposal budget, command deduplication and validation selection policy.
+
+    Distances are metres and angles are radians. ``jaw_symmetry`` treats a
+    180-degree closing-axis reversal as the same parallel-jaw command for both
+    deduplication and diversity. Set it False for asymmetric grippers.
+    """
+
     candidate_budget: int = 1000
     nominal_fraction: float = 0.7
     augmentation_rounds: int = 2
@@ -42,18 +50,33 @@ class RobustSetConfig:
     require_nominal_valid: bool = False
 
     def __post_init__(self):
-        if not isinstance(self.candidate_budget, int) or self.candidate_budget < 1:
-            raise ValueError("candidate_budget must be positive")
+        for name, minimum in (
+            ("candidate_budget", 1),
+            ("augmentation_rounds", 0),
+            ("guided_hypotheses_per_round", 1),
+            ("max_validation_candidates", 0),
+        ):
+            value = getattr(self, name)
+            if name == "max_validation_candidates" and value is None:
+                continue
+            if isinstance(value, bool) or not isinstance(value, (int, np.integer)) or value < minimum:
+                raise ValueError(f"{name} must be an integer >= {minimum}")
         if not 0 <= self.nominal_fraction <= 1:
             raise ValueError("nominal_fraction must lie in [0,1]")
         if self.strategy not in _STRATEGIES:
             raise ValueError(f"unknown strategy: {self.strategy!r}")
-        if self.augmentation_rounds < 0 or self.guided_hypotheses_per_round < 1:
-            raise ValueError("invalid augmentation settings")
+        for name in ("dedup_translation", "dedup_angle", "diversity_translation", "diversity_angle"):
+            value = getattr(self, name)
+            if not np.isfinite(value) or value < 0:
+                raise ValueError(f"{name} must be finite and nonnegative")
+        if self.dedup_angle > np.pi or self.diversity_angle > np.pi:
+            raise ValueError("angular tolerances must not exceed pi radians")
 
 
 @dataclass
 class RobustCandidate:
+    """Nominal-frame grasp and its fixed world command, with proposal provenance."""
+
     grasp: Grasp
     world_command: np.ndarray
     sources: list[str] = field(default_factory=list)
@@ -62,6 +85,8 @@ class RobustCandidate:
 
 @dataclass
 class RobustCandidateRecord:
+    """Search/validation diagnostics; acceptance depends on validation_R only."""
+
     candidate: RobustCandidate
     search_R: float
     validation_R: float | None
@@ -75,6 +100,8 @@ class RobustCandidateRecord:
 
 @dataclass
 class RobustGraspSetResult:
+    """Diverse accepted records, all evaluated records and generation diagnostics."""
+
     selected: list[RobustCandidateRecord]
     records: list[RobustCandidateRecord]
     diagnostics: dict
@@ -114,10 +141,7 @@ def _make_bank(values) -> _Bank:
     hypotheses = [v if isinstance(v, ObjectHypothesis) else ObjectHypothesis(*v) for v in values]
     if not hypotheses:
         raise ValueError("hypothesis bank cannot be empty")
-    weights = np.asarray([h.weight for h in hypotheses], float)
-    if not np.isfinite(weights).all() or (weights < 0).any() or weights.sum() <= 0:
-        raise ValueError("hypothesis weights must be finite, nonnegative and nonzero")
-    return _Bank(hypotheses, weights / weights.sum())
+    return _Bank(hypotheses, _normalized_weights(hypotheses))
 
 
 def _as_obj_mesh(mesh):
@@ -144,11 +168,12 @@ def _jaw_flip_distance(a, b):
 def _dedup(candidates, cfg):
     """Merge candidates whose commands agree within the dedup tolerances (first wins)."""
     unique = []
+    distance = _jaw_flip_distance if cfg.jaw_symmetry else _rot_distance
     for c in candidates:
         for kept in unique:
             offset = np.linalg.norm(c.world_command[:3, 3] - kept.world_command[:3, 3])
             close = offset <= cfg.dedup_translation
-            if close and _jaw_flip_distance(c.world_command, kept.world_command) <= cfg.dedup_angle:
+            if close and distance(c.world_command, kept.world_command) <= cfg.dedup_angle:
                 kept.duplicate_count += 1 + c.duplicate_count
                 kept.sources = list(dict.fromkeys(kept.sources + c.sources))
                 break
@@ -159,9 +184,10 @@ def _dedup(candidates, cfg):
 
 def _is_diverse(record, selected, cfg):
     a = record.candidate.world_command
+    distance = _jaw_flip_distance if cfg.jaw_symmetry else _rot_distance
     return all(
         np.linalg.norm(a[:3, 3] - q.candidate.world_command[:3, 3]) > cfg.diversity_translation
-        or _rot_distance(a, q.candidate.world_command) > cfg.diversity_angle
+        or distance(a, q.candidate.world_command) > cfg.diversity_angle
         for q in selected
     )
 
@@ -195,15 +221,15 @@ def _generate(source, nominal_pose, cap, samples, seed, source_id, grasp_config)
     ]
 
 
-def _score_candidate(candidate, bank, backend, opening, nominal_pose) -> _Score:
+def _score_candidate(candidate, bank, backend: ValidityBackend, opening, nominal_pose) -> _Score:
     """Evaluate the candidate's fixed world command on every hypothesis in ``bank``."""
     outcomes = [
         backend.evaluate(
             h.mesh,
-            object_world_pose=h.world_pose,
-            world_gripper_command=candidate.world_command,
+            object_world_pose=h.world_pose.copy(),
+            world_gripper_command=candidate.world_command.copy(),
             opening_width=opening,
-            nominal_object_pose=nominal_pose,
+            nominal_object_pose=nominal_pose.copy(),
         )
         for h in bank.hypotheses
     ]
@@ -286,7 +312,11 @@ def _collect_raw_candidates(mesh, nominal_pose, scorer, cfg, grasp_config, seed)
             remaining = cfg.candidate_budget - len(raw)
             if remaining <= 0:
                 break
-            raw += propose(round_id, remaining)
+            proposals = propose(round_id, remaining)[:remaining]
+            if cfg.strategy == "failure_guided":
+                for candidate in proposals:
+                    scorer.score(candidate)
+            raw += proposals
     return raw[: cfg.candidate_budget], usage
 
 
@@ -297,10 +327,10 @@ def _rank_on_search_bank(unique, scorer, mesh, cfg):
             scorer.score(c),
             scorer.backend.evaluate(
                 mesh,
-                object_world_pose=scorer.nominal_pose,
-                world_gripper_command=c.world_command,
+                object_world_pose=scorer.nominal_pose.copy(),
+                world_gripper_command=c.world_command.copy(),
                 opening_width=scorer.opening,
-                nominal_object_pose=scorer.nominal_pose,
+                nominal_object_pose=scorer.nominal_pose.copy(),
             ).valid,
         )
         for c in unique
@@ -338,7 +368,9 @@ def _resolve_banks(
             )
 
         search_hypotheses = sample(hypothesis_count, streams[0])
-        validation_hypotheses = sample(validation_count or hypothesis_count, streams[1])
+        if validation_hypotheses is None:
+            count = hypothesis_count if validation_count is None else validation_count
+            validation_hypotheses = sample(count, streams[1])
     elif validation_hypotheses is None:
         raise ValueError("validation_hypotheses is required when search_hypotheses is supplied")
     return _make_bank(search_hypotheses), _make_bank(validation_hypotheses)
@@ -358,7 +390,7 @@ def generate_robust_grasp_set(
     geometry_uncertainty=None,
     config=None,
     grasp_config=None,
-    backend=None,
+    backend: ValidityBackend | None = None,
     opening_width=None,
     seed=0,
 ):
@@ -370,7 +402,12 @@ def generate_robust_grasp_set(
     """
     cfg = config or RobustSetConfig()
     gcfg = grasp_config or GraspConfig(contact_geometry_policy="mesh")
-    if requested_count < 1 or not 0 <= robustness_threshold <= 1:
+    if (
+        isinstance(requested_count, bool)
+        or not isinstance(requested_count, (int, np.integer))
+        or requested_count < 1
+        or not 0 <= robustness_threshold <= 1
+    ):
         raise ValueError("invalid requested_count or threshold")
     nominal_pose = validate_pose(estimated_pose)
     search, validation = _resolve_banks(
@@ -384,7 +421,7 @@ def generate_robust_grasp_set(
         geometry_uncertainty,
         seed,
     )
-    backend = backend or GeometricGraspBackend(gcfg)
+    backend = GeometricGraspBackend(gcfg) if backend is None else backend
     opening = gcfg.gripper_max_width if opening_width is None else opening_width
     scorer = _SearchScorer(search, backend, opening, nominal_pose)
 
@@ -398,15 +435,15 @@ def generate_robust_grasp_set(
         v = _score_candidate(r.candidate, validation, backend, opening, nominal_pose)
         records.append(
             RobustCandidateRecord(
-                r.candidate,
-                r.score.weighted,
-                v.weighted,
-                r.score.successes,
-                v.successes,
-                r.score.failures,
-                v.failures,
-                v.weighted >= robustness_threshold,
-                r.nominal_valid,
+                candidate=r.candidate,
+                search_R=r.score.weighted,
+                validation_R=v.weighted,
+                search_successes=r.score.successes,
+                validation_successes=v.successes,
+                search_failures=r.score.failures,
+                validation_failures=v.failures,
+                accepted=v.weighted >= robustness_threshold,
+                nominal_valid=r.nominal_valid,
             )
         )
     accepted = [r for r in records if r.accepted]

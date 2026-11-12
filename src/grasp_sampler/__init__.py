@@ -24,6 +24,7 @@ from .robust import (
     RobustGraspEvaluator,
     RobustGraspResult,
     SymmetricPointBackend,
+    ValidityBackend,
     rank_grasps,
 )
 from .robust_set import (
@@ -33,8 +34,8 @@ from .robust_set import (
     RobustSetConfig,
     generate_robust_grasp_set,
 )
-from .sampler import GraspSampler
-from .transforms import stack_poses, tcp_to_ee, to_world
+from .sampler import GraspGenerator, GraspSampler
+from .transforms import stack_poses, tcp_to_ee, to_world, validate_pose
 from .types import Grasp, GraspConfig, ObjMesh
 from .uncertainty import GeometryUncertainty, ObjectHypothesis, PoseUncertainty, sample_hypotheses
 
@@ -42,6 +43,9 @@ __version__ = "0.1.0"
 
 __all__ = [
     "GraspSampler",
+    "GraspGenerator",
+    "ValidityBackend",
+    "validate_pose",
     "GraspConfig",
     "Grasp",
     "ObjMesh",

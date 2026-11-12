@@ -41,7 +41,7 @@ def antipodal_grasps(obj: ObjMesh, cfg: GraspConfig, rng: np.random.Generator | 
         contact = _opposing_contact(proxy, p1, n1, cone, cfg)
         if contact is None:
             continue
-        p2, _, width, closing = contact
+        p2, width, closing = contact
         center = 0.5 * (p1 + p2)
 
         for approach, facet_id in _approach_dirs(closing, facets, cfg):
@@ -91,7 +91,7 @@ def _opposing_contact(proxy, p1, n1, cone, cfg):
         closing = (locs[j] - p1) / width  # unit closing line p1 -> p2
         # Force closure: closing line inside both friction cones.
         if friction_cones_valid(n1, n2, closing, cone):
-            return locs[j], n2, width, closing
+            return locs[j], width, closing
     return None
 
 

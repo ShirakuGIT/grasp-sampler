@@ -8,7 +8,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from ..planning import PlanningGrasps, Stage
-from ..uncertainty import validate_pose
+from ..transforms import validate_pose
 
 
 @dataclass

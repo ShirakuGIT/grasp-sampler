@@ -43,7 +43,7 @@ class Workstation:
         self.speed, self.fps = speed, fps
         self.next_frame = 0.
         self.shapes = SUITES[suite][:count]
-        xml, self.objects, fixtures = build_scene(count, suite)
+        xml, self.objects, _ = build_scene(count, suite)
         self.model = mj.MjModel.from_xml_string(xml)
         self.data = mj.MjData(self.model)
         self.scratch = mj.MjData(self.model)
@@ -66,7 +66,6 @@ class Workstation:
                 if parent in self.robot_bodies:
                     self.robot_bodies.add(i); break
                 parent = self.model.body_parentid[parent]
-        self.fixture_ids = {self.model.geom(name).id for name in fixtures}
         self.home = np.array([0., -.8, 0., -2.3, 0., 1.6, .8])
         self.data.qpos[self.q_indices] = self.home
         self.data.ctrl[self.actuators] = self.home
@@ -82,7 +81,7 @@ class Workstation:
         self.planning_calls = 0
         self.grasps, self.world, self.selected = [], np.eye(4), None
         self.pick_path = []
-        self.rejected, self.costs, self.active_target = {}, {}, None
+        self.rejected, self.costs = {}, {}
         self.overlay_key = None
         self.frame_times = deque(maxlen=180)
         self.sync_times = deque(maxlen=180)
@@ -564,7 +563,6 @@ class Workstation:
             _, label, goal = self.objects[i]
             initial_height = float(self.data.xpos[self.body_ids[i], 2])
             self.active, self.selected, self.rejected, self.costs = i, None, {}, {}
-            self.active_target = None
             self.pick_path = []
             self.stage(f"SAMPLING / {label.upper()}")
             targets, self.grasps, self.world = self.make_targets(i)
@@ -574,7 +572,6 @@ class Workstation:
             self.stage("IK + COLLISION SCREEN")
             self.selected, self.rejected, self.costs = self.screen(targets)
             chosen = targets.select([self.selected])
-            self.active_target = chosen
             unseat = chosen.grasp[0].copy(); unseat[2, 3] += .015
             retreat = chosen.pregrasp[0].copy(); retreat[2, 3] = unseat[2, 3]
             lift = retreat.copy(); lift[2, 3] += .14 if i == 0 else .20

@@ -96,7 +96,7 @@ class RobustGraspViewer:
         self.radio.on_clicked(self._mode_changed)
         self.play_button.on_clicked(self._toggle_play)
         self.fail_button.on_clicked(self._next_failure)
-        self.fig.canvas.mpl_connect("close_event", lambda event: self.timer.stop())
+        self.fig.canvas.mpl_connect("close_event", lambda _event: self.timer.stop())
         self._compute_limits()
         self.draw()
 
@@ -222,14 +222,14 @@ class RobustGraspViewer:
         self.mode = value
         self.draw()
 
-    def _toggle_play(self, event):
+    def _toggle_play(self, _event):
         self.playing = not self.playing
         self.timer.start() if self.playing else self.timer.stop()
 
     def _tick(self):
         self.sample_slider.set_val((self.sample_index + 1) % len(self.modes[self.mode]))
 
-    def _next_failure(self, event):
+    def _next_failure(self, _event):
         outcomes = self._result().per_hypothesis_results
         indices = [i + 1 for i, r in enumerate(outcomes) if not r.success]
         if indices:

@@ -5,6 +5,8 @@
 ```{eval-rst}
 .. autoclass:: grasp_sampler.GraspSampler
    :members:
+
+.. autoclass:: grasp_sampler.GraspGenerator
 ```
 
 ## Data types
@@ -41,6 +43,7 @@
 .. autofunction:: grasp_sampler.stack_poses
 .. autofunction:: grasp_sampler.to_world
 .. autofunction:: grasp_sampler.tcp_to_ee
+.. autofunction:: grasp_sampler.validate_pose
 ```
 
 ## Planning targets and optional adapters
@@ -82,6 +85,7 @@ See {doc}`uncertainty` for the workflow.
 .. autoclass:: grasp_sampler.RobustSetConfig
 .. autofunction:: grasp_sampler.generate_robust_grasp_set
 .. autoclass:: grasp_sampler.RobustGraspSetResult
+.. autoclass:: grasp_sampler.ValidityBackend
 ```
 
 Validity backends: `GeometricGraspBackend`, `SymmetricPointBackend`,

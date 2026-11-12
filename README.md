@@ -236,6 +236,9 @@ examples/
 
 ## Publish the documentation
 
+For library changes and extension examples, see the [development guide](docs/development.md)
+and [contributing instructions](CONTRIBUTING.md).
+
 The website serves prebuilt HTML from the `gh-pages` branch. To rebuild locally:
 
 ```bash

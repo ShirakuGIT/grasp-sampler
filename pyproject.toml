@@ -26,7 +26,7 @@ mujoco = ["mujoco>=3.6", "Pillow>=9"]      # native viewer + original scan textu
 asset-prep = ["coacd==1.0.14", "Pillow>=9"] # offline household contact decomposition
 mplib = ["mplib>=0.2"]                     # MPlib / SAPIEN pose targets
 docs = ["sphinx>=7.0", "myst-parser>=2.0", "furo>=2024.1"]
-dev = ["pytest>=7.0", "ruff>=0.4"]
+dev = ["pytest>=7.0", "ruff>=0.4", "vulture>=2.14"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -45,3 +45,7 @@ select = ["E", "F", "W", "B", "I", "UP"]
 # Terse one-line test setup and example CLI argument lists read better unwrapped.
 "tests/*" = ["E501", "E702"]
 "examples/*" = ["E501", "E702"]
+
+[tool.vulture]
+paths = ["src", "tests", "examples", "tools", "vulture_whitelist.py"]
+min_confidence = 60

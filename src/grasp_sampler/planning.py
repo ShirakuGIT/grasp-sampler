@@ -13,9 +13,8 @@ from typing import Literal
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from .transforms import stack_poses
+from .transforms import stack_poses, validate_pose
 from .types import Grasp, ObjMesh
-from .uncertainty import validate_pose
 
 Stage = Literal["grasp", "pregrasp", "lift"]
 QuaternionOrder = Literal["xyzw", "wxyz"]

@@ -58,12 +58,12 @@ def top_grasps(
     return grasps
 
 
-# Per-face: (approach direction into the object, hand-offset direction, half-thickness)
+# Per-face: (approach direction into the object, hand-offset direction).
 _FACE_DEFS = {
-    0: (np.array([-1.0, 0, 0]), np.array([1.0, 0, 0]), 0),  # +X face
-    1: (np.array([1.0, 0, 0]), np.array([-1.0, 0, 0]), 0),  # -X face
-    2: (np.array([0, -1.0, 0]), np.array([0, 1.0, 0]), 1),  # +Y face
-    3: (np.array([0, 1.0, 0]), np.array([0, -1.0, 0]), 1),  # -Y face
+    0: (np.array([-1.0, 0, 0]), np.array([1.0, 0, 0])),  # +X face
+    1: (np.array([1.0, 0, 0]), np.array([-1.0, 0, 0])),  # -X face
+    2: (np.array([0, -1.0, 0]), np.array([0, 1.0, 0])),  # +Y face
+    3: (np.array([0, 1.0, 0]), np.array([0, -1.0, 0])),  # -Y face
 }
 
 
@@ -85,7 +85,7 @@ def side_grasps(
     half = {0: ex / 2.0, 1: ex / 2.0, 2: ey / 2.0, 3: ey / 2.0}
     grasps = []
     for f in faces:
-        approach, offdir, _ = _FACE_DEFS[f]
+        approach, offdir = _FACE_DEFS[f]
         z_axis = approach / np.linalg.norm(approach)
         x_axis = np.array([0.0, 0.0, 1.0])  # closing axis starts vertical
         x_axis = x_axis - np.dot(x_axis, z_axis) * z_axis

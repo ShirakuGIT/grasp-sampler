@@ -41,6 +41,10 @@ def load_mesh(
         mesh = raw.to_geometry() if hasattr(raw, "to_geometry") else raw.dump(concatenate=True)
     else:
         mesh = raw
+    if not isinstance(mesh, trimesh.Trimesh) or mesh.is_empty:
+        raise ValueError(f"mesh file must contain nonempty triangle geometry: {path}")
+    if not np.isfinite(mesh.vertices).all() or np.max(mesh.extents) <= 0:
+        raise ValueError(f"mesh must have finite vertices and a nonzero extent: {path}")
     # Reconstructing from vertices/faces silently discards UVs, textures and
     # vertex colors. Transform a copy so appearance follows the geometry.
     mesh = mesh.copy()
@@ -79,9 +83,11 @@ def _classify(extents: np.ndarray, mesh: trimesh.Trimesh) -> GeomClass:
         return "sphere"
 
     fx, fy = extents[0], extents[1]
+    if fx <= 0 or fy <= 0:
+        return "irregular"
     foot_ratio = min(fx, fy) / max(fx, fy)
     try:
-        pts, _ = trimesh.sample.sample_surface(mesh, 2500)
+        pts, _ = trimesh.sample.sample_surface(mesh, 2500, seed=0)
         fill = float(ConvexHull(pts[:, :2]).volume) / (fx * fy)  # 2D hull -> area
     except (RuntimeError, ValueError):  # degenerate footprint hull (QhullError)
         fill = 1.0

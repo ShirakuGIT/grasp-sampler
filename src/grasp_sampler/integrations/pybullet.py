@@ -6,6 +6,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from ..planning import PlanningGrasps, Stage
+from ..transforms import validate_pose
 
 
 def to_pybullet(targets: PlanningGrasps, *, stage: Stage = "grasp"):
@@ -39,8 +40,6 @@ def draw_grasps(
     a scaled inspection inset, provided local translations scale with it.
     """
     import pybullet as p
-
-    from ..uncertainty import validate_pose
 
     world = validate_pose(object_world_pose)
     if max_grasps < 1 or not np.isfinite(scale) or scale <= 0:
