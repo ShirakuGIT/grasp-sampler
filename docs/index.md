@@ -30,6 +30,16 @@ Mesh-based grasp sampling and shelf pick-and-place with the Franka FR3v2 in MuJo
 :file: _includes/demo-video.html
 ```
 
+## Watch live grasp sampling
+
+All 40 object variants rotate while fresh sampler batches arrive.
+
+```{raw} html
+:file: _includes/gallery-video.html
+```
+
+See the [gallery controls and recording commands](visualization.md).
+
 ```{toctree}
 :maxdepth: 2
 :caption: Contents

@@ -97,7 +97,9 @@ report; the viewer keeps the scene free of text panels and charts.
 
 ![MuJoCo FR3v2 with original household scan textures](docs/results/mujoco-expanded.png)
 
-[Watch the recorded demonstration on YouTube](https://youtu.be/lQIbH18UIP4).
+[Watch the freshly sampled MuJoCo demonstration and live grasp gallery](https://shivaram.net/grasp-sampler/).
+The [robot MP4](docs/_static/videos/mujoco-live-pick-place.mp4) and
+[live gallery MP4](docs/_static/videos/grasp-gallery-live.mp4) are also available directly.
 
 For a separate **8 × 5 live gallery of all 40 object variants**, with original
 source colors, slow synchronized rotation and streaming grasp candidates:

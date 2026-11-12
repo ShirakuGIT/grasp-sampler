@@ -7,7 +7,9 @@ one slow 360° revolution per minute. Genuine grasp batches are generated in two
 sampling processes while the viewer keeps rotating. No prerecorded candidate
 animation is used.
 
-![Original-color object library with live grasp candidates](results/grasp-gallery-grid.png)
+```{raw} html
+:file: _includes/gallery-video.html
+```
 
 ```bash
 pip install -e ".[mujoco]"
@@ -50,7 +52,7 @@ colors from their named original workspace reconstructions and YCB scans. This
 transfer is approximate, using bounds alignment and a triangle UV atlas; it does
 not preserve the dense scans' original UV fidelity. Existing household texture
 appearances are retained. See the
-[appearance provenance](https://github.com/ShirakuGIT/grasp-sampler/blob/feat/planner-integrations/assets/gallery_colors/README.md).
+[appearance provenance](https://github.com/ShirakuGIT/grasp-sampler/blob/master/assets/gallery_colors/README.md).
 Lighting is neutral, and objects receive no palette tint.
 
 Objects, grasp TCPs and jaw openings share the **same original metre scale**.
@@ -61,6 +63,36 @@ The larger master-chef can has no feasible candidates at that width in the saved
 These are geometric grasp proposals, not robot IK, collision-screened motion
 plans or verified physical picks. Glyph finger/stem lengths are schematic;
 TCP positions, orientation and jaw opening follow the actual sampler outputs.
+
+## Record the MuJoCo demos
+
+Install FFmpeg on your system, then record without opening a viewer window:
+
+```bash
+pip install -e ".[mujoco,fr3]" "mujoco==3.17.0"
+PYTHONPATH=src python examples/grasp_gallery.py --headless --once \
+  --seconds 60 --fps 30 --batches 8 \
+  --record docs/_static/videos/grasp-gallery-live.mp4 \
+  --report docs/results/grasp-gallery-recording.json
+PYTHONPATH=src python examples/pick_place_mujoco.py --headless \
+  --fps 30 --speed 2 --record docs/_static/videos/mujoco-live-pick-place.mp4 \
+  --report docs/results/mujoco-recording-pick-place.json
+```
+
+The gallery recording uses the same live worker loop as the interactive viewer;
+candidate sets are generated during capture. Without `--record`, `--headless`
+retains the faster asset-audit behavior. `--once` stops after a complete gallery
+revolution and all requested batches. The MP4s use H.264, 30 FPS and progressive
+loading. The [gallery capture report](results/grasp-gallery-recording.json)
+records all 320 batch arrival times in video seconds.
+
+The robot recording samples each object's current settled pose, displays the
+candidate and selected grasp sets, and captures the native physics run at 2×.
+Selection holds freeze physics just as they do in the interactive viewer.
+Physics retains its 2 ms timestep. These recordings use MuJoCo 3.17.0; physical
+outcomes can vary across simulator versions. The accompanying
+[physical report](results/mujoco-recording-pick-place.json) records measured
+contacts, lifts and placements for this capture.
 
 ## Interactive uncertainty viewer
 

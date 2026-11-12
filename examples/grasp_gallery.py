@@ -54,7 +54,9 @@ class Gallery:
         self.paused, self.show_grasps = False, True
         self.events = queue.SimpleQueue()
         self.viewer = None
+        self.recorder = None
         self.records = []
+        self.batch_events = []
         self.visibility_cache = {}
         self.frame_times = deque(maxlen=180)
         self.generation, self.resamples = 0, 0
@@ -98,6 +100,10 @@ class Gallery:
         self.grasps = unique_grasps([*self.grasps, *batch])
         self.arrival = time.monotonic()
         self.completed_batches += 1
+        if self.recorder:
+            self.batch_events.append({"object": self.index, "batch": self.completed_batches,
+                                      "video_seconds": self.recorder.frames/self.recorder.fps,
+                                      "unique_candidates": len(self.grasps)})
         print(f"  batch {self.completed_batches:02d}/{self.batches}: {len(self.grasps)} unique candidates", flush=True)
 
     def decorate(self, scene):
@@ -161,6 +167,8 @@ class Gallery:
                 scene.ngeom += 1
 
     def draw(self):
+        if self.recorder:
+            self.recorder.write(self.data, self.decorate)
         if self.viewer:
             with self.viewer.lock():
                 self.viewer.user_scn.ngeom = 0
@@ -190,7 +198,7 @@ class Gallery:
         visited, future, submitted_generation = 0, None, None
         last, next_frame = time.monotonic(), time.monotonic()
         with ProcessPoolExecutor(max_workers=1, mp_context=multiprocessing.get_context("spawn")) as pool:
-            while self.viewer.is_running():
+            while self.viewer.is_running() if self.viewer else self.recorder is not None:
                 now = time.monotonic()
                 dt, last = min(now-last, .1), now
                 while not self.events.empty():
@@ -275,6 +283,10 @@ class GridGallery(Gallery):
         self.candidates[index] = combined[-400:]
         self.arrivals[index] = time.monotonic()
         self.batch_counts[index] += 1
+        if self.recorder:
+            self.batch_events.append({"object": index, "batch": self.batch_counts[index],
+                                      "video_seconds": self.recorder.frames/self.recorder.fps,
+                                      "unique_candidates": len(self.candidates[index])})
         print(f"[{index+1:02d}/40] {self.items[index].label}: batch {self.batch_counts[index]}/{self.batches}, "
               f"{len(self.candidates[index])} candidates", flush=True)
 
@@ -295,7 +307,7 @@ class GridGallery(Gallery):
         futures, cursor = {}, 0
         last, next_frame = time.monotonic(), time.monotonic()
         with ProcessPoolExecutor(max_workers=2, mp_context=multiprocessing.get_context("spawn")) as pool:
-            while self.viewer.is_running():
+            while self.viewer.is_running() if self.viewer else self.recorder is not None:
                 now = time.monotonic()
                 dt, last = min(now-last, .1), now
                 while not self.events.empty():
@@ -370,6 +382,7 @@ def main():
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--report", type=Path)
     parser.add_argument("--snapshot", type=Path)
+    parser.add_argument("--record", type=Path, help="Record live sampler batches to MP4 (requires ffmpeg)")
     parser.add_argument("--cache", type=Path, default=Path(tempfile.gettempdir())/"grasp-sampler-gallery")
     args = parser.parse_args()
     if any(not np.isfinite(value) or value <= 0 for value in (args.seconds, args.fps, args.batches, args.batch_size,
@@ -385,7 +398,12 @@ def main():
                       batch_size=args.batch_size, jaw_width=args.jaw_width, visible=args.visible_grasps,
                       seed=args.seed, gui=not args.headless)
     try:
-        if args.headless:
+        if args.record:
+            from mujoco_recording import VideoRecorder
+            camera = mj.MjvCamera()
+            gallery.configure_camera(camera)
+            gallery.recorder = VideoRecorder(gallery.model, args.record, fps=args.fps, camera=camera)
+        if args.headless and not args.record:
             if args.layout == "grid":
                 gallery.select()
                 gallery.angle = 2*np.pi; gallery.update_pose()
@@ -426,11 +444,15 @@ def main():
     except KeyboardInterrupt:
         pass
     finally:
+        if gallery.recorder:
+            gallery.recorder.close()
         if args.report:
             args.report.parent.mkdir(parents=True, exist_ok=True)
             args.report.write_text(json.dumps({"assets": gallery.records, "inventory_count": len(items),
                 "jaw_width_m": args.jaw_width, "franka_max_opening_m": FRANKA_MAX_OPENING_M,
                 "physics_execution": False, "layout": args.layout,
+                "recording": gallery.recorder.report() if gallery.recorder else None,
+                "batch_events": gallery.batch_events,
                 "scene_update_hz": ((len(gallery.frame_times)-1)/(gallery.frame_times[-1]-gallery.frame_times[0])
                                     if len(gallery.frame_times) > 1 else None),
                 "candidate_colors": {"violet": "primitive / OBB proposals", "cyan": "antipodal candidates",

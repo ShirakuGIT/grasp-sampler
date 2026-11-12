@@ -32,6 +32,7 @@ def test_render_cost_is_inside_frame_budget_and_physics_is_unchanged(monkeypatch
     demo.model, demo.data, demo.dofs = model, data, np.array([0])
     demo.speed, demo.fps, demo.next_frame = 2., 60, 10.
     demo.viewer = SimpleNamespace(is_running=lambda: True)
+    demo.recorder = None
     frames = []
 
     def draw():
@@ -47,6 +48,31 @@ def test_render_cost_is_inside_frame_budget_and_physics_is_unchanged(monkeypatch
     assert data.time == pytest.approx(1.)
     np.testing.assert_allclose(data.qpos, reference.qpos)
     np.testing.assert_allclose(data.qvel, reference.qvel)
+
+
+def test_recording_and_selection_holds_preserve_physical_state(monkeypatch):
+    module = workstation_module(monkeypatch)
+    model = module.mj.MjModel.from_xml_string('''<mujoco><option timestep=".002" gravity="0 0 0"/>
+      <worldbody><body><joint type="slide"/><geom size=".01" mass="1"/></body></worldbody>
+      </mujoco>''')
+    demo = object.__new__(module.Workstation)
+    demo.model, demo.data = model, module.mj.MjData(model)
+    reference = module.mj.MjData(model)
+    for data in (demo.data, reference):
+        data.qvel[:] = .2
+        module.mj.mj_forward(model, data)
+    frames = []
+    demo.recorder = SimpleNamespace(fps=30, write=lambda data, decorate: frames.append(data.time))
+    demo.viewer, demo.dofs = None, np.array([0])
+    demo.speed, demo.next_record_time = 2., 0.
+    demo.step(1.)
+    module.mj.mj_step(model, reference, nstep=500)
+    assert 15 <= len(frames) <= 16
+    demo.show_for(2.)
+    assert frames[-30:] == [demo.data.time]*30
+    assert demo.data.time == reference.time
+    np.testing.assert_array_equal(demo.data.qpos, reference.qpos)
+    np.testing.assert_array_equal(demo.data.qvel, reference.qvel)
 
 
 def test_viewer_has_no_text_or_chart_and_only_syncs_state(monkeypatch):

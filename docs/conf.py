@@ -22,6 +22,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "furo"
 html_title = "grasp-sampler"
+html_static_path = ["_static"]
 
 autodoc_typehints = "description"
 autodoc_member_order = "bysource"

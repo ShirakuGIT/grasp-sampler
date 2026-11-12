@@ -48,6 +48,8 @@ class Workstation:
         self.data = mj.MjData(self.model)
         self.scratch = mj.MjData(self.model)
         self.count, self.gui, self.viewer = count, gui, None
+        self.recorder = None
+        self.next_record_time = 0.
         self.joint_names = tuple(f"fr3v2_joint{i}" for i in range(1, 8))
         self.joint_ids = [self.model.joint(name).id for name in self.joint_names]
         self.q_indices = self.model.jnt_qposadr[self.joint_ids]
@@ -104,6 +106,9 @@ class Workstation:
             # remain native dynamics, with the model's actuator force limits.
             self.data.qfrc_applied[self.dofs] = self.data.qfrc_bias[self.dofs]
             mj.mj_step(self.model, self.data)
+            if self.recorder and self.data.time >= self.next_record_time:
+                self.recorder.write(self.data, self.decorate)
+                self.next_record_time += self.speed/self.recorder.fps
             if self.viewer and time.monotonic() >= self.next_frame:
                 if not self.viewer.is_running():
                     raise KeyboardInterrupt
@@ -123,6 +128,9 @@ class Workstation:
         GUI-only physics steps would change settled poses, ray samples and
         grasp IDs relative to the headless validation run.
         """
+        if self.recorder:
+            for _ in range(max(1, round(seconds/self.speed*self.recorder.fps))):
+                self.recorder.write(self.data, self.decorate)
         if not self.viewer:
             return
         deadline = time.monotonic()+seconds/self.speed
@@ -798,6 +806,7 @@ def main():
     parser.add_argument("--hold", action="store_true")
     parser.add_argument("--report", type=Path)
     parser.add_argument("--snapshot", type=Path)
+    parser.add_argument("--record", type=Path, help="Record fresh sampling and native physics to MP4 (requires ffmpeg)")
     args = parser.parse_args()
     count = args.objects or len(SUITES[args.suite])
     if count > len(SUITES[args.suite]):
@@ -806,6 +815,15 @@ def main():
         parser.error("--speed and --fps must be positive")
     demo = Workstation(count, gui=args.gui, suite=args.suite, speed=args.speed, fps=args.fps)
     try:
+        if args.record:
+            from mujoco_recording import VideoRecorder
+            camera = mj.MjvCamera()
+            camera.lookat[:] = [.44, .02, .99]
+            camera.distance, camera.azimuth, camera.elevation = 1.9, 45, -28
+            options = mj.MjvOption(); options.geomgroup[3:5] = False
+            demo.recorder = VideoRecorder(demo.model, args.record, fps=args.fps, camera=camera, options=options)
+            demo.next_record_time = demo.data.time
+            demo.show_for(2.)
         try:
             report = demo.run()
         except RuntimeError as error:
@@ -819,6 +837,9 @@ def main():
         if args.gui:
             report["viewer_performance"] = demo.viewer_performance()
             print("Viewer timing:", json.dumps(report["viewer_performance"]), flush=True)
+        if demo.recorder:
+            demo.show_for(3.)
+            report["recording"] = demo.recorder.report()
         if args.report:
             args.report.parent.mkdir(parents=True, exist_ok=True)
             args.report.write_text(json.dumps(report, indent=2) + "\n")
@@ -832,6 +853,8 @@ def main():
     except KeyboardInterrupt:
         pass
     finally:
+        if demo.recorder:
+            demo.recorder.close()
         if demo.viewer:
             demo.viewer.close()
 
