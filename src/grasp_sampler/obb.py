@@ -4,6 +4,7 @@ For each pair of opposing OBB faces whose separation fits the gripper, emit a
 grasp centered on that axis, at a few offsets along the third axis. This gives
 clean axis-aligned grasps for box-like and tilted objects.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -27,7 +28,7 @@ def obb_face_grasps(obj: ObjMesh, cfg: GraspConfig) -> list[Grasp]:
         for approach_axis in (i for i in range(3) if i != axis):
             half_depth = extents[approach_axis] / 2.0
             for sign in (+1.0, -1.0):
-                z = -sign * R_obb[:, approach_axis]       # approach into the object
+                z = -sign * R_obb[:, approach_axis]  # approach into the object
                 y = np.cross(z, closing)
                 if np.linalg.norm(y) < 1e-6:
                     continue
@@ -43,9 +44,14 @@ def obb_face_grasps(obj: ObjMesh, cfg: GraspConfig) -> list[Grasp]:
                     pose = np.eye(4)
                     pose[:3, :3] = R
                     pose[:3, 3] = tcp + frac * extents[third] * R_obb[:, third]
-                    grasps.append(Grasp(pose, "obb_face", float(width),
-                                        meta={"axis": axis, "approach": approach_axis,
-                                              "offset": frac}))
+                    grasps.append(
+                        Grasp(
+                            pose,
+                            "obb_face",
+                            float(width),
+                            meta={"axis": axis, "approach": approach_axis, "offset": frac},
+                        )
+                    )
     return grasps
 
 

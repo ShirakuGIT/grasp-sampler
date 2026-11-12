@@ -26,6 +26,12 @@ jobs:
       - name: Lint
         run: ruff check src tests examples tools
 
+      - name: Check library formatting
+        run: ruff format --check src
+
+      - name: Check dead code
+        run: vulture
+
       - name: Test
         run: pytest
 

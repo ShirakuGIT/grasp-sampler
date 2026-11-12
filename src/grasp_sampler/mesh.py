@@ -1,4 +1,5 @@
 """Mesh loading and coarse geometry classification."""
+
 from __future__ import annotations
 
 import numpy as np
@@ -9,14 +10,12 @@ from .types import GeomClass, ObjMesh
 
 # Rotate 90 deg about X so a Y-up mesh stands upright (Y -> Z). Most GLB exports
 # are Y-up; adjust or pass an already-upright mesh if yours differs.
-_R_X90 = np.array([[1, 0, 0, 0],
-                   [0, 0, -1, 0],
-                   [0, 1, 0, 0],
-                   [0, 0, 0, 1]], float)
+_R_X90 = np.array([[1, 0, 0, 0], [0, 0, -1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], float)
 
 
-def load_mesh(path, *, upright_transform: np.ndarray | None = _R_X90,
-              center: bool = True, process: bool = True) -> ObjMesh:
+def load_mesh(
+    path, *, upright_transform: np.ndarray | None = _R_X90, center: bool = True, process: bool = True
+) -> ObjMesh:
     """Load geometry, optionally orient it and center its axis-aligned bounds.
 
     Use ``center=False, upright_transform=None`` to preserve the file frame.
@@ -39,10 +38,13 @@ def load_mesh(path, *, upright_transform: np.ndarray | None = _R_X90,
     """
     raw = trimesh.load(str(path), force="scene", process=process)
     if isinstance(raw, trimesh.Scene):
-        mesh = (raw.to_geometry() if hasattr(raw, "to_geometry")
-                else raw.dump(concatenate=True))
+        mesh = raw.to_geometry() if hasattr(raw, "to_geometry") else raw.dump(concatenate=True)
     else:
         mesh = raw
+    if not isinstance(mesh, trimesh.Trimesh) or mesh.is_empty:
+        raise ValueError(f"mesh file must contain nonempty triangle geometry: {path}")
+    if not np.isfinite(mesh.vertices).all() or np.max(mesh.extents) <= 0:
+        raise ValueError(f"mesh must have finite vertices and a nonzero extent: {path}")
     # Reconstructing from vertices/faces silently discards UVs, textures and
     # vertex colors. Transform a copy so appearance follows the geometry.
     mesh = mesh.copy()
@@ -61,12 +63,11 @@ def load_mesh(path, *, upright_transform: np.ndarray | None = _R_X90,
     try:
         obb_transform = mesh.bounding_box_oriented.primitive.transform.copy()
         obb_extents = np.asarray(mesh.bounding_box_oriented.primitive.extents, float)
-    except (RuntimeError, ValueError, np.linalg.LinAlgError):   # degenerate OBB
+    except (RuntimeError, ValueError, np.linalg.LinAlgError):  # degenerate OBB
         obb_transform = np.eye(4)
         obb_extents = extents.copy()
 
-    return ObjMesh(mesh, extents, obb_transform, obb_extents,
-                   _classify(extents, mesh), source_to_mesh)
+    return ObjMesh(mesh, extents, obb_transform, obb_extents, _classify(extents, mesh), source_to_mesh)
 
 
 def _classify(extents: np.ndarray, mesh: trimesh.Trimesh) -> GeomClass:
@@ -82,11 +83,13 @@ def _classify(extents: np.ndarray, mesh: trimesh.Trimesh) -> GeomClass:
         return "sphere"
 
     fx, fy = extents[0], extents[1]
+    if fx <= 0 or fy <= 0:
+        return "irregular"
     foot_ratio = min(fx, fy) / max(fx, fy)
     try:
-        pts, _ = trimesh.sample.sample_surface(mesh, 2500)
-        fill = float(ConvexHull(pts[:, :2]).volume) / (fx * fy)   # 2D hull -> area
-    except (RuntimeError, ValueError):   # degenerate footprint hull (QhullError)
+        pts, _ = trimesh.sample.sample_surface(mesh, 2500, seed=0)
+        fill = float(ConvexHull(pts[:, :2]).volume) / (fx * fy)  # 2D hull -> area
+    except (RuntimeError, ValueError):  # degenerate footprint hull (QhullError)
         fill = 1.0
 
     if fill >= 0.90:

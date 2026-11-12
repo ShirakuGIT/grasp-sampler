@@ -9,6 +9,7 @@ ss-pybullet (pybullet-planning) by Caelan Reed Garrett, re-expressed with NumPy.
 Each function returns a list of ``(pose, meta)`` tuples, where ``pose`` is a
 (4, 4) TCP pose in the object frame (+Z approach, +X closing, +Y completion).
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -31,15 +32,16 @@ def _pose(R: np.ndarray, t: np.ndarray) -> np.ndarray:
     return M
 
 
-def top_grasps(extents, *, max_width: float = 0.08, yaw_steps: int = 4,
-               grasp_length: float = 0.0, under: bool = True):
+def top_grasps(
+    extents, *, max_width: float = 0.08, yaw_steps: int = 4, grasp_length: float = 0.0, under: bool = True
+):
     """Top-down grasps on a box: the hand descends along -Z onto the top face.
 
     A yaw whose finger span exceeds ``max_width`` is dropped (object too wide).
     ``under`` also emits each grasp flipped 180 deg about its approach axis.
     """
     ex, ey, ez = extents
-    R_down = _Rx(np.pi)                      # TCP +Z -> object -Z (approach down)
+    R_down = _Rx(np.pi)  # TCP +Z -> object -Z (approach down)
     grasps = []
     for k in range(yaw_steps):
         yaw = np.pi * k / max(1, yaw_steps)
@@ -56,17 +58,24 @@ def top_grasps(extents, *, max_width: float = 0.08, yaw_steps: int = 4,
     return grasps
 
 
-# Per-face: (approach direction into the object, hand-offset direction, half-thickness)
+# Per-face: (approach direction into the object, hand-offset direction).
 _FACE_DEFS = {
-    0: (np.array([-1.0, 0, 0]), np.array([1.0, 0, 0]), 0),   # +X face
-    1: (np.array([1.0, 0, 0]), np.array([-1.0, 0, 0]), 0),   # -X face
-    2: (np.array([0, -1.0, 0]), np.array([0, 1.0, 0]), 1),   # +Y face
-    3: (np.array([0, 1.0, 0]), np.array([0, -1.0, 0]), 1),   # -Y face
+    0: (np.array([-1.0, 0, 0]), np.array([1.0, 0, 0])),  # +X face
+    1: (np.array([1.0, 0, 0]), np.array([-1.0, 0, 0])),  # -X face
+    2: (np.array([0, -1.0, 0]), np.array([0, 1.0, 0])),  # +Y face
+    3: (np.array([0, 1.0, 0]), np.array([0, -1.0, 0])),  # -Y face
 }
 
 
-def side_grasps(extents, *, max_width: float = 0.08, roll_steps: int = 2,
-                grasp_length: float = 0.0, under: bool = True, faces=(0, 1, 2, 3)):
+def side_grasps(
+    extents,
+    *,
+    max_width: float = 0.08,
+    roll_steps: int = 2,
+    grasp_length: float = 0.0,
+    under: bool = True,
+    faces=(0, 1, 2, 3),
+):
     """Lateral grasps into the four vertical side faces of a box.
 
     ``roll=0`` makes the fingers span the object height; ``roll=pi/2`` spans the
@@ -76,9 +85,9 @@ def side_grasps(extents, *, max_width: float = 0.08, roll_steps: int = 2,
     half = {0: ex / 2.0, 1: ex / 2.0, 2: ey / 2.0, 3: ey / 2.0}
     grasps = []
     for f in faces:
-        approach, offdir, _ = _FACE_DEFS[f]
+        approach, offdir = _FACE_DEFS[f]
         z_axis = approach / np.linalg.norm(approach)
-        x_axis = np.array([0.0, 0.0, 1.0])            # closing axis starts vertical
+        x_axis = np.array([0.0, 0.0, 1.0])  # closing axis starts vertical
         x_axis = x_axis - np.dot(x_axis, z_axis) * z_axis
         x_axis /= np.linalg.norm(x_axis)
         R0 = np.column_stack([x_axis, np.cross(z_axis, x_axis), z_axis])
@@ -86,8 +95,7 @@ def side_grasps(extents, *, max_width: float = 0.08, roll_steps: int = 2,
             roll = np.pi * r / max(1, roll_steps)
             R = R0 @ _Rz(roll)
             close_dir = R[:, 0]
-            span = (abs(close_dir[0]) * ex + abs(close_dir[1]) * ey
-                    + abs(close_dir[2]) * ez)
+            span = abs(close_dir[0]) * ex + abs(close_dir[1]) * ey + abs(close_dir[2]) * ez
             if span > max_width:
                 continue
             t = offdir * (half[f] - grasp_length)

@@ -4,6 +4,7 @@ import trimesh
 from scipy.spatial.transform import Rotation
 
 from grasp_sampler import (
+    FixedGraspResult,
     GeometricGraspBackend,
     GeometryUncertainty,
     Grasp,
@@ -248,3 +249,21 @@ def test_nominal_generators_smoke(tmp_path, box):
         for g in gs:
             np.testing.assert_allclose(g.pose[:3,:3].T @ g.pose[:3,:3], np.eye(3),atol=1e-7)
             assert np.linalg.det(g.pose[:3,:3]) == pytest.approx(1)
+
+
+def test_falsey_backend_is_kept_and_default_options_are_not_silently_ignored(box, grasp):
+    class CustomBackend:
+        def __bool__(self):
+            return False
+
+        def evaluate(self, mesh, **kwargs):
+            return FixedGraspResult(True, "custom")
+
+    backend = CustomBackend()
+    evaluator = RobustGraspEvaluator(box, backend=backend)
+    assert evaluator.backend is backend
+    result = evaluator.evaluate(grasp, nominal_object_pose=np.eye(4),
+                                hypotheses=[ObjectHypothesis(box, np.eye(4))])
+    assert result.nominal_result.reason == "custom" and result.worst_case_valid
+    with pytest.raises(ValueError, match="backend_options"):
+        RobustGraspEvaluator(box, backend=backend, check_body=False)

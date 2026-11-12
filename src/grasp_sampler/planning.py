@@ -4,6 +4,7 @@ All distances are metres. ``T_A_B`` maps coordinates in B into A. Tool
 calibration is ``T_tcp_tool`` (the planner's tool link expressed in the grasp
 TCP), so ``T_frame_tool = T_frame_tcp @ T_tcp_tool``.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -12,9 +13,8 @@ from typing import Literal
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from .transforms import stack_poses
+from .transforms import stack_poses, validate_pose
 from .types import Grasp, ObjMesh
-from .uncertainty import validate_pose
 
 Stage = Literal["grasp", "pregrasp", "lift"]
 QuaternionOrder = Literal["xyzw", "wxyz"]
@@ -38,8 +38,7 @@ def pose_components(poses, *, quaternion_order: QuaternionOrder = "xyzw"):
     if quaternion_order not in ("xyzw", "wxyz"):
         raise ValueError("quaternion_order must be 'xyzw' or 'wxyz'")
     poses = _poses(poses)
-    q = (Rotation.from_matrix(poses[:, :3, :3]).as_quat()
-         if len(poses) else np.empty((0, 4)))
+    q = Rotation.from_matrix(poses[:, :3, :3]).as_quat() if len(poses) else np.empty((0, 4))
     q[q[:, 3] < 0] *= -1
     if quaternion_order == "wxyz":
         q = q[:, [3, 0, 1, 2]]
@@ -127,15 +126,28 @@ class PlanningGrasps:
         """
         indices = {id(record): i for i, record in enumerate(result.records)}
         return cls.from_world_commands(
-            result.world_commands, [r.candidate.grasp.width for r in result.selected],
+            result.world_commands,
+            [r.candidate.grasp.width for r in result.selected],
             candidate_ids=[indices[id(r)] for r in result.selected],
-            scores=[r.validation_R for r in result.selected], **kwargs,
+            scores=[r.validation_R for r in result.selected],
+            **kwargs,
         )
 
     @classmethod
-    def from_world_commands(cls, world_tcp_poses, widths, *, frame_id: str, tool_link: str,
-                            tcp_to_tool=None, world_to_frame=None, approach_distance: float = .1,
-                            lift_offset=(0., 0., .1), candidate_ids=None, scores=None):
+    def from_world_commands(
+        cls,
+        world_tcp_poses,
+        widths,
+        *,
+        frame_id: str,
+        tool_link: str,
+        tcp_to_tool=None,
+        world_to_frame=None,
+        approach_distance: float = 0.1,
+        lift_offset=(0.0, 0.0, 0.1),
+        candidate_ids=None,
+        scores=None,
+    ):
         """Build targets from fixed world TCP commands.
 
         ``tcp_to_tool`` is T_tcp_tool; ``world_to_frame`` is T_frame_world.
@@ -159,8 +171,16 @@ class PlanningGrasps:
         ids = np.arange(len(world)) if candidate_ids is None else np.asarray(candidate_ids)
         if len(world) == 0 and ids.shape == (0,):
             ids = ids.astype(int)
-        return cls(frame @ world @ tool, frame @ pre @ tool, frame @ lift @ tool,
-                   widths, ids, frame_id, tool_link, scores)
+        return cls(
+            frame @ world @ tool,
+            frame @ pre @ tool,
+            frame @ lift @ tool,
+            widths,
+            ids,
+            frame_id,
+            tool_link,
+            scores,
+        )
 
     def poses(self, stage: Stage = "grasp") -> np.ndarray:
         """Return a copy of a stage's (N,4,4) tool transforms."""
@@ -186,17 +206,29 @@ class PlanningGrasps:
         if selection.dtype.kind == "b" and selection.shape != (len(self),):
             raise ValueError("boolean selection must have shape (N,)")
         indices = np.arange(len(self))[selection]
-        return type(self)(self.grasp[indices], self.pregrasp[indices], self.lift[indices],
-                          self.widths[indices], self.candidate_ids[indices], self.frame_id,
-                          self.tool_link, None if self.scores is None else self.scores[indices])
+        return type(self)(
+            self.grasp[indices],
+            self.pregrasp[indices],
+            self.lift[indices],
+            self.widths[indices],
+            self.candidate_ids[indices],
+            self.frame_id,
+            self.tool_link,
+            None if self.scores is None else self.scores[indices],
+        )
 
     def to_dict(self) -> dict:
         """JSON-compatible, versioned matrices in metres with explicit frame labels."""
-        return {"schema_version": 1, "units": "metres", "frame_id": self.frame_id,
-                "tool_link": self.tool_link, "candidate_ids": self.candidate_ids.tolist(),
-                "widths": self.widths.tolist(),
-                "scores": None if self.scores is None else self.scores.tolist(),
-                **{stage: self.poses(stage).tolist() for stage in ("grasp", "pregrasp", "lift")}}
+        return {
+            "schema_version": 1,
+            "units": "metres",
+            "frame_id": self.frame_id,
+            "tool_link": self.tool_link,
+            "candidate_ids": self.candidate_ids.tolist(),
+            "widths": self.widths.tolist(),
+            "scores": None if self.scores is None else self.scores.tolist(),
+            **{stage: self.poses(stage).tolist() for stage in ("grasp", "pregrasp", "lift")},
+        }
 
     @classmethod
     def from_dict(cls, value: dict) -> PlanningGrasps:
@@ -204,9 +236,14 @@ class PlanningGrasps:
         if value.get("schema_version") != 1 or value.get("units") != "metres":
             raise ValueError("unsupported planning targets schema or units")
         n = len(value["widths"])
-        return cls(*(np.asarray(value[s], float).reshape(0, 4, 4) if n == 0
-                     else np.asarray(value[s], float)
-                     for s in ("grasp", "pregrasp", "lift")),
-                   value["widths"], (np.asarray(value["candidate_ids"], dtype=int) if n == 0
-                                     else np.asarray(value["candidate_ids"])),
-                   value["frame_id"], value["tool_link"], value.get("scores"))
+        return cls(
+            *(
+                np.asarray(value[s], float).reshape(0, 4, 4) if n == 0 else np.asarray(value[s], float)
+                for s in ("grasp", "pregrasp", "lift")
+            ),
+            value["widths"],
+            (np.asarray(value["candidate_ids"], dtype=int) if n == 0 else np.asarray(value["candidate_ids"])),
+            value["frame_id"],
+            value["tool_link"],
+            value.get("scores"),
+        )

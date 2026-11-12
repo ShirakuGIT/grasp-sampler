@@ -144,9 +144,9 @@ evaluator = RobustGraspEvaluator(obj.mesh,
 ```
 
 This adds checks with the existing palm/stem box proxy in an isolated DIRECT
-client, using hypothesis vertices without reloading/normalizing. It corrects
-proxy component offsets for this new path; the legacy `collision_filter` is
-unchanged. It remains a static, discretized body check, with no finger closure
+client, using hypothesis vertices without reloading/normalizing. Both this
+callback and `collision_filter` share a TCP-relative compound proxy that keeps
+every component's offset when the TCP moves. It remains a static, discretized body check, with no finger closure
 or lift. It creates a client for each check, so is intended for small batches.
 
 A custom `backend` implements `ValidityBackend.evaluate(mesh,

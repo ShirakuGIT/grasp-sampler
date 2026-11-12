@@ -4,6 +4,7 @@ The sampler emits grasps as TCP poses in the object's local frame. Downstream
 motion planners usually want them placed in the world and expressed in the
 robot's end-effector (flange) frame. These helpers do both, as batched arrays.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -12,9 +13,25 @@ from .types import Grasp
 
 # Map a TCP frame (+X closing, +Z approach) to the Franka end-effector / flange
 # frame (+Y closing, +Z approach). Columns are the EE axes in TCP coordinates.
-_TCP_TO_PANDA_EE = np.array([[0.0, 1.0, 0.0],
-                             [-1.0, 0.0, 0.0],
-                             [0.0, 0.0, 1.0]], float)
+_TCP_TO_PANDA_EE = np.array([[0.0, 1.0, 0.0], [-1.0, 0.0, 0.0], [0.0, 0.0, 1.0]], float)
+
+
+def validate_pose(value) -> np.ndarray:
+    """Return an independent copy of a finite, rigid (4, 4) transform.
+
+    Reject scale, shear, reflections and invalid homogeneous coordinates.
+    This shared boundary check keeps planning independent of uncertainty models.
+    """
+    pose = np.asarray(value, float)
+    if (
+        pose.shape != (4, 4)
+        or not np.isfinite(pose).all()
+        or not np.allclose(pose[3], [0, 0, 0, 1])
+        or not np.allclose(pose[:3, :3].T @ pose[:3, :3], np.eye(3), atol=1e-7)
+        or not np.isclose(np.linalg.det(pose[:3, :3]), 1)
+    ):
+        raise ValueError("pose must be a finite 4x4 SE(3) transform")
+    return pose.copy()
 
 
 def stack_poses(grasps: list[Grasp]) -> np.ndarray:
@@ -34,8 +51,9 @@ def to_world(poses: np.ndarray, object_pose: np.ndarray) -> np.ndarray:
     return np.asarray(object_pose, float)[None] @ poses
 
 
-def tcp_to_ee(poses: np.ndarray, *, standoff: float = 0.105,
-              remap: np.ndarray = _TCP_TO_PANDA_EE) -> np.ndarray:
+def tcp_to_ee(
+    poses: np.ndarray, *, standoff: float = 0.105, remap: np.ndarray = _TCP_TO_PANDA_EE
+) -> np.ndarray:
     """Convert TCP poses to end-effector (flange) poses.
 
     The flange sits ``standoff`` metres behind the TCP along the approach axis
@@ -45,5 +63,5 @@ def tcp_to_ee(poses: np.ndarray, *, standoff: float = 0.105,
     poses = np.asarray(poses, float).reshape(-1, 4, 4)
     out = poses.copy()
     out[:, :3, :3] = poses[:, :3, :3] @ remap
-    out[:, :3, 3] = poses[:, :3, 3] - standoff * out[:, :3, 2]   # back off along approach
+    out[:, :3, 3] = poses[:, :3, 3] - standoff * out[:, :3, 2]  # back off along approach
     return out

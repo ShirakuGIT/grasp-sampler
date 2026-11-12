@@ -1,4 +1,5 @@
 """cuRobo current GoalToolPose and legacy 0.7 Pose exports (wxyz quaternions)."""
+
 from __future__ import annotations
 
 import numpy as np
@@ -26,8 +27,15 @@ def goal_arrays(targets: PlanningGrasps, *, stage: Stage = "grasp", api="current
     return p, q
 
 
-def to_curobo(targets: PlanningGrasps, *, stage: Stage = "grasp", api="current", layout="goalset",
-              device="cuda:0", dtype=None):
+def to_curobo(
+    targets: PlanningGrasps,
+    *,
+    stage: Stage = "grasp",
+    api="current",
+    layout="goalset",
+    device="cuda:0",
+    dtype=None,
+):
     """Create current ``GoalToolPose`` or legacy ``curobo.types.math.Pose``.
 
     Install cuRobo and PyTorch using NVIDIA's instructions for your CUDA stack.
@@ -45,8 +53,10 @@ def to_curobo(targets: PlanningGrasps, *, stage: Stage = "grasp", api="current",
     try:
         if api == "legacy":
             from curobo.types.math import Pose
+
             return Pose(position=p, quaternion=q, name=targets.tool_link)
         from curobo.types import GoalToolPose
+
         return GoalToolPose(tool_frames=[targets.tool_link], position=p, quaternion=q)
     except ImportError as exc:
         raise ImportError(

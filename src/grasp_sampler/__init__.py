@@ -8,32 +8,34 @@ Quick start
 >>> poses = to_world(stack_poses(grasps), T_world_obj)   # place in the world
 >>> ee = tcp_to_ee(poses)                         # Franka flange poses for IK
 """
+
 from .antipodal import antipodal_grasps
 from .mesh import load_mesh
 from .obb import obb_face_grasps
 from .planning import PlanningGrasps, mesh_world_pose, pose_components
 from .primitives import side_grasps, top_grasps
 from .robust import (
-                    FinitePadFixedObjectBackend,
-                    FinitePadQuasistaticBackend,
-                    FixedGraspResult,
-                    GeometricGraspBackend,
-                    HypothesisGraspResult,
-                    RankedGrasp,
-                    RobustGraspEvaluator,
-                    RobustGraspResult,
-                    SymmetricPointBackend,
-                    rank_grasps,
+    FinitePadFixedObjectBackend,
+    FinitePadQuasistaticBackend,
+    FixedGraspResult,
+    GeometricGraspBackend,
+    HypothesisGraspResult,
+    RankedGrasp,
+    RobustGraspEvaluator,
+    RobustGraspResult,
+    SymmetricPointBackend,
+    ValidityBackend,
+    rank_grasps,
 )
 from .robust_set import (
-                    RobustCandidate,
-                    RobustCandidateRecord,
-                    RobustGraspSetResult,
-                    RobustSetConfig,
-                    generate_robust_grasp_set,
+    RobustCandidate,
+    RobustCandidateRecord,
+    RobustGraspSetResult,
+    RobustSetConfig,
+    generate_robust_grasp_set,
 )
-from .sampler import GraspSampler
-from .transforms import stack_poses, tcp_to_ee, to_world
+from .sampler import GraspGenerator, GraspSampler
+from .transforms import stack_poses, tcp_to_ee, to_world, validate_pose
 from .types import Grasp, GraspConfig, ObjMesh
 from .uncertainty import GeometryUncertainty, ObjectHypothesis, PoseUncertainty, sample_hypotheses
 
@@ -41,6 +43,9 @@ __version__ = "0.1.0"
 
 __all__ = [
     "GraspSampler",
+    "GraspGenerator",
+    "ValidityBackend",
+    "validate_pose",
     "GraspConfig",
     "Grasp",
     "ObjMesh",
@@ -52,11 +57,26 @@ __all__ = [
     "stack_poses",
     "to_world",
     "tcp_to_ee",
-    "PlanningGrasps", "mesh_world_pose", "pose_components",
-    "PoseUncertainty", "GeometryUncertainty", "ObjectHypothesis", "sample_hypotheses",
-    "RobustGraspEvaluator", "RobustGraspResult", "GeometricGraspBackend",
-    "SymmetricPointBackend", "FinitePadFixedObjectBackend", "FinitePadQuasistaticBackend",
-    "FixedGraspResult", "HypothesisGraspResult", "RankedGrasp", "rank_grasps",
-    "RobustSetConfig", "RobustCandidate", "RobustCandidateRecord",
-    "RobustGraspSetResult", "generate_robust_grasp_set",
+    "PlanningGrasps",
+    "mesh_world_pose",
+    "pose_components",
+    "PoseUncertainty",
+    "GeometryUncertainty",
+    "ObjectHypothesis",
+    "sample_hypotheses",
+    "RobustGraspEvaluator",
+    "RobustGraspResult",
+    "GeometricGraspBackend",
+    "SymmetricPointBackend",
+    "FinitePadFixedObjectBackend",
+    "FinitePadQuasistaticBackend",
+    "FixedGraspResult",
+    "HypothesisGraspResult",
+    "RankedGrasp",
+    "rank_grasps",
+    "RobustSetConfig",
+    "RobustCandidate",
+    "RobustCandidateRecord",
+    "RobustGraspSetResult",
+    "generate_robust_grasp_set",
 ]

@@ -3,6 +3,7 @@
 No robot execution uncertainty is represented. Empirical/correlated perception
 runs can supply ObjectHypothesis directly, bypassing the independent sampler.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -12,15 +13,24 @@ import numpy as np
 import trimesh
 from scipy.spatial.transform import Rotation
 
+# Preserve the existing import path while geometry owns transform validation.
+from .transforms import validate_pose as validate_pose
 
-def validate_pose(value):
-    pose = np.asarray(value, float)
-    if (pose.shape != (4, 4) or not np.isfinite(pose).all()
-            or not np.allclose(pose[3], [0, 0, 0, 1])
-            or not np.allclose(pose[:3, :3].T @ pose[:3, :3], np.eye(3), atol=1e-7)
-            or not np.isclose(np.linalg.det(pose[:3, :3]), 1)):
-        raise ValueError("pose must be a finite 4x4 SE(3) transform")
-    return pose.copy()
+
+def _normalized_weights(hypotheses) -> np.ndarray:
+    """Validate one hypothesis bank's weights before normalizing them."""
+    weights = np.asarray([h.weight for h in hypotheses], float)
+    with np.errstate(over="ignore", invalid="ignore"):
+        total = weights.sum()
+    if (
+        not len(weights)
+        or not np.isfinite(weights).all()
+        or (weights < 0).any()
+        or not np.isfinite(total)
+        or total <= 0
+    ):
+        raise ValueError("hypotheses need finite nonnegative weights with positive finite total")
+    return weights / total
 
 
 def _vector(value, name):
@@ -40,8 +50,7 @@ def _draw(rng, std, bounds, baseline, name):
         return rng.normal(baseline, std)
     if bounds is not None:
         bounds = np.asarray(bounds, float)
-        if (bounds.shape != (3, 2) or not np.isfinite(bounds).all()
-                or (bounds[:, 0] > bounds[:, 1]).any()):
+        if bounds.shape != (3, 2) or not np.isfinite(bounds).all() or (bounds[:, 0] > bounds[:, 1]).any():
             raise ValueError(f"{name} bounds must be three [lower, upper] pairs")
         return rng.uniform(bounds[:, 0], bounds[:, 1])
     return np.full(3, baseline, float)
@@ -56,6 +65,7 @@ class PoseUncertainty:
     object: R_i = R_est @ D, t_i = t_est + R_est @ dt.
     Thus world rotations never orbit the object around the world origin.
     """
+
     translation_std_xyz: object = None
     rotation_std_rpy: object = None
     translation_bounds_xyz: object = None
@@ -86,6 +96,7 @@ class GeometryUncertainty:
     Gaussian scales are centered at one; nonpositive draws raise an error.
     No recentering or change to the mesh coordinate frame is performed.
     """
+
     scale_bounds_xyz: object = None
     scale_std_xyz: object = None
     pivot: object = (0.0, 0.0, 0.0)
@@ -118,9 +129,16 @@ class ObjectHypothesis:
             raise ValueError("weight must be finite and nonnegative")
 
 
-def sample_hypotheses(nominal_mesh, nominal_object_pose, count, *,
-                      pose_uncertainty=None, geometry_uncertainty=None,
-                      seed=None, rng=None):
+def sample_hypotheses(
+    nominal_mesh,
+    nominal_object_pose,
+    count,
+    *,
+    pose_uncertainty=None,
+    geometry_uncertainty=None,
+    seed=None,
+    rng=None,
+):
     """Sample independent mesh/pose hypotheses with equal weights.
 
     Supply either an explicit Generator or a seed. Explicit hypotheses can have
@@ -137,6 +155,9 @@ def sample_hypotheses(nominal_mesh, nominal_object_pose, count, *,
     for i in range(count):
         pose = pose_spec.sample(nominal_object_pose, rng)
         mesh, metadata = geometry_spec.sample(nominal_mesh, rng)
-        hypotheses.append(ObjectHypothesis(mesh, pose, metadata={
-            **metadata, "sample_index": i, "pose_frame": pose_spec.frame}))
+        hypotheses.append(
+            ObjectHypothesis(
+                mesh, pose, metadata={**metadata, "sample_index": i, "pose_frame": pose_spec.frame}
+            )
+        )
     return hypotheses
