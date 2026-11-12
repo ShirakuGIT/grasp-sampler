@@ -1,0 +1,3 @@
+newmtl ycb_gelatin_box_metric_fp
+Kd 1 1 1
+map_Kd ycb_gelatin_box_metric_fp.png

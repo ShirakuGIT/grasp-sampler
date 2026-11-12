@@ -1,0 +1,3 @@
+newmtl black_filter_box_metric_fp
+Kd 1 1 1
+map_Kd black_filter_box_metric_fp.png

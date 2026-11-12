@@ -57,6 +57,85 @@ Grasps use the standard tool-center-point (TCP) convention:
 `tcp_to_ee` converts to the Franka Panda flange frame (closing on +Y, flange
 `0.105 m` behind the TCP). Pass a different `remap` / `standoff` for other grippers.
 
+## Robot planners and simulators
+
+Use `PlanningGrasps` for calibrated tool-link targets with aligned pregrasp,
+grasp, lift, jaw widths, candidate IDs, and optional robustness scores:
+
+```python
+from grasp_sampler import PlanningGrasps
+from grasp_sampler.integrations.pybullet import to_pybullet
+
+# object_pose must describe the processed mesh frame in world coordinates.
+# tcp_to_tool is the planner tool link expressed in our grasp TCP frame.
+targets = PlanningGrasps.from_grasps(
+    grasps, object_pose, frame_id="world", tool_link="my_tcp",
+    approach_distance=0.12, lift_offset=(0, 0, 0.15),
+)
+position, quaternion_xyzw = to_pybullet(targets, stage="pregrasp")[0]
+```
+
+Adapters support **cuRobo** (current `GoalToolPose` and legacy 0.7 `Pose`),
+**MoveIt 2**, **PyBullet / pybullet-planning**, **MuJoCo**, and **MPlib / SAPIEN**.
+Planner packages are imported only when their adapters are called. See the
+[planning guide](docs/planning.md) for frame/tool calibration, batch shapes,
+robust-command preservation, and runnable exports/examples.
+
+The default demo uses **MuJoCo and a Franka FR3v2** for constrained lateral and
+oblique grasps inside a two-tier cabinet. The default expanded scene includes a
+**Ritz box, mug, cup, plate, bowl, curved mustard bottle and blue vase**, using original
+scanned textures and packaging colors. Ritz, cup and vase transfer from the
+lower tier to the upper tier; the mug, plate and mustard bottle move to the table,
+and the bowl uses an oblique rim grasp for a tabletop transfer. A chamfered
+aluminum plate, counterbored bolt holes and recessed fasteners mount the arm.
+The mug handle, cup cavity and plate rim have separate convex contact pieces.
+`--suite household` retains the previous four-object scene.
+`--suite classic` retains the mustard/can/foam sequence. Cyan glyphs show
+candidates, coral marks rejections, and gold highlights the selection and staged
+extraction path. Selection costs and rejection reasons are saved in the JSON
+report; the viewer keeps the scene free of text panels and charts.
+
+![MuJoCo FR3v2 with original household scan textures](docs/results/mujoco-expanded.png)
+
+[Watch the recorded demonstration on YouTube](https://youtu.be/lQIbH18UIP4).
+
+For a separate **8 × 5 live gallery of all 40 object variants**, with original
+source colors, slow synchronized rotation and streaming grasp candidates:
+
+```bash
+PYTHONPATH=src mjpython examples/grasp_gallery.py  # macOS; use python on Linux
+```
+
+Bright contact points and approach arrows show the candidates. Use `+` / `−`
+to adjust density and `Space` to pause. See the [gallery guide](docs/visualization.md).
+
+```bash
+pip install -e ".[mujoco,fr3]"
+python tools/prepare_fr3_mujoco.py          # pinned models and source materials
+# macOS native viewer:
+mjpython examples/pick_place_mujoco.py --gui --hold --speed 2 --fps 60
+# Linux: python examples/pick_place_mujoco.py --gui --hold
+# Headless physical check:
+python examples/pick_place_mujoco.py --headless --report /tmp/shelf-picks.json
+# Original three-object scene:
+python examples/pick_place_mujoco.py --suite classic --headless
+```
+
+Viewer playback defaults to **2× speed**, with a **60 FPS refresh target**.
+`--speed 1` restores real-time playback; `--fps 120` requests more frequent refresh.
+These settings only affect presentation: the native 2 ms physics timestep stays
+unchanged. Frame rate depends on the machine and scene.
+
+The scene follows shelf-picking / open-cabinet retrieval setups from
+MotionBenchMaker and RoboCasa; see the [paper-based scene rationale](docs/scenarios.md).
+Free-space transfers use collision-checked RRT-Connect, including the held mesh;
+insertion and extraction use Cartesian stages. Execution uses native actuators
+and finger contact, with no object attachments or teleportation. Source material
+regions preserve the FR3v2's dark accents and
+markings. The separate PyBullet demo remains in `examples/pick_place_pybullet.py`.
+Household asset provenance and preparation are documented in
+[assets/household/README.md](assets/household/README.md).
+
 ## Robust evaluation under perceived object uncertainty
 
 See [the uncertainty guide](docs/uncertainty.md) and run:

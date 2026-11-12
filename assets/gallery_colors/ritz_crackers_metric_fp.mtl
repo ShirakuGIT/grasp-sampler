@@ -1,0 +1,3 @@
+newmtl ritz_crackers_metric_fp
+Kd 1 1 1
+map_Kd ritz_crackers_metric_fp.png

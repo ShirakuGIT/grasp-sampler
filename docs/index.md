@@ -22,12 +22,22 @@ It combines three classic generators behind one API:
 No simulator, no robot model, no GPU — just NumPy, trimesh, SciPy, and Open3D. An
 optional PyBullet module adds collision checking and a 3-D viewer.
 
+## Watch the robot demonstration
+
+Mesh-based grasp sampling and shelf pick-and-place with the Franka FR3v2 in MuJoCo.
+
+```{raw} html
+:file: _includes/demo-video.html
+```
+
 ```{toctree}
 :maxdepth: 2
 :caption: Contents
 
 installation
 usage
+planning
+scenarios
 uncertainty
 visualization
 configuration

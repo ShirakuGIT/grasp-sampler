@@ -1,0 +1,3 @@
+newmtl cleaner_canister_metric_fp
+Kd 1 1 1
+map_Kd cleaner_canister_metric_fp.png

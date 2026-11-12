@@ -8,6 +8,7 @@ when the mesh is watertight, and falls back to trimesh otherwise.
 """
 from __future__ import annotations
 
+import os
 import weakref
 
 import numpy as np
@@ -15,10 +16,12 @@ import trimesh
 
 from .types import GraspConfig
 
-try:  # exact BVH signed-distance queries, ~100x faster than trimesh
-    import open3d as _o3d
-except ImportError:  # pragma: no cover
-    _o3d = None
+_o3d = None
+if os.environ.get("GRASP_SAMPLER_DISABLE_OPEN3D") != "1":
+    try:  # exact BVH signed-distance queries, ~100x faster than trimesh
+        import open3d as _o3d
+    except ImportError:  # pragma: no cover
+        pass
 
 _SCENES: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
 

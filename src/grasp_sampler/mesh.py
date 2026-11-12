@@ -43,8 +43,9 @@ def load_mesh(path, *, upright_transform: np.ndarray | None = _R_X90,
                 else raw.dump(concatenate=True))
     else:
         mesh = raw
-    mesh = trimesh.Trimesh(vertices=np.asarray(mesh.vertices, float),
-                           faces=np.asarray(mesh.faces), process=False)
+    # Reconstructing from vertices/faces silently discards UVs, textures and
+    # vertex colors. Transform a copy so appearance follows the geometry.
+    mesh = mesh.copy()
     source_to_mesh = np.eye(4)
     if upright_transform is not None:
         mesh.apply_transform(upright_transform)
